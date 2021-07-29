@@ -1,0 +1,10 @@
+
+// Search these terms to find commented code that needs fixing. 
+// I like to handle trivial fixes this way. 
+// Just let them pile up and then start searching one day.
+
+@FIX
+@TODO
+@IMPORTANT
+@DELETE
+@CONTINUE

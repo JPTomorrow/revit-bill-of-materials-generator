@@ -1,0 +1,1322 @@
+<Window x:Class="JPMorrow.UI.Views.ParentView" x:Name="WindowBase"
+	xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+	xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+	xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+	xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+	xmlns:i="http://schemas.microsoft.com/expression/2010/interactivity"
+	xmlns:Sys="clr-namespace:System;assembly=mscorlib"
+	xmlns:local="clr-namespace:JPMorrow.UI.Views"
+	AllowsTransparency="True"
+	Height="auto" Width="auto"
+	MinWidth="600" MinHeight="650"
+	ResizeMode="CanResizeWithGrip"
+	WindowStyle="None" WindowStartupLocation="CenterScreen" Title="Bill of Materials Generator"
+	FontSize="14" FontFamily="Segoe UI Light" Background="Maroon" mc:Ignorable="d">
+  <!-- Variables -->
+  <Window.Resources>
+    <Style x:Key="DGrids" TargetType="{x:Type DataGrid}">
+      <Setter Property="SelectionMode" Value="Extended" />
+      <Setter Property="FontFamily" Value="Consolas" />
+      <Setter Property="FontSize" Value="14" />
+      <Setter Property="FontWeight" Value="900" />
+      <Setter Property="Width" Value="auto" />
+      <Setter Property="Height" Value="auto" />
+      <Setter Property="AutoGenerateColumns" Value="False" />
+      <Setter Property="AlternatingRowBackground" Value="Gainsboro" />
+      <Setter Property="BorderBrush" Value="Maroon" />
+      <Setter Property="BorderThickness" Value="1" />
+      <Setter Property="VirtualizingStackPanel.IsVirtualizing" Value="False" />
+    </Style>
+    <Style x:Key="DGSel" TargetType="DataGridRow">
+      <Setter Property="IsSelected" Value="{Binding IsSelected}"/>
+      <Style.Triggers>
+        <Trigger Property="IsSelected" Value="true">
+          <Setter Property="Foreground" Value="White"/>
+          <Setter Property="Background" Value="Maroon"/>
+        </Trigger>
+      </Style.Triggers>
+    </Style>
+
+    <Sys:String x:Key="Title">Bill of Materials Generator
+    </Sys:String>
+    <!-- Row titles -->
+    <Sys:String x:Key="Title_Bar">0
+    </Sys:String>
+    <Sys:String x:Key="Header_Text_Row">1
+    </Sys:String>
+    <Sys:String x:Key="List_Tabs">2
+    </Sys:String>
+    <Sys:String x:Key="Datagrid_Size">400*
+    </Sys:String>
+
+    <Style x:Key="ButtonHoverNav" TargetType="Button">
+      <Setter Property="Template">
+        <Setter.Value>
+          <ControlTemplate TargetType="{x:Type Button}">
+            <Border x:Name="bg" Background="{TemplateBinding Background}" Width="30" Height="30" BorderThickness="0">
+              <ContentPresenter HorizontalAlignment="{TemplateBinding HorizontalAlignment}"
+				VerticalAlignment="{TemplateBinding VerticalAlignment}"/>
+            </Border>
+            <ControlTemplate.Triggers>
+              <Trigger Property="IsMouseOver" Value="True">
+                <Setter Property="Background" Value="Gray" TargetName="bg"/>
+              </Trigger>
+            </ControlTemplate.Triggers>
+          </ControlTemplate>
+        </Setter.Value>
+      </Setter>
+    </Style>
+
+    <Style x:Key="MarathonRed" TargetType="Button">
+      <Setter Property="FontSize" Value="12"/>
+      <Setter Property="Template">
+        <Setter.Value>
+          <ControlTemplate TargetType="{x:Type Button}">
+            <Border x:Name="bg" Background="{TemplateBinding Background}" BorderThickness="1" BorderBrush="White" Width="auto" Height="auto">
+              <TextBlock x:Name="content" VerticalAlignment="center" TextAlignment="center" TextWrapping="Wrap">
+                <Run x:Name="text" Text="{TemplateBinding Content}"/>
+              </TextBlock>
+            </Border>
+            <ControlTemplate.Triggers>
+              <Trigger Property="IsMouseOver" Value="True">
+                <Setter Property="Background" Value="Red" TargetName="bg"/>
+              </Trigger>
+            </ControlTemplate.Triggers>
+          </ControlTemplate>
+        </Setter.Value>
+      </Setter>
+    </Style>
+
+    <Style x:Key="RunCells" TargetType="DataGridCell">
+      <Setter Property="FocusVisualStyle" Value="{x:Null}"/>
+      <Setter Property="Width" Value="auto"/>
+      <Setter Property="Template">
+        <Setter.Value>
+          <ControlTemplate TargetType="{x:Type DataGridCell}">
+            <Grid Background="{TemplateBinding Background}">
+              <ContentPresenter VerticalAlignment="Center"/>
+            </Grid>
+            <ControlTemplate.Triggers>
+              <MultiDataTrigger>
+                <MultiDataTrigger.Conditions>
+                  <Condition Binding="{Binding RelativeSource={RelativeSource Self}, Path=Column.Header}" Value="From"/>
+                  <Condition Binding="{Binding RelativeSource={RelativeSource Self}, Path=Content.Text}" Value="UNSET"/>
+                </MultiDataTrigger.Conditions>
+                <Setter Property="Background" Value="Red"/>
+                <Setter Property="Foreground" Value="White"/>
+              </MultiDataTrigger>
+              <MultiDataTrigger>
+                <MultiDataTrigger.Conditions>
+                  <Condition Binding="{Binding RelativeSource={RelativeSource Self}, Path=Column.Header}" Value="To"/>
+                  <Condition Binding="{Binding RelativeSource={RelativeSource Self}, Path=Content.Text}" Value="UNSET"/>
+                </MultiDataTrigger.Conditions>
+                <Setter Property="Background" Value="Red"/>
+                <Setter Property="Foreground" Value="White"/>
+              </MultiDataTrigger>
+              <MultiDataTrigger>
+                <MultiDataTrigger.Conditions>
+                  <Condition Binding="{Binding RelativeSource={RelativeSource Self}, Path=Column.Header}" Value="Total Bends"/>
+                  <Condition Binding="{Binding Under_Bends}" Value="false"/>
+                </MultiDataTrigger.Conditions>
+                <Setter Property="Background" Value="Orange"/>
+                <Setter Property="Foreground" Value="White"/>
+              </MultiDataTrigger>
+            </ControlTemplate.Triggers>
+          </ControlTemplate>
+        </Setter.Value>
+      </Setter>
+    </Style>
+
+    <Style TargetType="{x:Type Image}" x:Key="DropShadow">
+      <Setter Property="Effect">
+        <Setter.Value>
+          <DropShadowEffect BlurRadius="20" ShadowDepth="5" Opacity="100" Color="Black">
+	  </DropShadowEffect>
+        </Setter.Value>
+      </Setter>
+    </Style>
+
+    <Style TargetType="{x:Type ComboBox}" x:Key="EnableWireSizeComboBox">
+      <Setter Property="IsEnabled" Value="False"/>
+      <Style.Triggers>
+        <DataTrigger Binding="{Binding Sel_Wire_Generation_Type}" Value="1">
+          <Setter Property="IsEnabled" Value="True"/>
+        </DataTrigger>
+      </Style.Triggers>
+    </Style>
+
+    <Style TargetType="{x:Type ComboBox}" x:Key="EnableLoadComboBox">
+      <Setter Property="IsEnabled" Value="False"/>
+      <Style.Triggers>
+        <DataTrigger Binding="{Binding Sel_Wire_Generation_Type}" Value="0">
+          <Setter Property="IsEnabled" Value="True"/>
+        </DataTrigger>
+      </Style.Triggers>
+    </Style>
+
+    <Style TargetType="{x:Type TextBox}" x:Key="EnableWireSizeTextBox">
+      <Setter Property="IsEnabled" Value="False"/>
+      <Style.Triggers>
+        <DataTrigger Binding="{Binding Sel_Wire_Generation_Type}" Value="1">
+          <Setter Property="IsEnabled" Value="True"/>
+        </DataTrigger>
+      </Style.Triggers>
+    </Style>
+
+    <Style TargetType="{x:Type TextBox}" x:Key="EnableLoadTextBox">
+      <Setter Property="IsEnabled" Value="False"/>
+      <Style.Triggers>
+        <DataTrigger Binding="{Binding Sel_Wire_Generation_Type}" Value="0">
+          <Setter Property="IsEnabled" Value="True"/>
+        </DataTrigger>
+      </Style.Triggers>
+    </Style>
+
+    <Style TargetType="{x:Type TextBlock}" x:Key="EnableWireSizeTextBlock">
+      <Setter Property="Foreground" Value="Gray"/>
+      <Style.Triggers>
+        <DataTrigger Binding="{Binding Sel_Wire_Generation_Type}" Value="1">
+          <Setter Property="Foreground" Value="White"/>
+        </DataTrigger>
+      </Style.Triggers>
+    </Style>
+
+    <Style TargetType="{x:Type TextBlock}" x:Key="EnableLoadTextBlock">
+      <Setter Property="Foreground" Value="Gray"/>
+      <Style.Triggers>
+        <DataTrigger Binding="{Binding Sel_Wire_Generation_Type}" Value="0">
+          <Setter Property="Foreground" Value="White"/>
+        </DataTrigger>
+      </Style.Triggers>
+    </Style>
+
+  </Window.Resources>
+  <!-- Master Grid -->
+  <Grid>
+    <Grid.ColumnDefinitions>
+      <ColumnDefinition Width="20"/>
+      <ColumnDefinition Width="50*"/>
+      <ColumnDefinition Width="50*"/>
+      <ColumnDefinition Width="50*"/>
+      <ColumnDefinition Width="50*"/>
+      <ColumnDefinition Width="50*"/>
+      <ColumnDefinition Width="50*"/>
+      <ColumnDefinition Width="50*"/>
+      <ColumnDefinition Width="50*"/>
+      <ColumnDefinition Width="20"/>
+    </Grid.ColumnDefinitions>
+    <Grid.RowDefinitions>
+      <RowDefinition Height="65"/>
+      <RowDefinition Height="30"/>
+      <RowDefinition Height="500*"/>
+      <RowDefinition Height="30"/>
+      <RowDefinition Height="5"/>
+      <RowDefinition Height="40"/>
+      <RowDefinition Height="20"/>
+    </Grid.RowDefinitions>
+    <!-- Title Bar -->
+    <Border Opacity="1" Grid.Column="0" Grid.Row="{Binding Source={StaticResource Title_Bar}}" Grid.ColumnSpan="11"
+	    MouseLeftButtonDown="WindowDrag" Height="65" Background="Gainsboro" Margin="0,0,0,5">
+      <TextBlock Margin="20,0,0,0" FontSize="24" Text="{Binding Source={StaticResource Title}}" VerticalAlignment="center" Foreground="Gray"/>
+    </Border>
+    <Button Command="{Binding MasterCloseCmd}" CommandParameter="{Binding ElementName = WindowBase}" Style="{StaticResource ButtonHoverNav}"
+	    Background="Transparent" BorderThickness="0" Name="HelpButton" Grid.Column="8" Grid.Row="0" HorizontalAlignment="Right">
+      <Image Source="./res/exit.png" Stretch="fill" VerticalAlignment="center"/>
+    </Button>
+
+    <TextBlock Text="{Binding Header_Text}" FontSize="14" Foreground="White" Grid.Column="1" Grid.Row="{Binding Source={StaticResource Header_Text_Row}}" Grid.ColumnSpan="4" VerticalAlignment="center"/>
+    <Button Name="NewButton" Command="{Binding NewPackageCmd}" CommandParameter="{Binding ElementName = WindowBase}" Style="{StaticResource MarathonRed}" Content="New" Margin="2,2,0,2" Background="Transparent" Foreground="White" BorderThickness="1" Width="auto" Height="auto" Grid.Column="6" Grid.Row="{Binding Source={StaticResource Header_Text_Row}}"/>
+    <Button Name="LoadButton" Command="{Binding LoadPackageCmd}" CommandParameter="{Binding ElementName = WindowBase}" Style="{StaticResource MarathonRed}" Content="Load" Margin="2,2,0,2" Background="Transparent" Foreground="White" BorderThickness="1" Width="auto" Height="auto" Grid.Column="7" Grid.Row="{Binding Source={StaticResource Header_Text_Row}}"/>
+    <Button Name="SaveButton" Command="{Binding SavePackageCmd}" CommandParameter="{Binding ElementName = WindowBase}" Style="{StaticResource MarathonRed}" Content="Save" Margin="2,2,0,2" Background="Transparent" Foreground="White" BorderThickness="1" Width="auto" Height="auto" Grid.Column="8" Grid.Row="{Binding Source={StaticResource Header_Text_Row}}"/>
+    
+    <TextBox Text="{Binding Current_Action_String}" IsReadOnly="true" FontSize="16" FontWeight="700" Foreground="White" Background="Maroon" Margin="0,0,0,0" Padding="5,0,0,0" Height="30" Grid.Column="1" Grid.Row="3" Grid.ColumnSpan="8" Grid.RowSpan="1" VerticalAlignment="center"/>
+    <Button Name="ALButton" Command="{Binding FullActionLogCmd}" CommandParameter="{Binding ElementName = WindowBase}" Style="{StaticResource MarathonRed}" FontSize="16" Content="Log" Margin="0" Background="Transparent" Foreground="White" BorderThickness="1" Width="auto" Height="auto" Grid.Column="1" Grid.Row="5" Grid.RowSpan="1"/>
+
+    <Button Name="ResetProjectFileButton" Command="{Binding ResetProjectFileCmd}" CommandParameter="{Binding ElementName = WindowBase}" Style="{StaticResource MarathonRed}" FontSize="16" Content="Reset Project" Margin="0,2,0,0" Background="Transparent" Foreground="White" BorderThickness="1" Width="auto" Height="auto" Grid.Column="7" Grid.Row="5" Grid.RowSpan="1"/>
+    <Button Name="ExportButton" Command="{Binding ExportCmd}" CommandParameter="{Binding ElementName = WindowBase}" Style="{StaticResource MarathonRed}" FontSize="16" Content="Export" Margin="0,2,0,0" Background="Transparent" Foreground="White" BorderThickness="1" Width="auto" Height="auto" Grid.Column="8" Grid.Row="5" Grid.RowSpan="1"/>
+
+    <TabControl Name="List_Tabs" Grid.Column="1" Grid.Row="{Binding Source={StaticResource List_Tabs}}"
+		Grid.ColumnSpan="8" Margin="0,5,0,0" Background="Maroon" SelectedIndex="0">
+      <!-- View -->
+      <!--
+          <TabItem Header="View" IsEnabled="False">
+          <Grid>
+          <Grid.ColumnDefinitions>
+          <ColumnDefinition Width="*"/>
+          <ColumnDefinition Width="*"/>
+          <ColumnDefinition Width="*"/>
+          </Grid.ColumnDefinitions>
+          <Grid.RowDefinitions>
+          <RowDefinition Height="40"/>
+          <RowDefinition Height="40"/>
+          <RowDefinition Height="40"/>
+          <RowDefinition Height="40"/>
+          <RowDefinition Height="40"/>
+          <RowDefinition Height="40"/>
+          <RowDefinition Height="40"/>
+          </Grid.RowDefinitions>
+          <TextBlock Text="Floor Plan View Preparation" Margin="10,0,0,0" FontSize="18" TextDecorations="Underline" Foreground="White" Grid.Column="0" Grid.Row="0" Grid.ColumnSpan="7" VerticalAlignment="center"/>
+          <TextBlock Text="Use this menu to make a copy of the floor plan, and prepare it for generating an accurate Bill of Material: " Margin="10,0,0,0" FontSize="12" Foreground="White" Grid.Column="0" Grid.Row="1" Grid.ColumnSpan="7" VerticalAlignment="center"/>
+          <TextBlock Text="1. Open the floor plan that you want to use for a Bill of Material." Margin="10,0,0,0" FontSize="12" Foreground="White" Grid.Column="0" Grid.Row="2" Grid.ColumnSpan="7" VerticalAlignment="center" TextWrapping="Wrap"/>
+          <TextBlock Text="2. Click the &apos;Generate BOM View&apos; button below." Margin="10,0,0,0" FontSize="12" Foreground="White" Grid.Column="0" Grid.Row="3" Grid.ColumnSpan="7" VerticalAlignment="center" TextWrapping="Wrap"/>
+          <TextBlock Text="3. A new view will be generated in Revit with the same view name as the floorplan with &apos;BOM&apos; appended to the end of the view name. Check this view to make sure that the appropriate worksets have been enabled." Margin="10,0,0,0" FontSize="12" Foreground="White" Grid.Column="0" Grid.Row="4" Grid.ColumnSpan="7" VerticalAlignment="center" TextWrapping="Wrap"/>
+          <Button Name="PrepViewButton" Command="{Binding PrepViewCmd}" CommandParameter="{Binding ElementName = WindowBase}" Style="{StaticResource MarathonRed}" Content="Generate BOM View" Margin="2" Background="Transparent" Foreground="White" BorderThickness="1" Width="auto" Height="auto" Grid.Column="2" Grid.Row="6"/>
+          </Grid>
+          </TabItem>
+      -->
+      <TabItem Header="Runs">
+        <Grid>
+          <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="*"/>
+            <ColumnDefinition Width="*"/>
+            <ColumnDefinition Width="*"/>
+            <ColumnDefinition Width="*"/>
+            <ColumnDefinition Width="*"/>
+	          <ColumnDefinition Width="*"/>
+            <ColumnDefinition Width="*"/>
+          </Grid.ColumnDefinitions>
+          <Grid.RowDefinitions>
+            <RowDefinition Height="40"/>
+            <RowDefinition Height="{Binding Source={StaticResource Datagrid_Size}}" />
+            <RowDefinition Height="40"/>
+            <RowDefinition Height="auto"/>
+            <RowDefinition Height="20"/> <!-- padding -->
+          </Grid.RowDefinitions>
+
+          <Button Name="SelectAllRunsButton" Command="{Binding SelectAllRunsCmd}" CommandParameter="{Binding ElementName = WindowBase}" Style="{StaticResource MarathonRed}" Content="Select All" Margin="2" Background="Transparent" Foreground="White" BorderThickness="1" Width="auto" Height="auto" Grid.Column="6" Grid.Row="0" Grid.ColumnSpan="1"/>
+          <DataGrid Name="ConduitRunBox" ItemsSource="{Binding Run_Items}" Style="{StaticResource DGrids}" RowStyle="{StaticResource DGSel}" Grid.Column="0" Grid.Row="1" Grid.ColumnSpan="8">
+
+            <i:Interaction.Triggers>
+              <i:EventTrigger EventName="SelectionChanged">
+                <i:InvokeCommandAction Command="{Binding RunSelectionChangedCmd}" CommandParameter="{Binding ElementName = WindowBase}"/>
+              </i:EventTrigger>
+            </i:Interaction.Triggers>
+
+            <DataGrid.Columns>
+            <DataGridTextColumn IsReadOnly="True" Width="*" CellStyle="{StaticResource RunCells}" Header="Has Wire" Binding="{Binding Path=Has_Wire}"/>
+              <DataGridTextColumn IsReadOnly="True" Width="*" CellStyle="{StaticResource RunCells}" Header="From" Binding="{Binding Path=From}"/>
+              <DataGridTextColumn IsReadOnly="false" Width="*" CellStyle="{StaticResource RunCells}" Header="To" Binding="{Binding Path=To, Mode=TwoWay}"/>
+              <DataGridTextColumn IsReadOnly="True" Width="*" CellStyle="{StaticResource RunCells}" Header="Length" Binding="{Binding Path=Length}"/>
+              <DataGridTextColumn IsReadOnly="True" Width="*" CellStyle="{StaticResource RunCells}" Header="Diameter" Binding="{Binding Path=Diameter}"/>
+              <DataGridTextColumn IsReadOnly="True" Width="*" CellStyle="{StaticResource RunCells}" Header="Reported Wires" Binding="{Binding Path=Reported_Wires}"/>
+              <DataGridTextColumn IsReadOnly="True" Width="*" CellStyle="{StaticResource RunCells}" Header="Type" Binding="{Binding Path=Conduit_Type}"/>
+            </DataGrid.Columns>
+          </DataGrid>
+
+          <TextBlock Text="Conduit Modifications &amp; Information" Margin="10,0,0,0" FontSize="18" Foreground="White" Grid.Column="0" Grid.Row="2" Grid.ColumnSpan="2" VerticalAlignment="center" TextDecorations="Underline"/>
+          
+          <TabControl Name="Revit_Conduit_Modification_Tabs" Grid.Column="0" Grid.Row="3"
+		                  Grid.ColumnSpan="3" Margin="10" Background="Maroon" SelectedIndex="0">
+            <TabItem Header="Material Type">
+              <Grid>
+                  <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="*"/>
+                    <ColumnDefinition Width="*"/>
+                  </Grid.ColumnDefinitions>
+                  <Grid.RowDefinitions>
+                    <RowDefinition Height="40"/>
+                    <RowDefinition Height="40"/>
+                    <RowDefinition Height="40"/>
+                  </Grid.RowDefinitions>
+                  
+                  <ComboBox SelectedIndex="{Binding Path=Sel_Conduit_Material, Mode=TwoWay}" ItemsSource="{Binding Conduit_Material_Items}" Margin="10,5,5,5" Grid.Column="0" Grid.Row="0"/>
+                  <ComboBox SelectedIndex="{Binding Path=Sel_Export_Type, Mode=TwoWay}" ItemsSource="{Binding Export_Type_Items}" Margin="10,5,5,5" Grid.Column="0" Grid.Row="1"/>
+                  <Button Name="ChangeMaterialTypeButton" Command="{Binding ChangeConduitMaterialTypeCmd}" CommandParameter="{Binding ElementName = WindowBase}" Style="{StaticResource MarathonRed}" Content="Change Material Type" Margin="10,2,2,2" Background="Transparent" Foreground="White" BorderThickness="1" Width="auto" Height="auto" Grid.Column="1" Grid.Row="0"/>
+                  <Button Name="MarkNoWireExportButton" Command="{Binding MarkConduitNoWireExportCmd}" CommandParameter="{Binding ElementName = WindowBase}" Style="{StaticResource MarathonRed}" Content="Mark Conduit For No Wire Export" Margin="10,2,2,2" Background="Transparent" Foreground="White" BorderThickness="1" Width="auto" Height="auto" Grid.Column="1" Grid.Row="1" Grid.ColumnSpan="1"/>
+                  <Button Name="CombineLikeRunsButton" Command="{Binding CombineLikeRunsCmd}" CommandParameter="{Binding ElementName = WindowBase}" Style="{StaticResource MarathonRed}" Content="Combine Like Runs" Margin="10,2,2,2" Background="Transparent" Foreground="White" BorderThickness="1" Width="auto" Height="auto" Grid.Column="1" Grid.Row="2" Grid.ColumnSpan="1"/>
+                  <Button Name="FixToFromButton" Command="{Binding FixToFromCmd}" CommandParameter="{Binding ElementName = WindowBase}" Style="{StaticResource MarathonRed}" Content="Fix Selected To/From" Margin="10,2,2,2" Background="Transparent" Foreground="White" BorderThickness="1" Width="auto" Height="auto" Grid.Column="0" Grid.Row="2" Grid.ColumnSpan="1"/>
+              </Grid>
+            </TabItem>
+            <TabItem Header="Information">
+              <Grid>
+                  <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="*"/>
+                    <ColumnDefinition Width="*"/>
+                  </Grid.ColumnDefinitions>
+                  <Grid.RowDefinitions>
+                    <RowDefinition Height="40"/>
+                    <RowDefinition Height="40"/>
+                    <RowDefinition Height="40"/>
+                  </Grid.RowDefinitions>
+                  <Button Name="GetLoadButton" Command="{Binding GetConduitLoadCmd}" CommandParameter="{Binding ElementName = WindowBase}" Style="{StaticResource MarathonRed}" Content="Get Selected Weights" Margin="2" Background="Transparent" Foreground="White" BorderThickness="1" Width="auto" Height="auto" Grid.Column="0" Grid.Row="0"/>
+                  <Button Name="GetStrutLengthFromSelectedButton" Command="{Binding GetStrutLengthFromSelectedCmd}" CommandParameter="{Binding ElementName = WindowBase}" Style="{StaticResource MarathonRed}" Content="Strut Length From Selected" Margin="2" Background="Transparent" Foreground="White" BorderThickness="1" Width="auto" Height="auto" Grid.Column="1" Grid.Row="0"/>
+                  <TextBox Text="{Binding Path=Load_Length_Txt, Mode=TwoWay}" VerticalContentAlignment="Center" Margin="2" Grid.Column="0" Grid.Row="1" Grid.ColumnSpan="2"/>
+              </Grid>
+            </TabItem>
+          </TabControl>
+
+          <TextBlock Text="Add / Remove Conduit" Margin="10,0,0,0" FontSize="18" Foreground="White" Grid.Column="4" Grid.Row="2" Grid.ColumnSpan="2" VerticalAlignment="center" TextDecorations="Underline"/>
+          <TabControl Name="Revit_Conduit_Tabs" Grid.Column="4" Grid.Row="3"
+		                  Grid.ColumnSpan="4" Margin="10" Background="Maroon" SelectedIndex="0">
+                      
+              <TabItem Header="By View">
+                <Grid>
+                  <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="*"/>
+                    <ColumnDefinition Width="*"/>
+                  </Grid.ColumnDefinitions>
+                  <Grid.RowDefinitions>
+                    <RowDefinition Height="40"/>
+                    <RowDefinition Height="40"/>
+                    <RowDefinition Height="40"/>
+                  </Grid.RowDefinitions>
+
+                  <Button Name="AddSingleRunButton" Command="{Binding AddSingleRunCmd}" CommandParameter="{Binding ElementName = WindowBase}" Style="{StaticResource MarathonRed}" Content="Add Single Run" Margin="2" Background="Transparent" Foreground="White" BorderThickness="1" Width="auto" Height="auto" Grid.Column="0" Grid.Row="0"/>
+                  <Button Name="AddAllRunsButton" Command="{Binding AddAllRunsCmd}" CommandParameter="{Binding ElementName = WindowBase}" Style="{StaticResource MarathonRed}" Content="Add All Runs" Margin="2" Background="Transparent" Foreground="White" BorderThickness="1" Width="auto" Height="auto" Grid.Column="0" Grid.Row="1"/>
+                  <Button Name="RemoveRunsButton" Command="{Binding RemoveSelectedRunsCmd}" CommandParameter="{Binding ElementName = WindowBase}" Style="{StaticResource MarathonRed}" Content="Remove Selected Runs" Margin="2" Background="Transparent" Foreground="White" BorderThickness="1" Width="auto" Height="auto" Grid.Column="1" Grid.Row="0"/>
+	                <Button Name="ClearRunsButton" Command="{Binding ClearRunsCmd}" CommandParameter="{Binding ElementName = WindowBase}" Style="{StaticResource MarathonRed}" Content="Clear All Runs" Margin="2" Background="Transparent" Foreground="White" BorderThickness="1" Width="auto" Height="auto" Grid.Column="1" Grid.Row="1"/>
+                  <Button Name="UpdateRunsButton" Command="{Binding UpdateRunsCmd}" CommandParameter="{Binding ElementName = WindowBase}" Style="{StaticResource MarathonRed}" Content="Update All Runs" Margin="2" Background="Transparent" Foreground="White" BorderThickness="1" Width="auto" Height="auto" Grid.Column="0" Grid.Row="2" Grid.ColumnSpan="2"/>
+                </Grid>
+              </TabItem>
+
+              <TabItem Header="By Workset / Level" IsEnabled="False">
+                <Grid>
+                  <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="*"/>
+                    <ColumnDefinition Width="*"/>
+                  </Grid.ColumnDefinitions>
+                  <Grid.RowDefinitions>
+                    <RowDefinition Height="40"/>
+                    <RowDefinition Height="40"/>
+                  </Grid.RowDefinitions>
+
+                  <Button Name="AddAllRunsByWorksetAndLevelButton" Command="{Binding AddAllRunsByWorksetAndLevelCmd}" CommandParameter="{Binding ElementName = WindowBase}" Style="{StaticResource MarathonRed}" Content="Add Runs" Margin="2" Background="Transparent" Foreground="White" BorderThickness="1" Width="auto" Height="auto" Grid.Column="0" Grid.Row="0"/>
+                </Grid>
+              </TabItem>
+          </TabControl>
+        </Grid>
+      </TabItem>
+      <!-- P3 -->
+      <TabItem Header="P3 Lighting">
+        <Grid>
+          <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="*"/>
+            <ColumnDefinition Width="*"/>
+            <ColumnDefinition Width="*"/>
+          </Grid.ColumnDefinitions>
+          <Grid.RowDefinitions>
+            <RowDefinition Height="40*"/>
+            <RowDefinition Height="{Binding Source={StaticResource Datagrid_Size}}"/>
+            <RowDefinition Height="40*"/>
+            <RowDefinition Height="40*"/>
+          </Grid.RowDefinitions>
+
+          <TextBlock Text="P3 Lighting Fixtures:" Margin="10,0,0,0" FontSize="18" TextDecorations="Underline" Foreground="White" Grid.Column="0" Grid.Row="0" Grid.ColumnSpan="3" VerticalAlignment="center"/>
+
+          <DataGrid Name="P3LightingBox" ItemsSource="{Binding P3_Lighting_Fixture_Items}" Style="{StaticResource DGrids}" RowStyle="{StaticResource DGSel}" Grid.Column="0" Grid.Row="1" Grid.ColumnSpan="3">
+
+            <i:Interaction.Triggers>
+              <i:EventTrigger EventName="SelectionChanged">
+                <i:InvokeCommandAction Command="{Binding P3LightingFixtureSelChangedCmd}" CommandParameter="{Binding ElementName = WindowBase}"/>
+              </i:EventTrigger>
+            </i:Interaction.Triggers>
+
+            <DataGrid.Columns>
+              <DataGridTextColumn IsReadOnly="True" CellStyle="{StaticResource RunCells}" Header="Entry Name" Binding="{Binding Path=Entry_Name}"/>
+              <DataGridTextColumn IsReadOnly="True" CellStyle="{StaticResource RunCells}" Header="Voltage" Binding="{Binding Path=Box_Voltage}"/>
+              <DataGridTextColumn IsReadOnly="True" CellStyle="{StaticResource RunCells}" Header="Box Config" Binding="{Binding Path=Box_Config}"/>
+              <DataGridTextColumn IsReadOnly="True" CellStyle="{StaticResource RunCells}" Header="Conduit Cnt" Binding="{Binding Path=Connected_Conduit_Count}"/>
+              <DataGridTextColumn IsReadOnly="True" CellStyle="{StaticResource RunCells}" Header="Unplaced Whips" Binding="{Binding Path=Unplaced_Whips}"/>
+            </DataGrid.Columns>
+          </DataGrid>
+
+          <Button Name="DebugSelectedP3LightingFixtureButton" Command="{Binding DebugSelectedP3LightingFixtureCmd}" CommandParameter="{Binding ElementName = WindowBase}" Style="{StaticResource MarathonRed}" Content="Debug Selected Fixture" Margin="2,2,0,2" Background="Transparent" Foreground="White" BorderThickness="1" Width="auto" Height="auto" Grid.Column="0" Grid.Row="2"/>
+          <Button Name="AddP3LightingFixturesInViewButton" Command="{Binding AddP3FixturesInViewCmd}" CommandParameter="{Binding ElementName = WindowBase}" Style="{StaticResource MarathonRed}" Content="Add Fixtures In View" Margin="2,2,0,2" Background="Transparent" Foreground="White" BorderThickness="1" Width="auto" Height="auto" Grid.Column="1" Grid.Row="2"/>
+          <Button Name="SelectP3LightingNetworkButton" Command="{Binding SelectP3LightingNetworkCmd}" CommandParameter="{Binding ElementName = WindowBase}" Style="{StaticResource MarathonRed}" Content="Select Network" Margin="2,2,0,2" Background="Transparent" Foreground="White" BorderThickness="1" Width="auto" Height="auto" Grid.Column="2" Grid.Row="2"/>
+        </Grid>
+      </TabItem>
+
+      <TabItem Header="P3 In Wall" IsEnabled="false">
+        <Grid>
+          <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="*"/>
+            <ColumnDefinition Width="*"/>
+            <ColumnDefinition Width="*"/>
+          </Grid.ColumnDefinitions>
+          <Grid.RowDefinitions>
+            <RowDefinition Height="40*"/>
+            <RowDefinition Height="{Binding Source={StaticResource Datagrid_Size}}"/>
+            <RowDefinition Height="40*"/>
+            <RowDefinition Height="40*"/>
+          </Grid.RowDefinitions>
+
+          <TextBlock Text="P3 In Wall Devices:" Margin="10,0,0,0" FontSize="18" TextDecorations="Underline" Foreground="White" Grid.Column="0" Grid.Row="0" Grid.ColumnSpan="3" VerticalAlignment="center"/>
+
+          <DataGrid Name="P3Box" ItemsSource="{Binding P3_Items}" Style="{StaticResource DGrids}" RowStyle="{StaticResource DGSel}" Grid.Column="0" Grid.Row="1" Grid.ColumnSpan="3">
+
+            <i:Interaction.Triggers>
+              <i:EventTrigger EventName="SelectionChanged">
+                <i:InvokeCommandAction Command="{Binding FixtureSelChangedCmd}" CommandParameter="{Binding ElementName = WindowBase}"/>
+              </i:EventTrigger>
+            </i:Interaction.Triggers>
+
+            <DataGrid.Columns>
+              <DataGridTextColumn IsReadOnly="True" CellStyle="{StaticResource RunCells}" Header="Entry Name" Binding="{Binding Path=Entry_Name}"/>
+              <DataGridTextColumn IsReadOnly="True" CellStyle="{StaticResource RunCells}" Header="Voltage" Binding="{Binding Path=Box_Voltage}"/>
+              <DataGridTextColumn IsReadOnly="True" CellStyle="{StaticResource RunCells}" Header="Box Config" Binding="{Binding Path=Box_Config}"/>
+              <DataGridTextColumn IsReadOnly="True" CellStyle="{StaticResource RunCells}" Header="Conduit Cnt" Binding="{Binding Path=Connected_Conduit_Count}"/>
+              <DataGridTextColumn IsReadOnly="True" CellStyle="{StaticResource RunCells}" Header="Unplaced Whips" Binding="{Binding Path=Unplaced_Whips}"/>
+            </DataGrid.Columns>
+          </DataGrid>
+
+          <Button Name="SelectNetworkButton" Command="{Binding SelectNetworkCmd}" CommandParameter="{Binding ElementName = WindowBase}" Style="{StaticResource MarathonRed}" Content="Select Network" Margin="2,2,0,2" Background="Transparent" Foreground="White" BorderThickness="1" Width="auto" Height="auto" Grid.Column="2" Grid.Row="2"/>
+        </Grid>
+      </TabItem>
+      <!-- Wire -->
+      <TabItem Header="Wire">
+        <Grid>
+          <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="*"/>
+            <ColumnDefinition Width="*"/>
+            <ColumnDefinition Width="*"/>
+            <ColumnDefinition Width="20"/>
+            <ColumnDefinition Width="*"/>
+            <ColumnDefinition Width="*"/>
+            <ColumnDefinition Width="*"/>
+          </Grid.ColumnDefinitions>
+          <Grid.RowDefinitions>
+            <RowDefinition Height="30*"/>
+            <RowDefinition Height="{Binding Source={StaticResource Datagrid_Size}}"/>
+            <RowDefinition Height="auto"/>
+          </Grid.RowDefinitions>
+          
+          <TextBlock Text="Selected Runs:" Margin="10,0,0,0" FontSize="18" TextDecorations="Underline" Foreground="White" Grid.Column="0" Grid.Row="0" Grid.ColumnSpan="3" VerticalAlignment="center"/>
+          <DataGrid Name="WireSelectedRunsBox" Style="{StaticResource DGrids}" RowStyle="{StaticResource DGSel}" ItemsSource="{Binding Selected_Run_Items}" Grid.Column="0" Grid.Row="1" Grid.ColumnSpan="3">
+            <DataGrid.Columns>
+              <DataGridTextColumn CellStyle="{StaticResource RunCells}" IsReadOnly="True" Header="Has Wire" Binding="{Binding Path=Has_Wire}"/>
+              <DataGridTextColumn CellStyle="{StaticResource RunCells}" IsReadOnly="True" Header="From" Binding="{Binding Path=From}"/>
+              <DataGridTextColumn CellStyle="{StaticResource RunCells}" IsReadOnly="True" Header="To" Binding="{Binding Path=To}"/>
+              <DataGridTextColumn CellStyle="{StaticResource RunCells}" IsReadOnly="True" Header="Length" Binding="{Binding Path=Length}"/>
+              <DataGridTextColumn CellStyle="{StaticResource RunCells}" IsReadOnly="True" Header="Diameter" Binding="{Binding Path=Diameter}"/>
+              <DataGridTextColumn CellStyle="{StaticResource RunCells}" IsReadOnly="True" Header="Reported Wires" Binding="{Binding Path=Reported_Wires}"/>
+              <DataGridTextColumn CellStyle="{StaticResource RunCells}" IsReadOnly="True" Header="Type" Binding="{Binding Path=Conduit_Type}"/>
+            </DataGrid.Columns>
+          </DataGrid>
+          <TextBlock Text="Wire:" Margin="10,0,0,0" FontSize="18" TextDecorations="Underline" Foreground="White" Grid.Column="4" Grid.Row="0" Grid.ColumnSpan="3" VerticalAlignment="center"/>
+          <DataGrid Name="WireBox" ItemsSource="{Binding Wire_Items}" Style="{StaticResource DGrids}" RowStyle="{StaticResource DGSel}" Grid.Column="4" Grid.Row="1" Grid.ColumnSpan="3">
+            <DataGrid.Columns>
+              <DataGridTextColumn IsReadOnly="True" CellStyle="{StaticResource RunCells}" Header="Circuit Number" Binding="{Binding Path=C_Num}"/>
+              <DataGridTextColumn IsReadOnly="True" CellStyle="{StaticResource RunCells}" Header="Color" Binding="{Binding Path=Color}"/>
+              <DataGridTextColumn IsReadOnly="True" CellStyle="{StaticResource RunCells}" Header="Size" Binding="{Binding Path=Size}"/>
+              <DataGridTextColumn IsReadOnly="True" CellStyle="{StaticResource RunCells}" Header="Run Type" Binding="{Binding Path=Type}"/>
+              <DataGridTextColumn IsReadOnly="True" CellStyle="{StaticResource RunCells}" Header="Material Type" Binding="{Binding Path=Mat_Type}"/>
+            </DataGrid.Columns>
+          </DataGrid>
+
+          <TabControl Name="Wire_Tabs" Grid.Column="0" Grid.Row="2" Grid.ColumnSpan="7" Margin="0,5,0,0" Background="Maroon" SelectedIndex="0">
+
+            <TabItem Header="Branch By Circuit Amp/Voltage">
+
+              <Grid>
+                <Grid.ColumnDefinitions>
+                  <ColumnDefinition Width="*"/>
+                  <ColumnDefinition Width="*"/>
+                  <ColumnDefinition Width="*"/>
+                  <ColumnDefinition Width="*"/>
+                  <ColumnDefinition Width="*"/>
+                  <ColumnDefinition Width="*"/>
+                </Grid.ColumnDefinitions>
+                <Grid.RowDefinitions>
+                  <RowDefinition Height="40"/>
+                  <RowDefinition Height="40"/>
+                  <RowDefinition Height="40"/>
+                  <RowDefinition Height="40"/>
+                  <RowDefinition Height="40"/>
+                  <RowDefinition Height="40"/>
+                  <RowDefinition Height="40"/>
+                </Grid.RowDefinitions>
+
+                <TextBlock Text="Panel Voltage:" Margin="10,0,0,0" FontSize="14" Foreground="White" Grid.Column="0" Grid.Row="0" VerticalAlignment="center" />
+                <TextBlock Text="Breaker Size:" Margin="10,0,0,0" FontSize="14" Foreground="White" Grid.Column="0" Grid.Row="1" VerticalAlignment="center" Grid.ColumnSpan="2"/>
+                <TextBlock Text="Wire Material Type:" Margin="10,0,0,0" FontSize="14" Foreground="White" Grid.Column="0" Grid.Row="2" VerticalAlignment="center" />
+                <TextBlock Text="Panel Phase:" Margin="10,0,0,0" FontSize="14" Foreground="White" Grid.Column="0" Grid.Row="3" VerticalAlignment="center" />
+
+                <ComboBox SelectedIndex="{Binding Path=Sel_Panel_Voltage, Mode=TwoWay}" ItemsSource="{Binding Panel_Voltage_Items}" Margin="5,5,5,5" Grid.Column="4" Grid.Row="0" Grid.ColumnSpan="2"/>
+                <TextBox Text="{Binding Path=Breaker_Size_Txt, Mode=TwoWay}" VerticalContentAlignment="Center" Margin="5,5,5,5" Grid.Column="4" Grid.Row="1" Grid.ColumnSpan="2"/>
+                <ComboBox SelectedIndex="{Binding Path=Sel_Branch_Wire_Material, Mode=TwoWay}" ItemsSource="{Binding Branch_Wire_Material_Items}" Margin="5,5,5,5" Grid.Column="4" Grid.Row="2" Grid.ColumnSpan="2" />
+                <ComboBox SelectedIndex="{Binding Path=Sel_Branch_Panel_Phase, Mode=TwoWay}" ItemsSource="{Binding Branch_Panel_Phase_Items}" Margin="5,5,5,5" Grid.Column="4" Grid.Row="3" Grid.ColumnSpan="2" />
+
+                <CheckBox Name="PNBox" Margin="10,0,0,0" Foreground="White" IsChecked="{Binding Phase_Nuet_Checked}" Content="Nuetral Per Phase" Grid.Column="0" Grid.Row="4" Grid.ColumnSpan="3" VerticalAlignment="center"/>
+                <CheckBox Name="IGBox" Margin="10,0,0,0" Foreground="White" IsChecked="{Binding IG_Checked}" Content="Isolated Ground" Grid.Column="0" Grid.Row="5" Grid.ColumnSpan="3" VerticalAlignment="center"/>
+
+                <Button Name="AddBranchWireButton" Command="{Binding AddBranchWireCmd}" CommandParameter="{Binding ElementName = WindowBase}" Style="{StaticResource MarathonRed}" Content="Add Branch Wire" Margin="2,2,0,2" Background="Transparent" Foreground="White" BorderThickness="1" Width="auto" Height="auto" Grid.Column="6" Grid.Row="6"/>
+              </Grid>
+            </TabItem>
+<!--     
+            <TabItem Header="Branch By Panel Load">
+              <Grid>
+                <Grid.ColumnDefinitions>
+                  <ColumnDefinition Width="*"/>
+                  <ColumnDefinition Width="*"/>
+                  <ColumnDefinition Width="*"/>
+                  <ColumnDefinition Width="20"/>
+                  <ColumnDefinition Width="*"/>
+                  <ColumnDefinition Width="*"/>
+                  <ColumnDefinition Width="*"/>
+                </Grid.ColumnDefinitions>
+                <Grid.RowDefinitions>
+                  <RowDefinition Height="40"/>
+                  <RowDefinition Height="40"/>
+                  <RowDefinition Height="40"/>
+                  <RowDefinition Height="40"/>
+                  <RowDefinition Height="40"/>
+                  <RowDefinition Height="40"/>
+                  <RowDefinition Height="40"/>
+                  <RowDefinition Height="40"/>
+                  <RowDefinition Height="40"/>
+                </Grid.RowDefinitions>
+                
+                   by load
+                  <TextBlock Text="By Load (Includes Voltage Drop):" Margin="10,0,0,0" FontSize="18" TextDecorations="Underline" Grid.Column="0" Grid.Row="3" Grid.ColumnSpan="3" VerticalAlignment="center" Style="{ StaticResource EnableLoadTextBlock }"/>
+                  <TextBlock Text="Panel Phase:" Margin="10,0,0,0" FontSize="14" Grid.Column="0" Grid.Row="4" VerticalAlignment="center" Style="{ StaticResource EnableLoadTextBlock }" Grid.ColumnSpan="2"/>
+                  <TextBlock Text="Load (VAmps):" Margin="10,0,0,0" FontSize="14" Grid.Column="0" Grid.Row="5" VerticalAlignment="center" Style="{ StaticResource EnableLoadTextBlock }" Grid.ColumnSpan="2"/>
+                  <TextBlock Text="Panel Voltage:" Margin="10,0,0,0" FontSize="14" Grid.Column="0" Grid.Row="6" VerticalAlignment="center" Style="{ StaticResource EnableLoadTextBlock }" Grid.ColumnSpan="2"/>
+                  <TextBlock Text="Copper or Aluminum Wire:" Margin="10,0,0,0" FontSize="14" Grid.Column="0" Grid.Row="7" VerticalAlignment="center" Style="{ StaticResource EnableLoadTextBlock }" Grid.ColumnSpan="2"/>
+                  <TextBlock Text="Wire Size Voltage Drop Cutoff:" Margin="10,0,0,0" FontSize="14" Grid.Column="0" Grid.Row="8" VerticalAlignment="center" Style="{ StaticResource EnableLoadTextBlock }" Grid.ColumnSpan="2"/>
+
+
+                  <ComboBox SelectedIndex="{Binding Path=Sel_Phase, Mode=TwoWay}" ItemsSource="{Binding Panel_Phase_Items}" Margin="5,5,5,5" Grid.Column="2" Grid.Row="4" Style="{StaticResource EnableLoadComboBox }"/>
+                  <TextBox Text="{Binding Path=VAmps_Txt, Mode=TwoWay}" VerticalContentAlignment="Center" Margin="5,5,5,5" Grid.Column="2" Grid.Row="5" Grid.ColumnSpan="1" Style="{ StaticResource EnableLoadTextBox }"/>
+                  <ComboBox SelectedIndex="{Binding Path=Sel_Load_Panel_Voltage, Mode=TwoWay}" ItemsSource="{Binding Load_Panel_Voltage_Items}" Margin="5,5,5,5" Grid.Column="2" Grid.Row="6" Style="{ StaticResource EnableLoadComboBox }"/>
+                  <ComboBox SelectedIndex="{Binding Path=Sel_Copper_Alum, Mode=TwoWay}" ItemsSource="{Binding Copper_Alum_Items}" Margin="5,5,5,5" Grid.Column="2" Grid.Row="7" Style="{ StaticResource EnableLoadComboBox }"/>
+                  <ComboBox SelectedIndex="{Binding Path=Sel_VD_Cutoff, Mode=TwoWay}" ItemsSource="{Binding VD_Cutoff_Items}" Margin="5,5,5,5" Grid.Column="2" Grid.Row="8" Style="{ StaticResource EnableLoadComboBox }"/>
+                      </Grid> 
+            </TabItem> -->
+
+            <TabItem Header="Distribution">
+              <Grid>
+                <Grid.ColumnDefinitions>
+                  <ColumnDefinition Width="*"/>
+                  <ColumnDefinition Width="*"/>
+                  <ColumnDefinition Width="*"/>
+                  <ColumnDefinition Width="*"/>
+                  <ColumnDefinition Width="*"/>
+                  <ColumnDefinition Width="*"/>
+                </Grid.ColumnDefinitions>
+                <Grid.RowDefinitions>
+                  <RowDefinition Height="40"/>
+                  <RowDefinition Height="40"/>
+                  <RowDefinition Height="40"/>
+                  <RowDefinition Height="40"/>
+                  <RowDefinition Height="40"/>
+                </Grid.RowDefinitions>
+                
+                <TextBlock Text="Distribution Wire Size:" Margin="10,0,0,0" FontSize="14" Foreground="White" Grid.Column="0" Grid.Row="0" VerticalAlignment="center" />
+                <TextBlock Text="Distribution Wire Color:" Margin="10,0,0,0" FontSize="14" Foreground="White" Grid.Column="0" Grid.Row="1" VerticalAlignment="center" />
+                <TextBlock Text="Wire Material Type:" Margin="10,0,0,0" FontSize="14" Foreground="White" Grid.Column="0" Grid.Row="2" VerticalAlignment="center" />
+
+                
+                <ComboBox SelectedIndex="{Binding Path=Sel_Dist_Wire_Size, Mode=TwoWay}" ItemsSource="{Binding Dist_Wire_Size_Items}" Margin="5,5,5,5" Grid.Column="4" Grid.Row="0" Grid.ColumnSpan="2" />
+                <ComboBox SelectedIndex="{Binding Path=Sel_Dist_Wire_Color, Mode=TwoWay}" ItemsSource="{Binding Dist_Wire_Color_Items}" Margin="5,5,5,5" Grid.Column="4" Grid.Row="1" Grid.ColumnSpan="2" />
+                <ComboBox SelectedIndex="{Binding Path=Sel_Dist_Wire_Material, Mode=TwoWay}" ItemsSource="{Binding Dist_Wire_Material_Items}" Margin="5,5,5,5" Grid.Column="4" Grid.Row="2" Grid.ColumnSpan="2" />
+
+                <CheckBox Name="TreatDistAsBranch" Margin="10,0,0,0" Foreground="White" IsChecked="{Binding Treat_Dist_As_Branch}" Content="Treat As Branch" Grid.Column="0" Grid.Row="3" Grid.ColumnSpan="2" VerticalAlignment="center"/>
+                <Button Name="AddDistWireButton" Command="{Binding AddDistWireCmd}" CommandParameter="{Binding ElementName = WindowBase}" Style="{StaticResource MarathonRed}" Content="Add Distribution Wire" Margin="2,2,0,2" Background="Transparent" Foreground="White" BorderThickness="1" Width="auto" Height="auto" Grid.Column="5" Grid.Row="4"/>
+              </Grid>
+            </TabItem>
+
+            <TabItem Header="Low Voltage">
+              <Grid>
+                <Grid.ColumnDefinitions>
+                  <ColumnDefinition Width="*"/>
+                  <ColumnDefinition Width="*"/>
+                  <ColumnDefinition Width="*"/>
+                  <ColumnDefinition Width="*"/>
+                  <ColumnDefinition Width="*"/>
+                  <ColumnDefinition Width="*"/>
+                </Grid.ColumnDefinitions>
+                <Grid.RowDefinitions>
+                  <RowDefinition Height="40"/>
+                  <RowDefinition Height="40"/>
+                </Grid.RowDefinitions>
+                
+                <TextBlock Text="Low Voltage Wire Size:" Margin="10,0,0,0" FontSize="14" Foreground="White" Grid.Column="0" Grid.Row="0" VerticalAlignment="center" />
+                <ComboBox SelectedIndex="{Binding Path=Sel_Low_Voltage_Wire_Size, Mode=TwoWay}" ItemsSource="{Binding Low_Voltage_Wire_Size_Items}" Margin="5,5,5,5" Grid.Column="4" Grid.Row="0" Grid.ColumnSpan="2" />
+                <Button Name="AddLowVoltageWireButton" Command="{Binding AddLowVoltageWireCmd}" CommandParameter="{Binding ElementName = WindowBase}" Style="{StaticResource MarathonRed}" Content="Add Low Voltage Wire" Margin="2,2,0,2" Background="Transparent" Foreground="White" BorderThickness="1" Width="auto" Height="auto" Grid.Column="5" Grid.Row="1"/>
+              </Grid>
+            </TabItem>
+
+            <TabItem Header="Reported Wire">
+              <Grid>
+                <Grid.ColumnDefinitions>
+                  <ColumnDefinition Width="*"/>
+                  <ColumnDefinition Width="*"/>
+                  <ColumnDefinition Width="*"/>
+                  <ColumnDefinition Width="*"/>
+                  <ColumnDefinition Width="*"/>
+                  <ColumnDefinition Width="*"/>
+                </Grid.ColumnDefinitions>
+                <Grid.RowDefinitions>
+                  <RowDefinition Height="40"/>
+                  <RowDefinition Height="40"/>
+                </Grid.RowDefinitions>
+                
+                <TextBlock Text="Reported Wires Panel Voltage:" Margin="10,0,0,0" FontSize="14" Foreground="White" Grid.Column="0" Grid.Row="0" VerticalAlignment="center" />
+                <ComboBox SelectedIndex="{Binding Path=Sel_Reported_Wire_Panel_Voltage, Mode=TwoWay}" ItemsSource="{Binding Reported_Wire_Panel_Voltage_Items}" Margin="5,5,5,5" Grid.Column="4" Grid.Row="0" Grid.ColumnSpan="2" />
+                <TextBlock Text="Reported Wires Panel Voltage:" Margin="10,0,0,0" FontSize="14" Foreground="White" Grid.Column="0" Grid.Row="0" VerticalAlignment="center" />
+                <ComboBox SelectedIndex="{Binding Path=Sel_Reported_Wire_Panel_Voltage, Mode=TwoWay}" ItemsSource="{Binding Reported_Wire_Panel_Voltage_Items}" Margin="5,5,5,5" Grid.Column="4" Grid.Row="0" Grid.ColumnSpan="2" />
+                <Button Name="AddReportedWiresButton" Command="{Binding AddReportedWiresCmd}" CommandParameter="{Binding ElementName = WindowBase}" Style="{StaticResource MarathonRed}" Content="Add Reported Wires" Margin="2,2,0,2" Background="Transparent" Foreground="White" BorderThickness="1" Width="auto" Height="auto" Grid.Column="5" Grid.Row="1" Grid.ColumnSpan="1"/>
+              </Grid>
+            </TabItem>
+
+            <TabItem Header="Project Settings">
+              <Grid>
+                <Grid.ColumnDefinitions>
+                  <ColumnDefinition Width="*"/>
+                </Grid.ColumnDefinitions>
+                <Grid.RowDefinitions>
+                  <RowDefinition Height="40"/>
+                  <RowDefinition Height="40"/>
+                </Grid.RowDefinitions>
+                
+                <CheckBox Name="StaggeredCircs" Margin="10,0,0,0" Foreground="White" IsChecked="{Binding Staggered_Circs}" Content="Staggered Circuits" Grid.Column="0" Grid.Row="0" Grid.ColumnSpan="2" VerticalAlignment="center"/>
+                <CheckBox Name="BOYReverse" Margin="10,0,0,0" Foreground="White" IsChecked="{Binding BOY_Reverse}" Content="BOY For 277/480V" Grid.Column="0" Grid.Row="1" Grid.ColumnSpan="2" VerticalAlignment="center"/>
+              </Grid>
+            </TabItem>
+          </TabControl>
+
+          <Button Name="RemoveWireButton" Command="{Binding RemoveWireCmd}" CommandParameter="{Binding ElementName = WindowBase}" Style="{StaticResource MarathonRed}" Content="Remove Selected Wire" Margin="2,2,0,2" Background="Transparent" Foreground="White" BorderThickness="1" Width="auto" Height="auto" Grid.Column="6" Grid.Row="0" Grid.ColumnSpan="1"/>
+        </Grid>
+      </TabItem>
+
+
+
+      <TabItem Header="Wire Automation">
+        <Grid>
+          <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="*"/>
+            <ColumnDefinition Width="*"/>
+            <ColumnDefinition Width="*"/>
+            <ColumnDefinition Width="20"/>
+            <ColumnDefinition Width="*"/>
+            <ColumnDefinition Width="*"/>
+            <ColumnDefinition Width="*"/>
+          </Grid.ColumnDefinitions>
+          <Grid.RowDefinitions>
+            <RowDefinition Height="40*"/>
+            <RowDefinition Height="{Binding Source={StaticResource Datagrid_Size}}"/>
+            <RowDefinition Height="50*"/>
+            <RowDefinition Height="30*"/>
+            <RowDefinition Height="40*"/>
+            <RowDefinition Height="40*"/>
+          </Grid.RowDefinitions>
+
+          <TextBlock Text="Device Pairings:" Margin="10,0,0,0" FontSize="18" TextDecorations="Underline" Foreground="White" Grid.Column="0" Grid.Row="0" Grid.ColumnSpan="3" VerticalAlignment="center"/>
+          <DataGrid Name="DevicePairingsBox" Style="{StaticResource DGrids}" RowStyle="{StaticResource DGSel}" ItemsSource="{Binding Device_Pairing_Items}" Grid.Column="0" Grid.Row="1" Grid.ColumnSpan="3">
+            <DataGrid.Columns>
+              <DataGridTextColumn CellStyle="{StaticResource RunCells}" IsReadOnly="True" Header="Panel Name" Binding="{Binding Path=PanelName}"/>
+              <DataGridTextColumn CellStyle="{StaticResource RunCells}" IsReadOnly="True" Header="Device Number" Binding="{Binding Path=DeviceNumber}"/>
+              <DataGridTextColumn CellStyle="{StaticResource RunCells}" IsReadOnly="True" Header="Wire Number" Binding="{Binding Path=WireNumber}"/>
+            </DataGrid.Columns>
+          </DataGrid>
+
+          <TextBlock Text="Wire Pairings:" Margin="10,0,0,0" FontSize="18" TextDecorations="Underline" Foreground="White" Grid.Column="4" Grid.Row="0" Grid.ColumnSpan="3" VerticalAlignment="center"/>
+          <DataGrid Name="WirePairingsBox" ItemsSource="{Binding Wire_Pairing_Items}" Style="{StaticResource DGrids}" RowStyle="{StaticResource DGSel}" Grid.Column="4" Grid.Row="1" Grid.ColumnSpan="3">
+            <DataGrid.Columns>
+              <DataGridTextColumn CellStyle="{StaticResource RunCells}" IsReadOnly="True" Header="Wire Number" Binding="{Binding Path=WireNumber}"/>
+              <DataGridTextColumn CellStyle="{StaticResource RunCells}" IsReadOnly="True" Header="Paired Wire" Binding="{Binding Path=WireNames}"/>
+            </DataGrid.Columns>
+          </DataGrid>
+	  <!-- switch -->
+
+          <Button Name="RemoveDevicePairingsButton" Command="{Binding RemoveDevicePairingsCmd}" CommandParameter="{Binding ElementName = WindowBase}" Style="{StaticResource MarathonRed}" Content="Remove Selected" Margin="2,2,0,2" Background="Transparent" Foreground="White" BorderThickness="1" Width="auto" Height="auto" Grid.Column="2" Grid.Row="2"/>
+          <Button Name="RemoveWirePairingsButton" Command="{Binding RemoveWirePairingsCmd}" CommandParameter="{Binding ElementName = WindowBase}" Style="{StaticResource MarathonRed}" Content="Remove Selected" Margin="2,2,0,2" Background="Transparent" Foreground="White" BorderThickness="1" Width="auto" Height="auto" Grid.Column="6" Grid.Row="2"/>
+          <CheckBox Name="AutomateWiring" Margin="10,0,0,0" Foreground="White" IsChecked="{Binding Automate_Wire}" Content="Automatically add wire when adding runs" Grid.Column="0" Grid.Row="4" Grid.ColumnSpan="2" VerticalAlignment="center"/>
+          <Button Name="ImportDeviceWirePairingsButton" Command="{Binding ImportDeviceWirePairingsCmd}" CommandParameter="{Binding ElementName = WindowBase}" Style="{StaticResource MarathonRed}" Content="Import Device / Wire Pairings" Margin="2,2,0,2" Background="Transparent" Foreground="White" BorderThickness="1" Width="auto" Height="auto" Grid.Column="5" Grid.Row="5"/>
+          <Button Name="AutomateDeviceTaggingButton" Command="{Binding AutomateDeviceTaggingCmd}" CommandParameter="{Binding ElementName = WindowBase}" Style="{StaticResource MarathonRed}" Content="Tag Devices in View" Margin="2,2,0,2" Background="Transparent" Foreground="White" BorderThickness="1" Width="auto" Height="auto" Grid.Column="6" Grid.Row="5"/>
+          
+        </Grid>
+      </TabItem>
+
+      <TabItem Header="Wire Migration">
+        <Grid>
+          <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="*"/>
+            <ColumnDefinition Width="*"/>
+            <ColumnDefinition Width="*"/>
+            <ColumnDefinition Width="20"/>
+            <ColumnDefinition Width="*"/>
+            <ColumnDefinition Width="*"/>
+            <ColumnDefinition Width="*"/>
+          </Grid.ColumnDefinitions>
+          <Grid.RowDefinitions>
+            <RowDefinition Height="40*"/>
+            <RowDefinition Height="{Binding Source={StaticResource Datagrid_Size}}"/>
+            <RowDefinition Height="20*"/>
+            <RowDefinition Height="30*"/>
+          </Grid.RowDefinitions>
+
+          <TextBlock Text="Current Project Runs:" Margin="10,0,0,0" FontSize="18" TextDecorations="Underline" Foreground="White" Grid.Column="0" Grid.Row="0" Grid.ColumnSpan="3" VerticalAlignment="center"/>
+          <DataGrid Name="ThisProjectMigrateConduitBox" SelectionMode="Single" ItemsSource="{Binding Run_Items}" Style="{StaticResource DGrids}" RowStyle="{StaticResource DGSel}" Grid.Column="0" Grid.Row="1" Grid.ColumnSpan="3">
+
+            <i:Interaction.Triggers>
+              <i:EventTrigger EventName="SelectionChanged">
+                <i:InvokeCommandAction Command="{Binding MigrateWireSelectionChangedCmd}" CommandParameter="{Binding ElementName = OtherProjectMigrateConduitBox}"/>
+              </i:EventTrigger>
+            </i:Interaction.Triggers>
+
+            <DataGrid.Columns>
+              <DataGridTextColumn IsReadOnly="True" Width="*" CellStyle="{StaticResource RunCells}" Header="Has Wire" Binding="{Binding Path=Has_Wire}"/>
+              <DataGridTextColumn IsReadOnly="True" Width="*" CellStyle="{StaticResource RunCells}" Header="From" Binding="{Binding Path=From}"/>
+              <DataGridTextColumn IsReadOnly="false" Width="*" CellStyle="{StaticResource RunCells}" Header="To" Binding="{Binding Path=To, Mode=TwoWay}"/>
+              <DataGridTextColumn IsReadOnly="True" Width="*" CellStyle="{StaticResource RunCells}" Header="Length" Binding="{Binding Path=Length}"/>
+              <DataGridTextColumn IsReadOnly="True" Width="*" CellStyle="{StaticResource RunCells}" Header="Diameter" Binding="{Binding Path=Diameter}"/>
+              <DataGridTextColumn IsReadOnly="True" Width="*" CellStyle="{StaticResource RunCells}" Header="Type" Binding="{Binding Path=Conduit_Type}"/>
+            </DataGrid.Columns>
+          </DataGrid>
+
+          <TextBlock Text="Other Project Runs:" Margin="10,0,0,0" FontSize="18" TextDecorations="Underline" Foreground="White" Grid.Column="4" Grid.Row="0" Grid.ColumnSpan="3" VerticalAlignment="center"/>
+          <DataGrid Name="OtherProjectMigrateConduitBox" SelectionMode="Single" ItemsSource="{Binding Migrate_Run_Items}" Style="{StaticResource DGrids}" RowStyle="{StaticResource DGSel}" Grid.Column="4" Grid.Row="1" Grid.ColumnSpan="3">
+
+            <DataGrid.Columns>
+              <DataGridTextColumn IsReadOnly="True" Width="*" CellStyle="{StaticResource RunCells}" Header="From" Binding="{Binding Path=From}"/>
+              <DataGridTextColumn IsReadOnly="false" Width="*" CellStyle="{StaticResource RunCells}" Header="To" Binding="{Binding Path=To, Mode=TwoWay}"/>
+              <DataGridTextColumn IsReadOnly="True" Width="*" CellStyle="{StaticResource RunCells}" Header="Length" Binding="{Binding Path=Length}"/>
+              <DataGridTextColumn IsReadOnly="True" Width="*" CellStyle="{StaticResource RunCells}" Header="Diameter" Binding="{Binding Path=Diameter}"/>
+              <DataGridTextColumn IsReadOnly="True" Width="*" CellStyle="{StaticResource RunCells}" Header="Type" Binding="{Binding Path=Conduit_Type}"/>
+            </DataGrid.Columns>
+          </DataGrid>
+          
+          <Button Name="LoadMigrateProjectButton" Command="{Binding LoadMigrateProjectCmd}" CommandParameter="{Binding ElementName = WindowBase}" Style="{StaticResource MarathonRed}" Content="Load Other Project" Margin="2,2,0,2" Background="Transparent" Foreground="White" BorderThickness="1" Width="auto" Height="auto" Grid.Column="5" Grid.Row="3"/>
+          <Button Name="MigrateWireButton" Command="{Binding MigrateWireCmd}" CommandParameter="{Binding ElementName = WindowBase}" Style="{StaticResource MarathonRed}" Content="Migrate Wire On Selected Runs" Margin="2,2,0,2" Background="Transparent" Foreground="White" BorderThickness="1" Width="auto" Height="auto" Grid.Column="6" Grid.Row="3"/>
+        </Grid>
+      </TabItem>
+
+      <TabItem Header="Voltage Drop">
+        <Grid>
+          <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="*"/>
+            <ColumnDefinition Width="*"/>
+            <ColumnDefinition Width="*"/>
+	          <ColumnDefinition Width="*"/>
+            <ColumnDefinition Width="*"/>
+            <ColumnDefinition Width="*"/>
+	          <ColumnDefinition Width="*"/>
+            <ColumnDefinition Width="*"/>
+          </Grid.ColumnDefinitions>
+          <Grid.RowDefinitions>
+            <RowDefinition Height="40*"/>
+            <RowDefinition Height="{Binding Source={StaticResource Datagrid_Size}}"/>
+            <RowDefinition Height="40*"/>
+            <RowDefinition Height="40*"/>
+            <RowDefinition Height="40*"/>
+          </Grid.RowDefinitions>
+
+          <TextBlock Text="Voltage Drop Rules:" Margin="10,0,0,0" FontSize="18" TextDecorations="Underline"
+		     Foreground="White" Grid.Column="0" Grid.Row="0" Grid.ColumnSpan="3" VerticalAlignment="center"/>
+
+          <DataGrid Name="VoltageDropBox" ItemsSource="{Binding Voltage_Drop_Items}" Style="{StaticResource DGrids}"
+		    RowStyle="{StaticResource DGSel}" Grid.Column="0" Grid.Row="1" Grid.ColumnSpan="8">
+
+            <i:Interaction.Triggers>
+              <i:EventTrigger EventName="SelectionChanged">
+                <i:InvokeCommandAction Command="{Binding VDSelChangedCmd}" CommandParameter="{Binding ElementName = WindowBase}"/>
+              </i:EventTrigger>
+            </i:Interaction.Triggers>
+
+            <DataGrid.Columns>
+              <DataGridTextColumn IsReadOnly="True" CellStyle="{StaticResource RunCells}" Header="Voltage" Binding="{Binding Path=Voltage}"/>
+              <DataGridTextColumn IsReadOnly="True" CellStyle="{StaticResource RunCells}" Header="Rule" Binding="{Binding Path=VoltageDropString}"/>
+            </DataGrid.Columns>
+          </DataGrid>
+
+          <TextBlock Text="Panel Voltage:" Margin="10,0,0,0" FontSize="14" Foreground="White"
+              Grid.Column="4" Grid.Row="2" Grid.ColumnSpan="3"  VerticalAlignment="center"/>
+                <ComboBox SelectedIndex="{Binding Path=Sel_Voltage_Drop_Voltage, Mode=TwoWay}"
+              ItemsSource="{Binding Panel_Voltage_Items}" VerticalContentAlignment="Center"
+              Margin="3" Grid.Column="5" Grid.Row="2" Grid.ColumnSpan="1"/>
+
+          <TextBlock Text="Wire Size:" Margin="10,0,0,0" FontSize="14" Foreground="White"
+              Grid.Column="4" Grid.Row="3" Grid.ColumnSpan="3"  VerticalAlignment="center"/>
+                <ComboBox SelectedIndex="{Binding Path=Sel_Voltage_Drop_Wire_Size, Mode=TwoWay}"
+              ItemsSource="{Binding Wire_Size_Items}" VerticalContentAlignment="Center" Margin="3"
+              Grid.Column="5" Grid.Row="3" Grid.ColumnSpan="1"/>
+
+          <TextBlock Text="Min Distance:" Margin="10,0,0,0" FontSize="14" Foreground="White"
+              Grid.Column="6" Grid.Row="2" Grid.ColumnSpan="3" VerticalAlignment="center"/>
+                <TextBox Text="{Binding Path=Voltage_Drop_Min_Distance_Txt, Mode=TwoWay}" VerticalContentAlignment="Center"
+            Margin="3" Grid.Column="7" Grid.Row="2" Grid.ColumnSpan="1"/>
+
+          <TextBlock Text="Max Distance:" Margin="10,0,0,0" FontSize="14" Foreground="White" Grid.Column="6"
+              Grid.Row="3" Grid.ColumnSpan="1" VerticalAlignment="center"/>
+                <TextBox Text="{Binding Path=Voltage_Drop_Max_Distance_Txt, Mode=TwoWay}" VerticalContentAlignment="Center"
+            Margin="3" Grid.Column="7" Grid.Row="3" Grid.ColumnSpan="1"/>
+
+                <Button Name="AddVDRuleButton" Command="{Binding AddVoltageDropRuleCmd}"
+            CommandParameter="{Binding ElementName = WindowBase}" Style="{StaticResource MarathonRed}"
+            Content="Add" Margin="2,2,0,2" Background="Transparent" Foreground="White" BorderThickness="1"
+            Width="auto" Height="auto" Grid.Column="6" Grid.Row="4"/>
+          
+          <Button Name="RemoveVDRuleButton" Command="{Binding RemoveVoltageDropRuleCmd}"
+            CommandParameter="{Binding ElementName = WindowBase}" Style="{StaticResource MarathonRed}"
+            Content="Remove" Margin="2,2,0,2" Background="Transparent" Foreground="White" BorderThickness="1"
+            Width="auto" Height="auto" Grid.Column="7" Grid.Row="4"/>
+        </Grid>
+      </TabItem>
+      <!-- Single Hangers -->
+      <TabItem Header="Hangers">
+        <TabControl Name="Hanger_Tabs" Grid.Column="1" Grid.Row="{Binding Source={StaticResource List_Tabs}}" Grid.ColumnSpan="4" Margin="0" Background="Maroon" SelectedIndex="0">
+          <TabItem Header="Single">
+            <Grid>
+              <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="10"/>
+                <ColumnDefinition Width="*"/>
+                <ColumnDefinition Width="*"/>
+                <ColumnDefinition Width="*"/>
+                <ColumnDefinition Width="*"/>
+                <ColumnDefinition Width="10"/>
+              </Grid.ColumnDefinitions>
+              <Grid.RowDefinitions>
+                <RowDefinition Height="40*"/>
+                <RowDefinition Height="{Binding Source={StaticResource Datagrid_Size}}"/>
+                <RowDefinition Height="40*"/>
+                <RowDefinition Height="40*"/>
+                <RowDefinition Height="40*"/>
+                <RowDefinition Height="40*"/>
+                <RowDefinition Height="40*"/>
+                <RowDefinition Height="40*"/>
+              </Grid.RowDefinitions>
+
+              <TextBlock Text="Single Hangers" Margin="10,0,0,0" FontSize="18" TextDecorations="Underline" Foreground="White" Grid.Column="0" Grid.Row="0" Grid.ColumnSpan="7" VerticalAlignment="center"/>
+              <DataGrid Name="SingleHangerBox" ItemsSource="{Binding Single_Hanger_Items}" Style="{StaticResource DGrids}" RowStyle="{StaticResource DGSel}"  Grid.Column="1" Grid.Row="1" Grid.ColumnSpan="4">
+
+                <i:Interaction.Triggers>
+                  <i:EventTrigger EventName="SelectionChanged">
+                    <i:InvokeCommandAction Command="{Binding SingleHangerSelChangedCmd}" CommandParameter="{Binding ElementName = WindowBase}"/>
+                  </i:EventTrigger>
+                </i:Interaction.Triggers>
+
+                <DataGrid.Columns>
+                  <DataGridTextColumn IsReadOnly="True" CellStyle="{StaticResource RunCells}" Header="Att Type" Binding="{Binding Path=Att_Type}"/>
+                  <DataGridTextColumn IsReadOnly="True" CellStyle="{StaticResource RunCells}" Header="Anchor Type" Binding="{Binding Path=Anchor_Type}"/>
+                  <DataGridTextColumn IsReadOnly="True" CellStyle="{StaticResource RunCells}" Header="Rod Diameter" Binding="{Binding Path=Rod_Diameter}"/>
+                  <DataGridTextColumn IsReadOnly="True" CellStyle="{StaticResource RunCells}" Header="Rod Length" Binding="{Binding Path=Rod_Length}"/>
+                  <DataGridTextColumn IsReadOnly="True" CellStyle="{StaticResource RunCells}" Header="Attachment Size" Binding="{Binding Path=Attachment_Size}"/>
+                </DataGrid.Columns>
+              </DataGrid>
+
+              <Button Name="AddSingleHangersButton" Command="{Binding AddSingleHangersCmd}" CommandParameter="{Binding ElementName = WindowBase}" Style="{StaticResource MarathonRed}" Content="Add Single" Margin="2,2,0,2" Background="Transparent" Foreground="White" BorderThickness="1" Width="auto" Height="auto" Grid.Column="3" Grid.Row="2"/>
+
+              <Button Name="RemoveHangersButton" Command="{Binding RemoveSingleHangersCmd}" CommandParameter="{Binding ElementName = WindowBase}" Style="{StaticResource MarathonRed}" Content="Remove" Margin="2,2,0,2" Background="Transparent" Foreground="White" BorderThickness="1" Width="auto" Height="auto" Grid.Column="4" Grid.Row="2"/>
+
+              <TextBlock Text="Single Hanger Options" Margin="10,0,0,0" FontSize="18" TextDecorations="Underline" Foreground="White" Grid.Column="0" Grid.Row="3"  Grid.ColumnSpan="3" VerticalAlignment="center"/>
+              <TextBlock Text="Rod Diameter:" Margin="10,0,0,0" FontSize="14" Foreground="White" Grid.Column="0" Grid.Row="4" Grid.ColumnSpan="3"  VerticalAlignment="center"/>
+              <ComboBox SelectedIndex="{Binding Path=Sel_Single_Rod_Diameter, Mode=TwoWay}" ItemsSource="{Binding Rod_Diameter_Items}" VerticalContentAlignment="Center" Margin="3" Grid.Column="4" Grid.Row="4" Grid.ColumnSpan="1"/>
+              <TextBlock Text="Single attachment type:" Margin="10,0,0,0" FontSize="14" Foreground="White" Grid.Column="0" Grid.Row="5" Grid.ColumnSpan="3" VerticalAlignment="center"/>
+              <ComboBox SelectedIndex="{Binding Path=Sel_Single_Att, Mode=TwoWay}" ItemsSource="{Binding Single_Att_Type_Items}" VerticalContentAlignment="Center" Margin="3" Grid.Column="4" Grid.Row="5" Grid.ColumnSpan="1"/>
+              <TextBlock Text="Minimum Rod Length:" Margin="10,0,0,0" FontSize="14" Foreground="White" Grid.Column="0" Grid.Row="6" Grid.ColumnSpan="3" VerticalAlignment="center"/>
+              <TextBox Text="{Binding Path=HO_Single_Min_Rod_Len_Txt, Mode=TwoWay}" VerticalContentAlignment="Center" Margin="3" Grid.Column="4" Grid.Row="6" Grid.ColumnSpan="1"/>
+              <CheckBox Name="DrawSingleDebugLines" Margin="10,0,0,0" Foreground="White" IsChecked="{Binding Draw_Single_Debug}" Content="Draw 3D model lines and anchor markers" Grid.Column="0" Grid.Row="7" Grid.ColumnSpan="4" VerticalAlignment="center"/>
+            </Grid>
+          </TabItem>
+          <TabItem Header="Fixture">
+            <Grid>
+              <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="10"/>
+                <ColumnDefinition Width="*"/>
+                <ColumnDefinition Width="*"/>
+                <ColumnDefinition Width="*"/>
+                <ColumnDefinition Width="*"/>
+                <ColumnDefinition Width="10"/>
+              </Grid.ColumnDefinitions>
+              <Grid.RowDefinitions>
+                <RowDefinition Height="40*"/>
+                <RowDefinition Height="{Binding Source={StaticResource Datagrid_Size}}"/>
+                <RowDefinition Height="40*"/>
+              </Grid.RowDefinitions>
+
+              <TextBlock Text="Fixture Hangers" Margin="0,0,0,0" FontSize="18" TextDecorations="Underline" Foreground="White" Grid.Column="1" Grid.Row="0" Grid.ColumnSpan="7" VerticalAlignment="center"/>
+
+              <DataGrid Name="FixtureHangerBox" ItemsSource="{Binding Fixture_Hanger_Items}" Style="{StaticResource DGrids}" RowStyle="{StaticResource DGSel}" Grid.Column="1" Grid.Row="1" Grid.ColumnSpan="4">
+
+                <DataGrid.Columns>
+                  <DataGridTextColumn IsReadOnly="True" CellStyle="{StaticResource RunCells}" Header="Anchor Type" Binding="{Binding Path=Anchor_Type}"/>
+                  <DataGridTextColumn IsReadOnly="True" CellStyle="{StaticResource RunCells}" Header="Rod Diameter" Binding="{Binding Path=Rod_Diameter}"/>
+                  <DataGridTextColumn IsReadOnly="True" CellStyle="{StaticResource RunCells}" Header="Rod Length" Binding="{Binding Path=Rod_Length}"/>
+                </DataGrid.Columns>
+              </DataGrid>
+
+              <Button Name="AddFixtureHangersButton" Command="{Binding AddFixtureHangersCmd}" CommandParameter="{Binding ElementName = WindowBase}" Style="{StaticResource MarathonRed}" Content="Add All Fixture" Margin="2,2,0,2" Background="Transparent" Foreground="White" BorderThickness="1" Width="auto" Height="auto" Grid.Column="4" Grid.Row="2"/>
+            </Grid>
+          </TabItem>
+          <TabItem Header="Strut">
+            <Grid>
+              <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="10"/>
+                <ColumnDefinition Width="*"/>
+                <ColumnDefinition Width="*"/>
+                <ColumnDefinition Width="*"/>
+                <ColumnDefinition Width="*"/>
+                <ColumnDefinition Width="10"/>
+              </Grid.ColumnDefinitions>
+              <Grid.RowDefinitions>
+                <RowDefinition Height="30*"/>
+                <RowDefinition Height="{Binding Source={StaticResource Datagrid_Size}}"/>
+                <RowDefinition Height="30"/>
+                <RowDefinition Height="30"/>
+                <RowDefinition Height="30"/>
+                <RowDefinition Height="30"/>
+                <RowDefinition Height="30"/>
+                <RowDefinition Height="30"/>
+                <RowDefinition Height="30"/>
+                <RowDefinition Height="30"/>
+                <RowDefinition Height="30"/>
+                <RowDefinition Height="30"/>
+              </Grid.RowDefinitions>
+
+              <TextBlock Text="Strut Hangers" Margin="0,0,0,0" FontSize="18" TextDecorations="Underline" Foreground="White" Grid.Column="1" Grid.Row="0" Grid.ColumnSpan="4" VerticalAlignment="center"/>
+              <DataGrid Name="StrutHangerBox" ItemsSource="{Binding Strut_Hanger_Items}" Style="{StaticResource DGrids}" RowStyle="{StaticResource DGSel}" Grid.Column="1" Grid.Row="1" Grid.ColumnSpan="4">
+
+                <i:Interaction.Triggers>
+                  <i:EventTrigger EventName="SelectionChanged">
+                    <i:InvokeCommandAction Command="{Binding StrutHangerSelChangedCmd}" CommandParameter="{Binding ElementName = WindowBase}"/>
+                  </i:EventTrigger>
+                </i:Interaction.Triggers>
+
+                <DataGrid.Columns>
+                  <DataGridTextColumn IsReadOnly="True" CellStyle="{StaticResource RunCells}" Header="Att Type" Binding="{Binding Path=Att_Type}"/>
+                  <DataGridTextColumn IsReadOnly="True" CellStyle="{StaticResource RunCells}" Header="Rod Diameter" Binding="{Binding Path=Rod_Diameter}"/>
+                  <DataGridTextColumn IsReadOnly="True" CellStyle="{StaticResource RunCells}" Header="Rod Length" Binding="{Binding Path=Rod_Length}"/>
+                </DataGrid.Columns>
+              </DataGrid>
+              <TextBlock Text="{Binding Path=Total_Unistrut_Hanger_Length_Txt, Mode=TwoWay}" Margin="10,0,0,0" FontSize="18" TextDecorations="Underline" Foreground="White" Grid.Column="0" Grid.Row="2" Grid.ColumnSpan="3" VerticalAlignment="center"/>
+
+              <Button Name="AddStrutHangersButton" Command="{Binding AddStrutHangersCmd}" CommandParameter="{Binding ElementName = WindowBase}" Style="{StaticResource MarathonRed}" Content="Add Strut" Margin="2,2,0,2" Background="Transparent" Foreground="White" BorderThickness="1" Width="auto" Height="auto" Grid.Column="3" Grid.Row="2"/>
+              <Button Name="RemoveStrutHangersButton" Command="{Binding RemoveStrutHangersCmd}" CommandParameter="{Binding ElementName = WindowBase}" Style="{StaticResource MarathonRed}" Content="Remove" Margin="2,2,0,2" Background="Transparent" Foreground="White" BorderThickness="1" Width="auto" Height="auto" Grid.Column="4" Grid.Row="2"/>
+
+              <TextBlock Text="Strut Hanger Options" Margin="10,0,0,0" FontSize="18" TextDecorations="Underline" Foreground="White" Grid.Column="1" Grid.Row="3" Grid.ColumnSpan="3" VerticalAlignment="center"/>
+              <TextBlock Text="Rod Diameter:" Margin="10,0,0,0" FontSize="14" Foreground="White" Grid.Column="1" Grid.Row="4" Grid.ColumnSpan="3" VerticalAlignment="center"/>
+              <ComboBox SelectedIndex="{Binding Path=Sel_Strut_Rod_Diameter, Mode=TwoWay}" VerticalContentAlignment="Center" ItemsSource="{Binding Rod_Diameter_Items}" Margin="3" Grid.Column="4" Grid.ColumnSpan="1" Grid.Row="4"/>
+              <TextBlock Text="Minimum Rod Length:" Margin="10,0,0,0" FontSize="14" Foreground="White" Grid.Column="1" Grid.Row="5" Grid.ColumnSpan="3" VerticalAlignment="center"/>
+              <TextBox Text="{Binding Path=HO_Strut_Min_Rod_Len_Txt, Mode=TwoWay}" VerticalContentAlignment="Center" Margin="3" Grid.Column="4" Grid.ColumnSpan="1" Grid.Row="5" />
+              <TextBlock Text="Inside Conduit-To-Rod Gap:" Margin="10,0,0,0" FontSize="14" Foreground="White" Grid.Column="1" Grid.Row="6" Grid.ColumnSpan="3" VerticalAlignment="center"/>
+              <TextBox Text="{Binding Path=HO_IRGap_Txt, Mode=TwoWay}" VerticalContentAlignment="Center" Margin="3" Grid.Column="4" Grid.ColumnSpan="1" Grid.Row="6" />
+              <TextBlock Text="Outside Extra Strut Length:" Margin="10,0,0,0" FontSize="14" Foreground="White" Grid.Column="1" Grid.Row="7" Grid.ColumnSpan="4" VerticalAlignment="center"/>
+              <TextBox Text="{Binding Path=HO_OESLength_Txt, Mode=TwoWay}" VerticalContentAlignment="Center" Margin="3" Grid.Column="4" Grid.ColumnSpan="1" Grid.Row="7" />
+              <TextBlock Text="Spacing Between Hangers:" Margin="10,0,0,0" FontSize="14" Foreground="White" Grid.Column="1" Grid.Row="8" Grid.ColumnSpan="3" VerticalAlignment="center"/>
+              <TextBox Text="{Binding Path=Nominal_Hanger_Spacing_Txt, Mode=TwoWay}" VerticalContentAlignment="Center" Margin="3" Grid.Column="4" Grid.ColumnSpan="1" Grid.Row="8" />
+              <TextBlock Text="Spacing From Bend:" Margin="10,0,0,0" FontSize="14" Foreground="White" Grid.Column="1" Grid.Row="9" Grid.ColumnSpan="3" VerticalAlignment="center"/>
+              <TextBox Text="{Binding Path=Bend_Hanger_Spacing_Txt, Mode=TwoWay}" VerticalContentAlignment="Center" Margin="3" Grid.Column="4" Grid.ColumnSpan="1" Grid.Row="9" />
+              <CheckBox Name="CeilingSupported" Margin="10,0,0,0" Foreground="White" IsChecked="{Binding Ceiling_Supported_Strut_Hanger}" Content="Ceiling Supported Strut Hangers" Grid.Column="1" Grid.ColumnSpan="5" Grid.Row="10" VerticalAlignment="center"/>
+              <CheckBox Name="DrawStrutDebugLines" Margin="10,0,0,0" Foreground="White" IsChecked="{Binding Draw_Strut_Debug}" Content="Draw 3D model lines and anchor markers" Grid.Column="1" Grid.ColumnSpan="5" Grid.Row="11" VerticalAlignment="center"/>
+
+            </Grid>
+          </TabItem>
+        </TabControl>
+      </TabItem>
+      <TabItem Header="Labor">
+        <Grid>
+          <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="*"/>
+            <ColumnDefinition Width="*"/>
+            <ColumnDefinition Width="*"/>
+          </Grid.ColumnDefinitions>
+          <Grid.RowDefinitions>
+            <RowDefinition Height="{Binding Source={StaticResource Datagrid_Size}}"/>
+            <RowDefinition Height="30"/>
+            <RowDefinition Height="30"/>
+            <RowDefinition Height="30"/>
+            <RowDefinition Height="30"/>
+          </Grid.RowDefinitions>
+
+          <DataGrid Name="LaborBox" ItemsSource="{Binding Labor_Items}" Style="{StaticResource DGrids}" RowStyle="{StaticResource DGSel}" Grid.Column="0" Grid.Row="0" Grid.ColumnSpan="3">
+            <DataGrid.Columns>
+              <DataGridTextColumn IsReadOnly="True" CellStyle="{StaticResource RunCells}" Header="Entry Name" Binding="{Binding Path=Entry_Name}"/>
+              <DataGridTextColumn IsReadOnly="True" CellStyle="{StaticResource RunCells}" Header="Per Unit Labor" Binding="{Binding Path=Per_Unit_Labor}"/>
+              <DataGridTextColumn IsReadOnly="True" CellStyle="{StaticResource RunCells}" Header="Letter Code" Binding="{Binding Path=Letter_Code}"/>
+            </DataGrid.Columns>
+          </DataGrid>
+
+          <!-- Labor Entry Boxes -->
+          <TextBlock Text="Entry Name:" Margin="10,0,0,0" FontSize="14" Foreground="White" Grid.Column="0" Grid.Row="1" VerticalAlignment="center"/>
+          <TextBox Text="{Binding Path=Labor_Entry_Name_Txt, Mode=TwoWay}" VerticalContentAlignment="Center" Margin="3" Grid.Column="3" Grid.Row="1" Grid.ColumnSpan="1"/>
+          <TextBlock Text="Per Unit Labor:" Margin="10,0,0,0" FontSize="14" Foreground="White" Grid.Column="0" Grid.Row="2" VerticalAlignment="center"/>
+          <TextBox Text="{Binding Path=Labor_Per_Unit_Txt, Mode=TwoWay}" VerticalContentAlignment="Center" Margin="3" Grid.Column="3" Grid.Row="2" Grid.ColumnSpan="1"/>
+          <TextBlock Text="Labor Letter Code:" Margin="10,0,0,0" FontSize="14" Foreground="White" Grid.Column="0" Grid.Row="3" VerticalAlignment="center"/>
+          <ComboBox SelectedIndex="{Binding Path=Sel_Labor_Letter_Code, Mode=TwoWay}" VerticalContentAlignment="Center" ItemsSource="{Binding Labor_Code_Items}" Margin="3" Grid.Column="3" Grid.Row="3"/>
+          <Button Name="AddLaborButton" Command="{Binding AddLaborEntryCmd}" CommandParameter="{Binding ElementName = WindowBase}" Style="{StaticResource MarathonRed}" Content="Add" Margin="2,2,0,2" Background="Transparent" Foreground="White" BorderThickness="1" Width="auto" Height="auto" Grid.Column="1" Grid.Row="4"/>
+          <Button Name="RemoveLaborButton" Command="{Binding RemoveLaborEntryCmd}" CommandParameter="{Binding ElementName = WindowBase}" Style="{StaticResource MarathonRed}" Content="Remove" Margin="2,2,0,2" Background="Transparent" Foreground="White" BorderThickness="1" Width="auto" Height="auto" Grid.Column="2" Grid.Row="4"/>
+        </Grid>
+      </TabItem>
+      <!-- Hardware -->
+      <TabItem Header="Hardware">
+        <Grid>
+          <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="*"/>
+            <ColumnDefinition Width="*"/>
+            <ColumnDefinition Width="*"/>
+            <ColumnDefinition Width="*"/>
+          </Grid.ColumnDefinitions>
+          <Grid.RowDefinitions>
+            <RowDefinition Height="{Binding Source={StaticResource Datagrid_Size}}"/>
+            <RowDefinition Height="40*"/>
+            <RowDefinition Height="40*"/>
+            <RowDefinition Height="40*"/>
+          </Grid.RowDefinitions>
+          <DataGrid Name="MiscHardwareBox" ItemsSource="{Binding Hardware_Items}" Style="{StaticResource DGrids}" RowStyle="{StaticResource DGSel}" Grid.Column="0" Grid.Row="0" Grid.ColumnSpan="4">
+            <DataGrid.Columns>
+              <DataGridTextColumn IsReadOnly="True" CellStyle="{StaticResource RunCells}" Header="Entry Name" Binding="{Binding Path=Entry_Name}"/>
+              <DataGridTextColumn IsReadOnly="True" CellStyle="{StaticResource RunCells}" Header="Qty" Binding="{Binding Path=Quantity}"/>
+            </DataGrid.Columns>
+          </DataGrid>
+	  <!-- Misc Hardware Entry Boxes -->
+          <TextBlock Text="Entry Name:" Margin="10,0,0,0" FontSize="14" Foreground="White" Grid.Column="0" Grid.Row="1" VerticalAlignment="center"/>
+          <TextBox Text="{Binding Path=Hardware_Entry_Name_Txt, Mode=TwoWay}" VerticalContentAlignment="Center" Margin="3" Grid.Column="3" Grid.Row="1" Grid.ColumnSpan="1"/>
+          <TextBlock Text="Quantity:" Margin="10,0,0,0" FontSize="14" Foreground="White" Grid.Column="0" Grid.Row="2" VerticalAlignment="center"/>
+          <TextBox Text="{Binding Path=Hardware_Qty_Txt, Mode=TwoWay}" VerticalContentAlignment="Center" Margin="3" Grid.Column="3" Grid.Row="2" Grid.ColumnSpan="1"/>
+          <Button Name="AddHardwareButton" Command="{Binding AddHardwareEntryCmd}" CommandParameter="{Binding ElementName = WindowBase}" Style="{StaticResource MarathonRed}" Content="Add" Margin="2,2,0,2" Background="Transparent" Foreground="White" BorderThickness="1" Width="auto" Height="auto" Grid.Column="2" Grid.Row="3"/>
+          <Button Name="RemoveHardwareButton" Command="{Binding RemoveHardwareEntryCmd}" CommandParameter="{Binding ElementName = WindowBase}" Style="{StaticResource MarathonRed}" Content="Remove" Margin="2,2,0,2" Background="Transparent" Foreground="White" BorderThickness="1" Width="auto" Height="auto" Grid.Column="3" Grid.Row="3"/>
+        </Grid>
+      </TabItem>
+      <!-- Elec Room -->
+      <TabItem Header="Elec Room">
+        <Grid>
+          <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="*"/>
+            <ColumnDefinition Width="*"/>
+            <ColumnDefinition Width="*"/>
+            <ColumnDefinition Width="*"/>
+            <ColumnDefinition Width="20"/>
+            <ColumnDefinition Width="*"/>
+            <ColumnDefinition Width="*"/>
+            <ColumnDefinition Width="*"/>
+            <ColumnDefinition Width="*"/>
+          </Grid.ColumnDefinitions>
+          <Grid.RowDefinitions>
+            <RowDefinition Height="30*"/>
+            <RowDefinition Height="45*"/>
+            <RowDefinition Height="45*"/>
+            <RowDefinition Height="45*"/>
+	    <!--3-->
+            <RowDefinition Height="30"/>
+
+            <RowDefinition Height="30"/>
+            <RowDefinition Height="45*"/>
+            <RowDefinition Height="45*"/>
+            <RowDefinition Height="45*"/>
+	    <!--8-->
+
+            <RowDefinition Height="30"/>
+            <RowDefinition Height="45*"/>
+            <RowDefinition Height="45*"/>
+            <RowDefinition Height="45*"/>
+	    <!--12-->
+            <RowDefinition Height="30"/>
+
+            <RowDefinition Height="20*"/>
+            <RowDefinition Height="30"/>
+            <RowDefinition Height="30"/>
+            <RowDefinition Height="30"/>
+            <RowDefinition Height="30"/>
+	    <!--18-->
+          </Grid.RowDefinitions>
+          <TextBlock Text="Electrical Rooms" Margin="10,0,0,0" FontSize="18" TextDecorations="Underline" Foreground="White" Grid.Column="0" Grid.Row="0" Grid.ColumnSpan="7" VerticalAlignment="center"/>
+          <DataGrid Name="ElecRoomBox" ItemsSource="{Binding Elec_Room_Items}" Style="{StaticResource DGrids}" RowStyle="{StaticResource DGSel}" Grid.Column="0" Grid.Row="1" Grid.ColumnSpan="9" Grid.RowSpan="3">
+            <i:Interaction.Triggers>
+              <i:EventTrigger EventName="SelectionChanged">
+                <i:InvokeCommandAction Command="{Binding ElecRoomSelectionChangedCmd}" CommandParameter="{Binding ElementName = WindowBase}"/>
+              </i:EventTrigger>
+            </i:Interaction.Triggers>
+            <DataGrid.Columns>
+              <DataGridTextColumn IsReadOnly="True" CellStyle="{StaticResource RunCells}" Header="Room Name" Binding="{Binding Path=RoomName}"/>
+              <DataGridTextColumn IsReadOnly="True" CellStyle="{StaticResource RunCells}" Header="Unistrut" Binding="{Binding Path=UnistrutCount}"/>
+              <DataGridTextColumn IsReadOnly="True" CellStyle="{StaticResource RunCells}" Header="Ground Bar" Binding="{Binding Path=GrdBarCount}"/>
+              <DataGridTextColumn IsReadOnly="True" CellStyle="{StaticResource RunCells}" Header="Panelboard" Binding="{Binding Path=PbCount}"/>
+              <DataGridTextColumn IsReadOnly="True" CellStyle="{StaticResource RunCells}" Header="Panel Backing" Binding="{Binding Path=BackingCount}"/>
+              <DataGridTextColumn IsReadOnly="True" CellStyle="{StaticResource RunCells}" Header="Conduit" Binding="{Binding Path=ConduitCount}"/>
+            </DataGrid.Columns>
+          </DataGrid>
+          <Button Name="AddCurrentRoomButton" Command="{Binding AddElecRoomCmd}" CommandParameter="{Binding ElementName = WindowBase}" Style="{StaticResource MarathonRed}" Content="Add Current Room" Margin="2,2,0,2" Background="Transparent" Foreground="White" BorderThickness="1" Width="auto" Height="auto" Grid.Column="6" Grid.Row="4"/>
+          <Button Name="RemoveElecRoomButton" Command="{Binding RemoveElecRoomCmd}" CommandParameter="{Binding ElementName = WindowBase}" Style="{StaticResource MarathonRed}" Content="Remove Selected Rooms" Margin="2,2,0,2" Background="Transparent" Foreground="White" BorderThickness="1" Width="auto" Height="auto" Grid.Column="7" Grid.ColumnSpan="2" Grid.Row="4"/>
+          <TextBlock Text="Unistrut" Margin="10,0,0,0" FontSize="18" TextDecorations="Underline" Foreground="White" Grid.Column="0" Grid.Row="5" Grid.ColumnSpan="7" VerticalAlignment="center"/>
+          <DataGrid Name="UnistrutBox" ItemsSource="{Binding Unistrut_Items}" Style="{StaticResource DGrids}" RowStyle="{StaticResource DGSel}" Grid.Column="0" Grid.Row="6" Grid.ColumnSpan="4" Grid.RowSpan="3">
+            <DataGrid.Columns>
+              <DataGridTextColumn IsReadOnly="True" CellStyle="{StaticResource RunCells}" Header="Name" Binding="{Binding Path=Name}"/>
+              <DataGridTextColumn IsReadOnly="True" Width="auto" CellStyle="{StaticResource RunCells}" Header="Length" Binding="{Binding Path=Length}"/>
+              <DataGridTextColumn IsReadOnly="True" CellStyle="{StaticResource RunCells}" Header="Size" Binding="{Binding Path=Size}"/>
+              <DataGridTextColumn IsReadOnly="True" CellStyle="{StaticResource RunCells}" Header="Hardware Cnt" Binding="{Binding Path=Hardware_Cnt}"/>
+            </DataGrid.Columns>
+          </DataGrid>
+          <TextBlock Text="Ground Bar" Margin="10,0,0,0" FontSize="18" TextDecorations="Underline" Foreground="White" Grid.Column="5" Grid.Row="5" Grid.ColumnSpan="7" VerticalAlignment="center"/>
+          <DataGrid Name="GrdBarBox" ItemsSource="{Binding Grd_Bar_Items}" Style="{StaticResource DGrids}" RowStyle="{StaticResource DGSel}" Grid.Column="5" Grid.Row="6" Grid.ColumnSpan="4" Grid.RowSpan="3">
+            <DataGrid.Columns>
+              <DataGridTextColumn IsReadOnly="True" CellStyle="{StaticResource RunCells}" Header="Name" Binding="{Binding Path=Name}"/>
+              <DataGridTextColumn IsReadOnly="True" CellStyle="{StaticResource RunCells}" Header="Dimensions" Binding="{Binding Path=Dimensions}"/>
+              <DataGridTextColumn IsReadOnly="True" CellStyle="{StaticResource RunCells}" Header="Hardware Cnt" Binding="{Binding Path=Hardware_Cnt}"/>
+            </DataGrid.Columns>
+          </DataGrid>
+          
+	        <!-- Second row of datagrids -->
+          <TextBlock Text="Panels" Margin="10,0,0,0" FontSize="18" TextDecorations="Underline" Foreground="White" Grid.Column="0" Grid.Row="9" Grid.ColumnSpan="7" VerticalAlignment="center"/>
+          <DataGrid Name="PanelsBox" ItemsSource="{Binding Panelboard_Items}" Style="{StaticResource DGrids}" RowStyle="{StaticResource DGSel}" Grid.Column="0" Grid.Row="10" Grid.ColumnSpan="4" Grid.RowSpan="3">
+            <DataGrid.Columns>
+              <DataGridTextColumn IsReadOnly="True" CellStyle="{StaticResource RunCells}" Header="Name" Binding="{Binding Path=Name}"/>
+              <DataGridTextColumn IsReadOnly="True" CellStyle="{StaticResource RunCells}" Header="Amperage" Binding="{Binding Path=Amperage}"/>
+              <DataGridTextColumn IsReadOnly="True" CellStyle="{StaticResource RunCells}" Header="Hardware Cnt" Binding="{Binding Path=Hardware_Cnt}"/>
+            </DataGrid.Columns>
+          </DataGrid>
+          <TextBlock Text="Panel Backing" Margin="10,0,0,0" FontSize="18" TextDecorations="Underline" Foreground="White" Grid.Column="5" Grid.Row="9" Grid.ColumnSpan="7" VerticalAlignment="center"/>
+          <DataGrid Name="PBBox" ItemsSource="{Binding Backing_Items}" Style="{StaticResource DGrids}" RowStyle="{StaticResource DGSel}" Grid.Column="5" Grid.Row="10" Grid.ColumnSpan="4" Grid.RowSpan="3">
+            <DataGrid.Columns>
+              <DataGridTextColumn IsReadOnly="True" CellStyle="{StaticResource RunCells}" Header="Name" Binding="{Binding Path=Name}"/>
+              <DataGridTextColumn IsReadOnly="True" CellStyle="{StaticResource RunCells}" Header="Dimensions" Binding="{Binding Path=Dimensions}"/>
+              <DataGridTextColumn IsReadOnly="True" CellStyle="{StaticResource RunCells}" Header="Hardware Cnt" Binding="{Binding Path=Hardware_Cnt}"/>
+            </DataGrid.Columns>
+          </DataGrid>
+
+          <TextBlock Text="Electrical Room Title:" Margin="10,0,0,0" FontSize="14" Foreground="White" Grid.Column="0" Grid.Row="4" Grid.ColumnSpan="2" VerticalAlignment="center"/>
+          <TextBox Text="{Binding Path=Elec_Room_Title_Txt, Mode=TwoWay}" VerticalContentAlignment="Center" Margin="3" Grid.Column="2" Grid.Row="4" Grid.ColumnSpan="2"/>
+          <CheckBox Content="Wall Type Override:" IsChecked="{Binding Wall_Override_Switch}" Margin="10,0,0,0" FontSize="14" Foreground="White" Grid.Column="0" Grid.Row="15" Grid.ColumnSpan="2" VerticalAlignment="center"/>
+          <ComboBox SelectedIndex="{Binding Path=Sel_Wall_Type, Mode=TwoWay}" VerticalContentAlignment="Center" ItemsSource="{Binding WallType_Items}" Margin="3" Grid.Column="2" Grid.Row="15" Grid.ColumnSpan="2"/>
+          <CheckBox Content="Ground Bar Lug Size Override:" IsChecked="{Binding GB_Lug_Override_Switch}" Margin="10,0,0,0" FontSize="14" Foreground="White" Grid.Column="0" Grid.Row="16" Grid.ColumnSpan="2" VerticalAlignment="center"/>
+          <ComboBox SelectedIndex="{Binding Path=Sel_Grd_Lug_Size, Mode=TwoWay}" VerticalContentAlignment="Center" ItemsSource="{Binding Grd_Lug_Size_Items}" Margin="3" Grid.Column="2" Grid.Row="16" Grid.ColumnSpan="2"/>
+          <TextBlock Text="Buildout Conduit Cutoff Height:" Margin="10,0,0,0" FontSize="14" Foreground="White" Grid.Column="0" Grid.Row="17" Grid.ColumnSpan="2" VerticalAlignment="center"/>
+          <TextBox Text="{Binding Path=Elec_Room_Conduit_Cutoff_Txt, Mode=TwoWay}" VerticalContentAlignment="Center" Margin="3" Grid.Column="2" Grid.Row="17" Grid.ColumnSpan="2"/>
+
+          <TextBlock Text="Masonry Anchor:" Margin="10,0,0,0" FontSize="14" Foreground="White" Grid.Column="0" Grid.Row="18" Grid.ColumnSpan="2" VerticalAlignment="center"/>
+          <ComboBox SelectedIndex="{Binding Path=Sel_Masonry_Anchor_Size, Mode=TwoWay}" VerticalContentAlignment="Center" ItemsSource="{Binding Masonry_Anchor_Size_Items}" Margin="3" Grid.Column="2" Grid.Row="18" Grid.ColumnSpan="2"/>
+
+          <Button Name="AddAllUSButton" Command="{Binding AddAllUnistrutCmd}" CommandParameter="{Binding ElementName = WindowBase}" Style="{StaticResource MarathonRed}" Content="Add All Unistrut" Margin="2,2,0,2" Background="Transparent" Foreground="White" BorderThickness="1" Width="auto" Height="auto" Grid.Column="2" Grid.Row="9"/>
+          <Button Name="RemUSButton" Command="{Binding RemoveUnistrutCmd}" CommandParameter="{Binding ElementName = WindowBase}" Style="{StaticResource MarathonRed}" Content="Remove Unistrut" Margin="2,2,0,2" Background="Transparent" Foreground="White" BorderThickness="1" Width="auto" Height="auto" Grid.Column="3" Grid.Row="9"/>
+
+          <Button Name="AddAllGBButton" Command="{Binding AddAllGrdBarCmd}" CommandParameter="{Binding ElementName = WindowBase}" Style="{StaticResource MarathonRed}" Content="Add All Ground Bar" Margin="2,2,0,2" Background="Transparent" Foreground="White" BorderThickness="1" Width="auto" Height="auto" Grid.Column="7" Grid.Row="9"/>
+          <Button Name="RemGBButton" Command="{Binding RemoveGrdBarCmd}" CommandParameter="{Binding ElementName = WindowBase}" Style="{StaticResource MarathonRed}" Content="Remove Ground Bar" Margin="2,2,0,2" Background="Transparent" Foreground="White" BorderThickness="1" Width="auto" Height="auto" Grid.Column="8" Grid.Row="9"/>
+
+          <Button Name="AddAllpbButton" Command="{Binding AddAllPanelBackingCmd}" CommandParameter="{Binding ElementName = WindowBase}" Style="{StaticResource MarathonRed}" Content="Add All Panel Backing" Margin="2,2,0,2" Background="Transparent" Foreground="White" BorderThickness="1" Width="auto" Height="auto" Grid.Column="7" Grid.Row="13"/>
+          <Button Name="RempbButton" Command="{Binding RemovePanelBackingCmd}" CommandParameter="{Binding ElementName = WindowBase}" Style="{StaticResource MarathonRed}" Content="Remove Panel Backing" Margin="2,2,0,2" Background="Transparent" Foreground="White" BorderThickness="1" Width="auto" Height="auto" Grid.Column="8" Grid.Row="13"/>
+
+          <Button Name="AddAllpanelButton" Command="{Binding AddAllPanelboardCmd}" CommandParameter="{Binding ElementName = WindowBase}" Style="{StaticResource MarathonRed}" Content="Add All Panelboard" Margin="2,2,0,2" Background="Transparent" Foreground="White" BorderThickness="1" Width="auto" Height="auto" Grid.Column="2" Grid.Row="13"/>
+          <Button Name="RempanelButton" Command="{Binding RemovePanelboardCmd}" CommandParameter="{Binding ElementName = WindowBase}" Style="{StaticResource MarathonRed}" Content="Remove Panelboard" Margin="2,2,0,2" Background="Transparent" Foreground="White" BorderThickness="1" Width="auto" Height="auto" Grid.Column="3" Grid.Row="13"/>
+
+          <TextBlock Text="{Binding Path=Elec_Room_Conduit_Txt, Mode=TwoWay}" Margin="10,0,0,0" FontSize="14" Foreground="White" Grid.Column="7" Grid.Row="17" Grid.ColumnSpan="3" VerticalAlignment="center"/>
+          <Button Command="{Binding GetElecRoomConduitCmd}" CommandParameter="{Binding ElementName = WindowBase}" Style="{StaticResource MarathonRed}" Content="Get Conduit" Margin="2,2,0,2" Background="Transparent" Foreground="White" BorderThickness="1" Width="auto" Height="auto" Grid.Column="7" Grid.Row="18"/>
+          <Button Command="{Binding ClearElecRoomConduitCmd}" CommandParameter="{Binding ElementName = WindowBase}" Style="{StaticResource MarathonRed}" Content="Clear Conduit" Margin="2,2,0,2" Background="Transparent" Foreground="White" BorderThickness="1" Width="auto" Height="auto" Grid.Column="8" Grid.Row="18"/>
+        </Grid>
+      </TabItem>
+      <!-- Settings -->
+      <TabItem Header="Settings">
+        <Grid>
+          <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="*"/>
+            <ColumnDefinition Width="*"/>
+            <ColumnDefinition Width="*"/>
+            <ColumnDefinition Width="*"/>
+            <ColumnDefinition Width="*"/>
+            <ColumnDefinition Width="*"/>
+            <ColumnDefinition Width="*"/>
+            <ColumnDefinition Width="*"/>
+            <ColumnDefinition Width="*"/>
+            <ColumnDefinition Width="*"/>
+          </Grid.ColumnDefinitions>
+          <Grid.RowDefinitions>
+            <RowDefinition Height="40"/> <!-- Header -->
+
+            <RowDefinition Height="40"/> <!-- Branch Sheet Name -->
+            <RowDefinition Height="40"/> <!-- Distribution sheet name -->
+            <RowDefinition Height="40"/> <!-- Low Voltage Sheet name -->
+            <RowDefinition Height="40"/>
+            <RowDefinition Height="40"/>
+            <RowDefinition Height="40"/>
+            <RowDefinition Height="40"/>
+            <RowDefinition Height="40"/>
+            <RowDefinition Height="40"/>
+            <RowDefinition Height="40"/>
+            <RowDefinition Height="40"/>
+          </Grid.RowDefinitions>
+
+          <TextBlock Text="Package Settings" Margin="10,0,0,0" FontSize="18" Foreground="White" Grid.Column="0" Grid.Row="0" Grid.ColumnSpan="2" VerticalAlignment="center" TextDecorations="Underline"/>
+
+          <TextBlock Text="Branch Export Sheet Name:" Margin="10,0,0,0" FontSize="14" Foreground="White" Grid.Column="0" Grid.ColumnSpan="2" Grid.Row="1" VerticalAlignment="center"/>
+          <TextBox Text="{Binding Path=Branch_Export_Sheet_Name_Txt, Mode=TwoWay}" VerticalContentAlignment="Center" Margin="3" Grid.Column="2" Grid.Row="1" Grid.ColumnSpan="2"/>
+
+          <TextBlock Text="Distribution Export Sheet Name:" Margin="10,0,0,0" FontSize="14" Foreground="White" Grid.Column="0" Grid.ColumnSpan="2" Grid.Row="2" VerticalAlignment="center"/>
+          <TextBox Text="{Binding Path=Distribution_Export_Sheet_Name_Txt, Mode=TwoWay}" VerticalContentAlignment="Center" Margin="3" Grid.Column="2" Grid.Row="2" Grid.ColumnSpan="2"/>
+
+          <TextBlock Text="Low Voltage Export Sheet Name:" Margin="10,0,0,0" FontSize="14" Foreground="White" Grid.Column="0" Grid.ColumnSpan="2" Grid.Row="3" VerticalAlignment="center"/>
+          <TextBox Text="{Binding Path=Low_Voltage_Export_Sheet_Name_Txt, Mode=TwoWay}" VerticalContentAlignment="Center" Margin="3" Grid.Column="2" Grid.Row="3" Grid.ColumnSpan="2"/>
+
+          <TextBlock Text="Hangers Export Sheet Name:" Margin="10,0,0,0" FontSize="14" Foreground="White" Grid.Column="0" Grid.ColumnSpan="2" Grid.Row="4" VerticalAlignment="center"/>
+          <TextBox Text="{Binding Path=Hangers_Export_Sheet_Name_Txt, Mode=TwoWay}" VerticalContentAlignment="Center" Margin="3" Grid.Column="2" Grid.Row="4" Grid.ColumnSpan="2"/>
+
+          <TextBlock Text="Wire Makeup Length:" Margin="10,0,0,0" FontSize="14" Foreground="White" Grid.Column="0" Grid.ColumnSpan="2" Grid.Row="5" VerticalAlignment="center"/>
+          <TextBox Text="{Binding Path=Wire_Makeup_Length_Txt, Mode=TwoWay}" VerticalContentAlignment="Center" Margin="3" Grid.Column="2" Grid.Row="5" Grid.ColumnSpan="2"/>
+
+          <TextBlock Text="Coupling Material Type:" Margin="10,0,0,0" FontSize="14" Foreground="White" Grid.Column="0" Grid.ColumnSpan="2" Grid.Row="6" VerticalAlignment="center"/>
+          <ComboBox SelectedIndex="{Binding Path=Sel_Coupling_Mat_Type, Mode=TwoWay}" VerticalContentAlignment="Center" ItemsSource="{Binding Coupling_Mat_Items}" Margin="3" Grid.Column="2" Grid.ColumnSpan="2" Grid.Row="6"/>
+
+          <Button Name="SaveSettingsButton" Command="{Binding SaveGlobalSettingsCmd}" CommandParameter="{Binding ElementName = WindowBase}" Style="{StaticResource MarathonRed}" Content="Save Settings" Margin="2,2,0,2" Background="Transparent" Foreground="White" BorderThickness="1" Width="auto" Height="auto" Grid.Column="3" Grid.Row="7"/>
+
+          <TextBlock Text="Hanger Settings" Margin="10,0,0,0" FontSize="18" Foreground="White" Grid.Column="0" Grid.Row="7" Grid.ColumnSpan="2" VerticalAlignment="center" TextDecorations="Underline"/>
+          <Button Name="RestoreHangersButton" Command="{Binding RestoreHangersCmd}" CommandParameter="{Binding ElementName = WindowBase}" Style="{StaticResource MarathonRed}" Content="Restore Hangers" Margin="10,2,0,2" Background="Transparent" Foreground="White" BorderThickness="1" Width="auto" Height="auto" Grid.Column="0" Grid.Row="9"/>
+        </Grid>
+      </TabItem>
+      <!-- Help -->
+      <TabItem Header="Help">
+        <ScrollViewer Width="600" Height="500" Grid.Column="1" Grid.Row="2" Grid.ColumnSpan="4" HorizontalAlignment="Center">
+          <Grid>
+            <Grid.ColumnDefinitions>
+              <ColumnDefinition Width="150"/>
+              <ColumnDefinition Width="150"/>
+              <ColumnDefinition Width="150"/>
+              <ColumnDefinition Width="150"/>
+            </Grid.ColumnDefinitions>
+            <Grid.RowDefinitions>
+              <RowDefinition Height="40*"/>
+              <RowDefinition Height="*"/>
+              <RowDefinition Height="*"/>
+              <RowDefinition Height="*"/>
+              <RowDefinition Height="*"/>
+              <RowDefinition Height="*"/>
+              <RowDefinition Height="*"/>
+            </Grid.RowDefinitions>
+            <TextBlock Foreground="White" Text="FAQ" Grid.Column="0" Grid.Row="0" Width="auto" Height="auto" VerticalAlignment="center" HorizontalAlignment="Left" Grid.ColumnSpan="4" Margin="10,0,0,0"/>
+	    <!-- Question 1-->
+            <StackPanel Background="DimGray" Width="auto" Height="auto" Grid.Column="0" Grid.Row="1" Grid.ColumnSpan="4">
+	      <!-- Q -->
+              <TextBlock Foreground="White" Background="Gray" FontSize="18" Padding="10" Text="Question: How to create a new project?" VerticalAlignment="center"/>
+	      <!-- A -->
+              <TextBlock Foreground="White" Background="DimGray" Padding="10,10,10,5" Text="Answer: " VerticalAlignment="center"/>
+              <TextBlock Foreground="White" Background="DimGray" Padding="48,5,5,5" Text="Step 1: Click on the &apos;New&apos; button in the top right." VerticalAlignment="center"/>
+              <TextBlock Foreground="White" Background="DimGray" Padding="48,5,5,5" Text="Step 2: Click ok on the prompt that comes up. " VerticalAlignment="center"/>
+              <TextBlock Foreground="White" Background="DimGray" Padding="48,5,5,10" Text="Step 3: A window will appear. Enter a file name and click the &apos;Save&apos; button." VerticalAlignment="center"/>
+	      <!--
+                  <Image Style="{StaticResource DropShadow}" Source="./res/help/load_prompt.png" Margin="0,10,0,10" Width="400" Height="auto" /> -->
+            </StackPanel>
+	    <!-- Question 2-->
+            <StackPanel Background="DimGray" Width="auto" Height="auto" Grid.Column="0" Grid.Row="2" Grid.ColumnSpan="4" Margin="0,5,0,0">
+	      <!-- Q -->
+              <TextBlock Foreground="White" TextWrapping="WrapWithOverflow" Background="Gray" FontSize="18" Padding="10" Text="Question: How to create a new project?" VerticalAlignment="center"/>
+	      <!-- A -->
+              <TextBlock Foreground="White" Background="DimGray" Padding="10,10,10,5" Text="Answer: " VerticalAlignment="center"/>
+              <TextBlock Foreground="White" Background="DimGray" Padding="48,5,5,5" Text="Step 1: Click on the New button in the top right." VerticalAlignment="center"/>
+              <TextBlock Foreground="White" Background="DimGray" Padding="48,5,5,5" Text="Step 2: Click &apos;Yes&apos; on the prompt that comes up. " VerticalAlignment="center"/>
+              <TextBlock Foreground="White" Background="DimGray" Padding="48,5,5,10" Text="Step 3: A window will appear. Enter a file name and click the &apos;save&apos; button." VerticalAlignment="center"/>
+	      <!--
+                  <Image Style="{StaticResource DropShadow}" Source="./res/help/load_prompt.png" Margin="0,10,0,10" Width="400" Height="auto" /> -->
+            </StackPanel>
+	    <!-- Question 3-->
+            <StackPanel Background="DimGray" Width="auto" Height="auto" Grid.Column="0" Grid.Row="3" Grid.ColumnSpan="4" Margin="0,5,0,0">
+	      <!-- Q -->
+              <TextBlock Foreground="White" TextWrapping="WrapWithOverflow" Background="Gray" FontSize="18" Padding="10" Text="Question: How do I load an existing project?" VerticalAlignment="center"/>
+	      <!-- A -->
+              <TextBlock Foreground="White" Background="DimGray" Padding="10,10,10,5" Text="Answer: " VerticalAlignment="center"/>
+              <TextBlock Foreground="White" Background="DimGray" Padding="48,5,5,5" Text="Step 1: Click on the &apos;Load&apos; button." VerticalAlignment="center"/>
+              <TextBlock Foreground="White" Background="DimGray" Padding="48,5,5,5" Text="Step 2: Browse for and select a file in the window that appears. The file type that you are looking for is a .. " VerticalAlignment="center"/>
+              <TextBlock Foreground="White" Background="DimGray" Padding="48,5,5,10" Text="Step 3: Click on the &apos;Open&apos; button to load the project." VerticalAlignment="center"/>
+            </StackPanel>
+	    <!-- Question 4-->
+            <StackPanel Background="DimGray" Width="auto" Height="auto" Grid.Column="0" Grid.Row="4" Grid.ColumnSpan="4" Margin="0,5,0,0">
+	      <!-- Q -->
+              <TextBlock Foreground="White" TextWrapping="WrapWithOverflow" Background="Gray" FontSize="18" Padding="10" Text="Question: How do I add conduit runs from the currently active floor plan view in Revit, into the currently loaded project?" VerticalAlignment="center"/>
+	      <!-- A -->
+              <TextBlock Foreground="White" Background="DimGray" Padding="10,10,10,5" Text="Answer: " VerticalAlignment="center"/>
+              <TextBlock Foreground="White" Background="DimGray" Padding="48,5,5,5" Text="Step 1: Click on the New button in the top right." VerticalAlignment="center"/>
+              <TextBlock Foreground="White" Background="DimGray" Padding="48,5,5,5" Text="Step 2: Click ok on the prompt that comes up. " VerticalAlignment="center"/>
+              <TextBlock Foreground="White" Background="DimGray" Padding="48,5,5,10" Text="Step 3: A window will appear. Enter a file name and click the &apos;save&apos; button." VerticalAlignment="center"/>
+            </StackPanel>
+          </Grid>
+        </ScrollViewer>
+      </TabItem>
+    </TabControl>
+  </Grid>
+</Window>
