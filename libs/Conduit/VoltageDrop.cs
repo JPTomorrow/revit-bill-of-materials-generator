@@ -57,10 +57,11 @@ namespace JPMorrow.Revit.VoltageDrop {
         public static MasterDataPackage AllWireDropVoltage(MasterDataPackage old_package) {
 
             var package  = new MasterDataPackage(old_package);
-            var old_man = package.WireManager;
+            var old_man = package.GetSelectedConduitPackage().WireManager;
             WireManager new_man = new WireManager(new List<HashedWire>());
             
-            foreach(var run in package.Cris) {
+            foreach(var run in package.GetSelectedConduitPackage().Cris) 
+            {
 
                 var wires = old_man.GetWires(run.WireIds).ToList();
                 var ground_wires = wires.Where(x => WireColor.Ground_Colors.Any(y => y.Equals(x.Color))).ToList();
@@ -79,7 +80,9 @@ namespace JPMorrow.Revit.VoltageDrop {
                     var s = wire.GetPanelVoltage(out string voltage);
                     
                     if(s) {
-                        s = package.VoltageDropRules.GetRuleByVoltageAndLength(voltage, run.Length + old_package.WireMakeupLength, out var rule);
+                        s = package.VoltageDropRules.GetRuleByVoltageAndLength(
+                            voltage, run.Length + old_package.GetSelectedGlobalSettingsPackage().WireMakeupLength, 
+                            out var rule);
                         
                         if(s) {
                             var pass = Wire.IsWireSizeGreaterThan(size, rule.WireSize);
@@ -123,9 +126,9 @@ namespace JPMorrow.Revit.VoltageDrop {
                 }
             }
             
-            package.WireManager.Clear();
-            foreach(var run in package.Cris) {
-                package.WireManager.AddWires(run.WireIds, new_man.GetWires(run.WireIds));
+            package.GetSelectedConduitPackage().WireManager.Clear();
+            foreach(var run in package.GetSelectedConduitPackage().Cris) {
+                package.GetSelectedConduitPackage().WireManager.AddWires(run.WireIds, new_man.GetWires(run.WireIds));
             }
 
             return package;

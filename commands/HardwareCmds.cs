@@ -14,9 +14,9 @@ namespace JPMorrow.UI.ViewModels
             entry.name = Hardware_Entry_Name_Txt;
             entry.qty = int.Parse(Hardware_Qty_Txt);
 
-            if(ALS.AppData.MiscHardwareEntries.Any(x => x.name == entry.name)) return;
+            if(ALS.AppData.GetSelectedHardwarePackage().MiscHardwareEntries.Any(x => x.name == entry.name)) return;
 
-            ALS.AppData.MiscHardwareEntries.Add(entry);
+            ALS.AppData.GetSelectedHardwarePackage().MiscHardwareEntries.Add(entry);
             RefreshDataGrids(BOMDataGrid.Hardware);
 
             WriteToLog("Labor entry added: " +
@@ -27,7 +27,7 @@ namespace JPMorrow.UI.ViewModels
         public void RemoveHardwareEntry(Window window)
         {
             var sel_entries = Hardware_Items.Where(x => x.IsSelected).Select(x => x.Value).ToList();
-            sel_entries.ForEach(x => ALS.AppData.MiscHardwareEntries.Remove(x));
+            sel_entries.ForEach(x => ALS.AppData.GetSelectedHardwarePackage().MiscHardwareEntries.Remove(x));
             RefreshDataGrids(BOMDataGrid.Hardware);
 
             WriteToLog(sel_entries.Count + " harware entry removed.");

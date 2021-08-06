@@ -79,24 +79,24 @@ namespace JPMorrow.Excel
             string title = "M.P.A.C.T. - " + project_title;
 
             if(pull_type == WireType.Branch) {
-                InsertHeader(title, "Per-Panel Breakdown", data_package.BranchExportSheetName);
+                InsertHeader(title, "Per-Panel Breakdown", data_package.GetSelectedGlobalSettingsPackage().BranchExportSheetName);
             }
             else if(pull_type == WireType.Distribution) {
-                InsertHeader(title, "Per-Panel Breakdown", data_package.DistributionExportSheetName);
+                InsertHeader(title, "Per-Panel Breakdown", data_package.GetSelectedGlobalSettingsPackage().DistributionExportSheetName);
             }
             else if(pull_type == WireType.LowVoltage) {
-                InsertHeader(title, "Per-Panel Breakdown", data_package.LowVoltageExportSheetName);
+                InsertHeader(title, "Per-Panel Breakdown", data_package.GetSelectedGlobalSettingsPackage().LowVoltageExportSheetName);
             }
             
             // voltage drop
             package = VoltageDrop.AllWireDropVoltage(package);
 
-            var cris = package.Cris.OrderBy(x => x.From).ToList();
+            var cris = package.GetSelectedConduitPackage().Cris.OrderBy(x => x.From).ToList();
 
             // print all the wire by panel
             foreach(ConduitRunInfo cri in cris) {
                 
-                Wire[] wires = package.WireManager.GetWires(cri.WireIds.ToArray()).ToArray();
+                Wire[] wires = package.GetSelectedConduitPackage().WireManager.GetWires(cri.WireIds.ToArray()).ToArray();
                 wires = wires.Where(x => x.WireType == pull_type).ToArray();
 
                 if(!wires.Any() || wires.Any(x => x.IsNoWireExport(pull_type))) continue;
@@ -106,7 +106,7 @@ namespace JPMorrow.Excel
 
 				foreach(var wire in wires)
 				{
-					var wire_length = Math.Round(cri.Length + package.WireMakeupLength);
+					var wire_length = Math.Round(cri.Length + package.GetSelectedGlobalSettingsPackage().WireMakeupLength);
 					var c_num = wire.CircuitNumber == "" ? "Feeder" : wire.CircuitNumber;
 					var dia = RMeasure.LengthFromDbl(info.DOC, cri.Diameter);
 
@@ -138,13 +138,13 @@ namespace JPMorrow.Excel
             string title = "M.P.A.C.T. - " + project_title;
 
             if(pull_type == WireType.Branch) {
-                InsertHeader(title, "Wire Pull Totals", data_package.BranchExportSheetName);
+                InsertHeader(title, "Wire Pull Totals", data_package.GetSelectedGlobalSettingsPackage().BranchExportSheetName);
             }
             else if(pull_type == WireType.Distribution) {
-                InsertHeader(title, "Wire Pull Totals", data_package.DistributionExportSheetName);
+                InsertHeader(title, "Wire Pull Totals", data_package.GetSelectedGlobalSettingsPackage().DistributionExportSheetName);
             }
             else if(pull_type == WireType.LowVoltage) {
-                InsertHeader(title, "Wire Pull Totals", data_package.LowVoltageExportSheetName);
+                InsertHeader(title, "Wire Pull Totals", data_package.GetSelectedGlobalSettingsPackage().LowVoltageExportSheetName);
             }
 
 
@@ -159,7 +159,7 @@ namespace JPMorrow.Excel
                     InsertSingleDivider(Draw.Color.SlateGray, Draw.Color.White, wires[wires.IndexOf(w)].Size + " - " + w.MaterialTypeText);
                 }
 
-                var length = Math.Round(w.Length + package.WireMakeupLength);
+                var length = Math.Round(w.Length + package.GetSelectedGlobalSettingsPackage().WireMakeupLength);
                 InsertIntoRow(w.Size + " - " + w.MaterialTypeText, w.Color, length);
                 ApplyColorToColumn('B', w.Color);
                 NextRow(1);
@@ -197,13 +197,13 @@ namespace JPMorrow.Excel
             string title = "M.P.A.C.T. - " + project_title;
 
             if(pull_type == WireType.Branch) {
-                InsertHeader(title, "Labor Breakdown", data_package.BranchExportSheetName);
+                InsertHeader(title, "Labor Breakdown", data_package.GetSelectedGlobalSettingsPackage().BranchExportSheetName);
             }
             else if(pull_type == WireType.Distribution) {
-                InsertHeader(title, "Labor Breakdown", data_package.DistributionExportSheetName);
+                InsertHeader(title, "Labor Breakdown", data_package.GetSelectedGlobalSettingsPackage().DistributionExportSheetName);
             }
             else if(pull_type == WireType.LowVoltage) {
-                InsertHeader(title, "Labor Breakdown", data_package.LowVoltageExportSheetName);
+                InsertHeader(title, "Labor Breakdown", data_package.GetSelectedGlobalSettingsPackage().LowVoltageExportSheetName);
             }
 
             // voltage drop
@@ -215,10 +215,10 @@ namespace JPMorrow.Excel
 			static double shave_labor(double labor) => labor * 0.82;
 
             WirePackageSettings wire_pack_settings = WirePackageSettings.Load();
-            var h = package.MiscHardwareEntries;
-            var fixture_hangers = package.FixtureHangers;
-            var single_hangers = package.SingleHangers;
-            var strut_hangers = package.StrutHangers;
+            var h = package.GetSelectedHardwarePackage().MiscHardwareEntries;
+            var fixture_hangers = package.GetSelectedHangerPackage().FixtureHangers;
+            var single_hangers = package.GetSelectedHangerPackage().SingleHangers;
+            var strut_hangers = package.GetSelectedHangerPackage().StrutHangers;
             var totaled_cris = ConduitTotal.GetTotaledConduit(info, package, pull_type).Conduit;
             var elbows = FittingTotal.GetTotaledFittings(info, package, pull_type).Fittings;
             var couplings = CouplingTotal.GetTotaledCouplings(info, package, pull_type).Couplings;
@@ -410,7 +410,7 @@ namespace JPMorrow.Excel
                         size = total.Size;
                     }
                     
-                    double rounded_len = (int)Math.Ceiling(((total.Length + package.WireMakeupLength) / 10.0) * 10.0);
+                    double rounded_len = (int)Math.Ceiling(((total.Length + package.GetSelectedGlobalSettingsPackage().WireMakeupLength) / 10.0) * 10.0);
                     var has_item = l.GetItem(out var li, (double)rounded_len, "Wire", total.MaterialTypeText, total.Size);
                     if(!has_item) throw new Exception("No Labor item for hardware");
 
@@ -448,16 +448,16 @@ namespace JPMorrow.Excel
             var project_title = info.DOC.ProjectInformation.Name;
             string title = "M.P.A.C.T. - " + project_title;
 
-            InsertHeader(title, "Hanger Labor Breakdown", data_package.HangerExportSheetName);
+            InsertHeader(title, "Hanger Labor Breakdown", data_package.GetSelectedGlobalSettingsPackage().HangerExportSheetName);
 
             double gt = 0.0; // Grand Total
 			double code_one_gt = 0; // 01 EMPTY RACEWAY Grand Total
             static double shave_labor(double labor) => labor * 0.82;
             
             LaborExchange l = new LaborExchange(ModelInfo.SettingsBasePath, package.LaborHourEntries);
-            var fixture_hangers = package.FixtureHangers;
-            var single_hangers = package.SingleHangers;
-            var strut_hangers = package.StrutHangers;
+            var fixture_hangers = package.GetSelectedHangerPackage().FixtureHangers;
+            var single_hangers = package.GetSelectedHangerPackage().SingleHangers;
+            var strut_hangers = package.GetSelectedHangerPackage().StrutHangers;
 
             #region Hanger Labor
             bool has_hangers = fixture_hangers.Any() || single_hangers.Any() || strut_hangers.Any();
@@ -702,7 +702,7 @@ namespace JPMorrow.Excel
 
             InsertSingleDivider(Draw.Color.Chocolate, Draw.Color.White, "Conduit", 15);
 
-			List<ElecRoomConduit> conduit = package.ElectricalRoomPack.FlattenConduit(info).ToList();
+			List<ElecRoomConduit> conduit = package.GetSelectedElecRoomPackage().ElectricalRoomPack.FlattenConduit(info).ToList();
 			UnistrutTotal ut = room.Unistrut.FlattenUnistrut(info);
 			GrdBarTotal gbt = room.GroundBar.FlattenGroundBars(info);
 			PanelBackingTotal pbt = room.PanelBacking.FlattenPanelBacking();
@@ -982,7 +982,7 @@ namespace JPMorrow.Excel
 
             InsertHeader(title, "Conduit And Wire Only", project_file_name);
 
-			foreach(var run in package.Cris.OrderBy(x => x.From).ThenBy(y => y.To).ThenBy(z => z.ConduitMaterialType).ToList())
+			foreach(var run in package.GetSelectedConduitPackage().Cris.OrderBy(x => x.From).ThenBy(y => y.To).ThenBy(z => z.ConduitMaterialType).ToList())
 			{
 				var len = RMeasure.LengthFromDbl(info.DOC, run.Length);
 				var ws = run.GetRevitWireSizeString(info);
@@ -1009,7 +1009,7 @@ namespace JPMorrow.Excel
 
             InsertHeader(title, "Conduit Only", project_file_name);
 
-            var group_mat_types = data_package.Cris
+            var group_mat_types = data_package.GetSelectedConduitPackage().Cris
                 .GroupBy(x => new { Mat = x.ConduitMaterialType, Diameter = RMeasure.LengthFromDbl(info.DOC, x.Diameter) } )
                 .Select(x => new { Length = RMeasure.LengthFromDbl(info.DOC, x.Sum(x => x.Length)), Diameter = x.Key.Diameter, Material = x.Key.Mat })
                 .ToList();

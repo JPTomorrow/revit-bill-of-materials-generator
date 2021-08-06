@@ -61,13 +61,13 @@ namespace JPMorrow.UI.ViewModels
                             wire_size, wire_size, wire_size, stag, boy, 
                             phase_nuet, ig, wire_mat_type, branch_panel_phase);
 
-                        ALS.AppData.WireManager.StoreBranchWire(ids, voltage, new[] { kvp.Key }, wire_data);
+                        ALS.AppData.GetSelectedConduitPackage().WireManager.StoreBranchWire(ids, voltage, new[] { kvp.Key }, wire_data);
                     }
                 }
 
                 List<Wire> display_wire = new List<Wire>();
                 Selected_Run_Items.Select(x => x.Value).ToList()
-                    .ForEach(x => display_wire.AddRange(ALS.AppData.WireManager.GetWires(x.WireIds)));
+                    .ForEach(x => display_wire.AddRange(ALS.AppData.GetSelectedConduitPackage().WireManager.GetWires(x.WireIds)));
 
                 Wire_Items.Clear();
                 display_wire.ForEach(x => Wire_Items.Add(new WirePresenter(x, ALS.Info)));
@@ -109,12 +109,12 @@ namespace JPMorrow.UI.ViewModels
                         run.To, dist_size, dist_color, wire_type, 
                         WireCreationData.GetMaterialTypeFromString(wire_mat_type));
 
-                    ALS.AppData.WireManager.StoreDistWire(ids, wire);
+                    ALS.AppData.GetSelectedConduitPackage().WireManager.StoreDistWire(ids, wire);
                 }
 
                 List<Wire> display_wire = new List<Wire>();
                 Selected_Run_Items.Select(x => x.Value).ToList()
-                    .ForEach(x => display_wire.AddRange(ALS.AppData.WireManager.GetWires(x.WireIds)));
+                    .ForEach(x => display_wire.AddRange(ALS.AppData.GetSelectedConduitPackage().WireManager.GetWires(x.WireIds)));
 
                 Wire_Items.Clear();
                 display_wire.ForEach(x => Wire_Items.Add(new WirePresenter(x, ALS.Info)));
@@ -144,12 +144,12 @@ namespace JPMorrow.UI.ViewModels
                 foreach(var run in sel_presenters.Select(x => x.Value)) {
                     var ids = run.WireIds;
                     var wire = new Wire(run.To, size, color, wire_type, WireMaterialType.Special);
-                    ALS.AppData.WireManager.StoreDistWire(ids, wire);
+                    ALS.AppData.GetSelectedConduitPackage().WireManager.StoreDistWire(ids, wire);
                 }
 
                 List<Wire> display_wire = new List<Wire>();
                 Selected_Run_Items.Select(x => x.Value).ToList()
-                    .ForEach(x => display_wire.AddRange(ALS.AppData.WireManager.GetWires(x.WireIds)));
+                    .ForEach(x => display_wire.AddRange(ALS.AppData.GetSelectedConduitPackage().WireManager.GetWires(x.WireIds)));
 
                 Wire_Items.Clear();
                 display_wire.ForEach(x => Wire_Items.Add(new WirePresenter(x, ALS.Info)));
@@ -171,7 +171,7 @@ namespace JPMorrow.UI.ViewModels
             WireType type = Wire.GetWireType(Export_Type_Items[Sel_Export_Type]);
 
             bool unmark(int[] ids) => 
-                ALS.AppData.WireManager.GetWires(ids)
+                ALS.AppData.GetSelectedConduitPackage().WireManager.GetWires(ids)
                 .Any(x => x.IsNoWireExport(type));
 
             foreach(var run in runs)
@@ -179,12 +179,12 @@ namespace JPMorrow.UI.ViewModels
                 var ids = run.WireIds;
 
                 if(unmark(ids)) {
-                    ALS.AppData.WireManager.RemoveWires(ids);
+                    ALS.AppData.GetSelectedConduitPackage().WireManager.RemoveWires(ids);
                 }
                 else {
-                    ALS.AppData.WireManager.RemoveWires(ids);
+                    ALS.AppData.GetSelectedConduitPackage().WireManager.RemoveWires(ids);
                     var wire = new Wire("NO WIRE EXPORT", "NO WIRE EXPORT", "NO WIRE EXPORT", type, WireMaterialType.Special);
-                    ALS.AppData.WireManager.StoreDistWire(ids, wire);
+                    ALS.AppData.GetSelectedConduitPackage().WireManager.StoreDistWire(ids, wire);
                 }
             }
             
@@ -233,12 +233,12 @@ namespace JPMorrow.UI.ViewModels
                 var ids = run.WireIds;
 
                 foreach(var wire in sel_wires) {
-                    if(ALS.AppData.WireManager.ContainsWire(ids, wire))
-                        ALS.AppData.WireManager.RemoveWire(ids, wire, out int rem);
+                    if(ALS.AppData.GetSelectedConduitPackage().WireManager.ContainsWire(ids, wire))
+                        ALS.AppData.GetSelectedConduitPackage().WireManager.RemoveWire(ids, wire, out int rem);
                 }
                     
 
-                display_wire.AddRange(ALS.AppData.WireManager.GetWires(ids));
+                display_wire.AddRange(ALS.AppData.GetSelectedConduitPackage().WireManager.GetWires(ids));
             }
 
             Wire_Items.Clear();
@@ -267,10 +267,10 @@ namespace JPMorrow.UI.ViewModels
                 string txt_filename = ofd.FileName;
                 OtherProject = new MasterDataPackage();
                 OtherProject.LoadPackageFromLocation(txt_filename);
-                var cris = OtherProject.Cris;
+                var cris = OtherProject.GetSelectedConduitPackage().Cris;
                 Migrate_Run_Items.Clear();
                 cris.ForEach(x => {
-                    var wire_cnt = OtherProject.WireManager.GetWires(x.WireIds).Count();
+                    var wire_cnt = OtherProject.GetSelectedConduitPackage().WireManager.GetWires(x.WireIds).Count();
                     if(wire_cnt > 0) Migrate_Run_Items.Add(new MigrantRunPresenter(x, ALS.Info));
                 });
                 Update("Migrate_Run_Items");
@@ -295,12 +295,12 @@ namespace JPMorrow.UI.ViewModels
                 var current_run = current_sel.First();
                 var other_run = other_sel.First();
 
-                var other_wires = OtherProject.WireManager.GetWires(other_run.WireIds);
+                var other_wires = OtherProject.GetSelectedConduitPackage().WireManager.GetWires(other_run.WireIds);
 
                 if(!other_wires.Any())
                     debugger.show(header:"Migrate Wire", err:"The other project run has no wire to migrate.");
 
-                ALS.AppData.WireManager.AddWires(current_run.WireIds, other_wires);
+                ALS.AppData.GetSelectedConduitPackage().WireManager.AddWires(current_run.WireIds, other_wires);
 
                 debugger.show( 
                     header:"Migrate Wire", 

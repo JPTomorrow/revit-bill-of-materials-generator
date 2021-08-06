@@ -43,7 +43,7 @@ namespace JPMorrow.UI.ViewModels
                 bool exports_selected = export_branch || export_dist || export_lowvoltage || export_hanger_labor || 
                     export_elecroom || export_conduit_wire_only || export_conduit_only || export_legacy_p3_in_wall;
 
-                if(!ALS.AppData.Cris.Any()) 
+                if(!ALS.AppData.GetSelectedConduitPackage().Cris.Any()) 
                 {
                     debugger.show(
                         header:"Export", 
@@ -120,7 +120,7 @@ namespace JPMorrow.UI.ViewModels
 
                 if(export_elecroom) 
                 {
-                    foreach(var er in ALS.AppData.ElectricalRoomPack.Rooms) 
+                    foreach(var er in ALS.AppData.GetSelectedElecRoomPackage().ElectricalRoomPack.Rooms) 
                     {
                         ExcelOutputSheet s1 = new ExcelOutputSheet(ExportStyle.ElecRoom);
                         exporter.RegisterSheets("elec room", s1);

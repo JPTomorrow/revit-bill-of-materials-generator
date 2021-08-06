@@ -18,6 +18,7 @@ using om = System.Collections.ObjectModel;
 using JPMorrow.Revit.ConduitRuns;
 using JPMorrow.Revit.Measurements;
 using JPMorrow.Data.Globals;
+using JPMorrow.Tools.Diagnostics;
 
 namespace JPMorrow.UI.ViewModels
 {
@@ -230,6 +231,40 @@ namespace JPMorrow.UI.ViewModels
 
         public ICommand GetConduitLoadCmd => new RelayCommand<Window>(GetConduitLoad);
         public ICommand GetStrutLengthFromSelectedCmd => new RelayCommand<Window>(GetStrutLengthFromSelected);
+
+        /// <summary>
+        /// Package Selection UI
+        /// </summary>
+        
+        public ObsStr ConduitPackageNameItems { get; set; } = new ObsStr();
+        public ObsStr HangerPackageNameItems { get; set; } = new ObsStr();
+        public ObsStr P3PackageNameItems { get; set; } = new ObsStr();
+        public ObsStr HardwarePackageNameItems { get; set; } = new ObsStr();
+        public ObsStr ElecRoomPackageNameItems { get; set; } = new ObsStr();
+        public ObsStr GlobalSettingsPackageNameItems { get; set; } = new ObsStr();
+
+        public int SelConduitPackage { get; set; }
+        public int SelHangerPackage { get; set; }
+        public int SelP3Package { get; set; }
+        public int SelHardwarePackage { get; set; }
+        public int SelElecRoomPackage { get; set; }
+        public int SelGlobalSettingsPackage { get; set; }
+
+        public ICommand AddNewConduitSubPackageCmd => new RelayCommand<ComboBox>(AddNewConduitSubPackage);
+        public ICommand RemoveConduitSubPackageCmd => new RelayCommand<Window>(RemoveConduitSubPackage);
+        public ICommand ConduitSubPackageSelectionChangedCmd => new RelayCommand<Window>(ConduitSubPackageSelectionChanged);
+
+        public ICommand AddNewHangerSubPackageCmd => new RelayCommand<ComboBox>(AddNewHangerSubPackage);
+        public ICommand RemoveHangerSubPackageCmd => new RelayCommand<Window>(RemoveHangerSubPackage);
+        public ICommand HangerSubPackageSelectionChangedCmd => new RelayCommand<Window>(HangerSubPackageSelectionChanged);
+
+        public ICommand AddNewHardwareSubPackageCmd => new RelayCommand<ComboBox>(AddNewHardwareSubPackage);
+        public ICommand RemoveHardwareSubPackageCmd => new RelayCommand<Window>(RemoveHardwareSubPackage);
+        public ICommand HardwareSubPackageSelectionChangedCmd => new RelayCommand<Window>(HardwareSubPackageSelectionChanged);
+
+        public ICommand AddNewGlobalSettingsSubPackageCmd => new RelayCommand<ComboBox>(AddNewGlobalSettingsSubPackage);
+        public ICommand RemoveGlobalSettingsSubPackageCmd => new RelayCommand<Window>(RemoveGlobalSettingsSubPackage);
+        public ICommand GlobalSettingsSubPackageSelectionChangedCmd => new RelayCommand<Window>(GlobalSettingsSubPackageSelectionChanged);
         
         //Action Log Text
         public string Action_Log { get; set; }
@@ -297,6 +332,31 @@ namespace JPMorrow.UI.ViewModels
             }
 
             ALS.AppData.LoadPackageFromLocation(path);
+
+            // fill in combo boxes
+            ConduitPackageNameItems = new ObsStr(ALS.AppData.ConduitPackages.Select(x => x.PackageName));
+            HangerPackageNameItems = new ObsStr(ALS.AppData.HangerPackages.Select(x => x.PackageName));
+            P3PackageNameItems = new ObsStr(ALS.AppData.P3Packages.Select(x => x.PackageName));
+            HardwarePackageNameItems = new ObsStr(ALS.AppData.HardwarePackages.Select(x => x.PackageName));
+            ElecRoomPackageNameItems = new ObsStr(ALS.AppData.ElecRoomPackages.Select(x => x.PackageName));
+            GlobalSettingsPackageNameItems = new ObsStr(ALS.AppData.GlobalSettingsPackages.Select(x => x.PackageName));
+
+            SelConduitPackage = ALS.AppData.SelectedConduitPackageIdx;
+            SelHangerPackage = ALS.AppData.SelectedHangerPackageIdx;
+            SelP3Package = ALS.AppData.SelectedP3PackageIdx;
+            SelHardwarePackage = ALS.AppData.SelectedHardwarePackageIdx;
+            SelElecRoomPackage = ALS.AppData.SelectedElecRoomPackageIdx;
+            SelGlobalSettingsPackage = ALS.AppData.SelectedGlobalSettingsPackageIdx;
+
+            Branch_Export_Sheet_Name_Txt = ALS.AppData.GetSelectedGlobalSettingsPackage().BranchExportSheetName;
+            Distribution_Export_Sheet_Name_Txt = ALS.AppData.GetSelectedGlobalSettingsPackage().DistributionExportSheetName;
+            Low_Voltage_Export_Sheet_Name_Txt = ALS.AppData.GetSelectedGlobalSettingsPackage().LowVoltageExportSheetName;
+            Hangers_Export_Sheet_Name_Txt = ALS.AppData.GetSelectedGlobalSettingsPackage().HangerExportSheetName;
+
+            // set makeup length from ALS.AppData
+            Wire_Makeup_Length_Txt = RMeasure.LengthFromDbl(ALS.Info.DOC, ALS.AppData.GetSelectedGlobalSettingsPackage().WireMakeupLength);
+
+
             WriteToLog("Loaded package at: " + packagePath);
         }
 
@@ -334,14 +394,6 @@ namespace JPMorrow.UI.ViewModels
             Load_Length_Txt = "0' 1\"";
             
             UpdateTotalStrutLengthLabel();
-
-            Branch_Export_Sheet_Name_Txt = ALS.AppData.BranchExportSheetName;
-            Distribution_Export_Sheet_Name_Txt = ALS.AppData.DistributionExportSheetName;
-            Low_Voltage_Export_Sheet_Name_Txt = ALS.AppData.LowVoltageExportSheetName;
-            Hangers_Export_Sheet_Name_Txt = ALS.AppData.HangerExportSheetName;
-
-            // set makeup length from ALS.AppData
-            Wire_Makeup_Length_Txt = RMeasure.LengthFromDbl(ALS.Info.DOC, ALS.AppData.WireMakeupLength);
 
             var ws_idx = Wire.WireSizes.ToList().IndexOf("#12");
             var pv_idx = Wire.PanelVoltages.ToList().IndexOf(Wire.PanelVoltages.First());
@@ -433,7 +485,7 @@ namespace JPMorrow.UI.ViewModels
             if(p(BOMDataGrid.Runs)) 
             {
                 Run_Items.Clear();
-                ALS.AppData.Cris.ForEach(x => Run_Items.Add(new RunPresenter(x, ALS.Info)));
+                ALS.AppData.GetSelectedConduitPackage().Cris.ForEach(x => Run_Items.Add(new RunPresenter(x, ALS.Info)));
                 Update("Run_Items");
             }
 
@@ -451,9 +503,11 @@ namespace JPMorrow.UI.ViewModels
                 Single_Hanger_Items.Clear();
                 Strut_Hanger_Items.Clear();
                 Fixture_Hanger_Items.Clear();
-                ALS.AppData.SingleHangers.ForEach(x => Single_Hanger_Items.Add(new SingleHangerPresenter(x, ALS.Info)));
-                ALS.AppData.StrutHangers.ForEach(x => Strut_Hanger_Items.Add(new StrutHangerPresenter(x, ALS.Info)));
-                ALS.AppData.FixtureHangers.ForEach(x => Fixture_Hanger_Items.Add(new FixtureHangerPresenter(x, ALS.Info)));
+
+                var hanger_package = ALS.AppData.GetSelectedHangerPackage();
+                hanger_package.SingleHangers.ForEach(x => Single_Hanger_Items.Add(new SingleHangerPresenter(x, ALS.Info)));
+                hanger_package.StrutHangers.ForEach(x => Strut_Hanger_Items.Add(new StrutHangerPresenter(x, ALS.Info)));
+                hanger_package.FixtureHangers.ForEach(x => Fixture_Hanger_Items.Add(new FixtureHangerPresenter(x, ALS.Info)));
 
                 Update("Single_Hanger_Items");
                 Update("Strut_Hanger_Items");
@@ -463,7 +517,7 @@ namespace JPMorrow.UI.ViewModels
             if(p(BOMDataGrid.Hardware)) 
             {
                 Hardware_Items.Clear();
-                ALS.AppData.MiscHardwareEntries.ForEach(x => Hardware_Items.Add(new HardwarePresenter(x, ALS.Info)));
+                ALS.AppData.GetSelectedHardwarePackage().MiscHardwareEntries.ForEach(x => Hardware_Items.Add(new HardwarePresenter(x, ALS.Info)));
                 Update("Hardware_Items");
             }
 
@@ -477,7 +531,7 @@ namespace JPMorrow.UI.ViewModels
             if(p(BOMDataGrid.P3)) 
             {
                 P3_Items.Clear();
-                ALS.AppData.P3Boxes.ForEach(x => P3_Items.Add(new P3BoxPresenter(x, ALS.Info)));
+                ALS.AppData.GetSelectedP3Package().P3Boxes.ForEach(x => P3_Items.Add(new P3BoxPresenter(x, ALS.Info)));
                 Update("P3_Items");
             }
 
@@ -487,7 +541,7 @@ namespace JPMorrow.UI.ViewModels
             if(p(BOMDataGrid.ElecRoom)) 
             {
                 Elec_Room_Items.Clear();
-                ALS.AppData.ElectricalRoomPack.Rooms.ForEach(room => Elec_Room_Items.Add(new ElecRoomPresenter(room)));
+                ALS.AppData.GetSelectedElecRoomPackage().ElectricalRoomPack.Rooms.ForEach(room => Elec_Room_Items.Add(new ElecRoomPresenter(room)));
                 Update("Elec_Room_Items");
 
                 Unistrut_Items.Clear();

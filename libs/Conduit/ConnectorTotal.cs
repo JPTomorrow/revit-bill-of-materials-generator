@@ -43,7 +43,7 @@ namespace JPMorrow.Revit.Connectors {
 		public static ConnectorTotal GetTotaledConnectors(ModelInfo info, MasterDataPackage package, WireType type) {
 			
 			ConnectorTotal t = new ConnectorTotal();
-			t.PushConnectors(info, package.Cris, type);
+			t.PushConnectors(info, package.GetSelectedConduitPackage().Cris, type);
 			t.OrderConnectors();
 			return t;
 		}

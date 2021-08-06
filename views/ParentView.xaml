@@ -277,14 +277,25 @@
           </Grid.ColumnDefinitions>
           <Grid.RowDefinitions>
             <RowDefinition Height="40"/>
+            <RowDefinition Height="40"/>
             <RowDefinition Height="{Binding Source={StaticResource Datagrid_Size}}" />
             <RowDefinition Height="40"/>
             <RowDefinition Height="auto"/>
             <RowDefinition Height="20"/> <!-- padding -->
           </Grid.RowDefinitions>
 
-          <Button Name="SelectAllRunsButton" Command="{Binding SelectAllRunsCmd}" CommandParameter="{Binding ElementName = WindowBase}" Style="{StaticResource MarathonRed}" Content="Select All" Margin="2" Background="Transparent" Foreground="White" BorderThickness="1" Width="auto" Height="auto" Grid.Column="6" Grid.Row="0" Grid.ColumnSpan="1"/>
-          <DataGrid Name="ConduitRunBox" ItemsSource="{Binding Run_Items}" Style="{StaticResource DGrids}" RowStyle="{StaticResource DGSel}" Grid.Column="0" Grid.Row="1" Grid.ColumnSpan="8">
+          <ComboBox Name="ConduitSubPackageCB" SelectedIndex="{Binding Path=SelConduitPackage, Mode=TwoWay}" VerticalContentAlignment="Center" ItemsSource="{Binding ConduitPackageNameItems}" Margin="3" Grid.Column="0" Grid.Row="0" Grid.ColumnSpan="1">
+            <i:Interaction.Triggers>
+              <i:EventTrigger EventName="SelectionChanged">
+                <i:InvokeCommandAction Command="{Binding ConduitSubPackageSelectionChangedCmd}" CommandParameter="{Binding ElementName = WindowBase}"/>
+              </i:EventTrigger>
+            </i:Interaction.Triggers>
+          </ComboBox>
+          <Button Name="AddNewConduitSubPackage" Command="{Binding AddNewConduitSubPackageCmd}" CommandParameter="{Binding ElementName = ConduitSubPackageCB}" Style="{StaticResource MarathonRed}" Content="Add" Margin="2" Background="Transparent" Foreground="White" BorderThickness="1" Width="auto" Height="auto" Grid.Column="1" Grid.Row="0" Grid.ColumnSpan="1"/>
+          <Button Name="RemoveConduitSubPackage" Command="{Binding RemoveNewConduitSubPackageCmd}" CommandParameter="{Binding ElementName = ConduitSubPackageCB}" Style="{StaticResource MarathonRed}" Content="Remove" Margin="2" Background="Transparent" Foreground="White" BorderThickness="1" Width="auto" Height="auto" Grid.Column="2" Grid.Row="0" Grid.ColumnSpan="1"/>
+
+          <Button Name="SelectAllRunsButton" Command="{Binding SelectAllRunsCmd}" CommandParameter="{Binding ElementName = WindowBase}" Style="{StaticResource MarathonRed}" Content="Select All" Margin="2" Background="Transparent" Foreground="White" BorderThickness="1" Width="auto" Height="auto" Grid.Column="6" Grid.Row="1" Grid.ColumnSpan="1"/>
+          <DataGrid Name="ConduitRunBox" ItemsSource="{Binding Run_Items}" Style="{StaticResource DGrids}" RowStyle="{StaticResource DGSel}" Grid.Column="0" Grid.Row="2" Grid.ColumnSpan="8">
 
             <i:Interaction.Triggers>
               <i:EventTrigger EventName="SelectionChanged">
@@ -303,9 +314,9 @@
             </DataGrid.Columns>
           </DataGrid>
 
-          <TextBlock Text="Conduit Modifications &amp; Information" Margin="10,0,0,0" FontSize="18" Foreground="White" Grid.Column="0" Grid.Row="2" Grid.ColumnSpan="2" VerticalAlignment="center" TextDecorations="Underline"/>
+          <TextBlock Text="Conduit Modifications &amp; Information" Margin="10,0,0,0" FontSize="18" Foreground="White" Grid.Column="0" Grid.Row="3" Grid.ColumnSpan="2" VerticalAlignment="center" TextDecorations="Underline"/>
           
-          <TabControl Name="Revit_Conduit_Modification_Tabs" Grid.Column="0" Grid.Row="3"
+          <TabControl Name="Revit_Conduit_Modification_Tabs" Grid.Column="0" Grid.Row="4"
 		                  Grid.ColumnSpan="3" Margin="10" Background="Maroon" SelectedIndex="0">
             <TabItem Header="Material Type">
               <Grid>
@@ -345,8 +356,8 @@
             </TabItem>
           </TabControl>
 
-          <TextBlock Text="Add / Remove Conduit" Margin="10,0,0,0" FontSize="18" Foreground="White" Grid.Column="4" Grid.Row="2" Grid.ColumnSpan="2" VerticalAlignment="center" TextDecorations="Underline"/>
-          <TabControl Name="Revit_Conduit_Tabs" Grid.Column="4" Grid.Row="3"
+          <TextBlock Text="Add / Remove Conduit" Margin="10,0,0,0" FontSize="18" Foreground="White" Grid.Column="4" Grid.Row="3" Grid.ColumnSpan="2" VerticalAlignment="center" TextDecorations="Underline"/>
+          <TabControl Name="Revit_Conduit_Tabs" Grid.Column="4" Grid.Row="4"
 		                  Grid.ColumnSpan="4" Margin="10" Background="Maroon" SelectedIndex="0">
                       
               <TabItem Header="By View">
@@ -396,14 +407,15 @@
           </Grid.ColumnDefinitions>
           <Grid.RowDefinitions>
             <RowDefinition Height="40*"/>
+            <RowDefinition Height="40*"/>
             <RowDefinition Height="{Binding Source={StaticResource Datagrid_Size}}"/>
             <RowDefinition Height="40*"/>
             <RowDefinition Height="40*"/>
           </Grid.RowDefinitions>
 
-          <TextBlock Text="P3 Lighting Fixtures:" Margin="10,0,0,0" FontSize="18" TextDecorations="Underline" Foreground="White" Grid.Column="0" Grid.Row="0" Grid.ColumnSpan="3" VerticalAlignment="center"/>
+          <TextBlock Text="P3 Lighting Fixtures:" Margin="10,0,0,0" FontSize="18" TextDecorations="Underline" Foreground="White" Grid.Column="0" Grid.Row="1" Grid.ColumnSpan="3" VerticalAlignment="center"/>
 
-          <DataGrid Name="P3LightingBox" ItemsSource="{Binding P3_Lighting_Fixture_Items}" Style="{StaticResource DGrids}" RowStyle="{StaticResource DGSel}" Grid.Column="0" Grid.Row="1" Grid.ColumnSpan="3">
+          <DataGrid Name="P3LightingBox" ItemsSource="{Binding P3_Lighting_Fixture_Items}" Style="{StaticResource DGrids}" RowStyle="{StaticResource DGSel}" Grid.Column="0" Grid.Row="2" Grid.ColumnSpan="3">
 
             <i:Interaction.Triggers>
               <i:EventTrigger EventName="SelectionChanged">
@@ -420,9 +432,9 @@
             </DataGrid.Columns>
           </DataGrid>
 
-          <Button Name="DebugSelectedP3LightingFixtureButton" Command="{Binding DebugSelectedP3LightingFixtureCmd}" CommandParameter="{Binding ElementName = WindowBase}" Style="{StaticResource MarathonRed}" Content="Debug Selected Fixture" Margin="2,2,0,2" Background="Transparent" Foreground="White" BorderThickness="1" Width="auto" Height="auto" Grid.Column="0" Grid.Row="2"/>
-          <Button Name="AddP3LightingFixturesInViewButton" Command="{Binding AddP3FixturesInViewCmd}" CommandParameter="{Binding ElementName = WindowBase}" Style="{StaticResource MarathonRed}" Content="Add Fixtures In View" Margin="2,2,0,2" Background="Transparent" Foreground="White" BorderThickness="1" Width="auto" Height="auto" Grid.Column="1" Grid.Row="2"/>
-          <Button Name="SelectP3LightingNetworkButton" Command="{Binding SelectP3LightingNetworkCmd}" CommandParameter="{Binding ElementName = WindowBase}" Style="{StaticResource MarathonRed}" Content="Select Network" Margin="2,2,0,2" Background="Transparent" Foreground="White" BorderThickness="1" Width="auto" Height="auto" Grid.Column="2" Grid.Row="2"/>
+          <Button Name="DebugSelectedP3LightingFixtureButton" Command="{Binding DebugSelectedP3LightingFixtureCmd}" CommandParameter="{Binding ElementName = WindowBase}" Style="{StaticResource MarathonRed}" Content="Debug Selected Fixture" Margin="2,2,0,2" Background="Transparent" Foreground="White" BorderThickness="1" Width="auto" Height="auto" Grid.Column="0" Grid.Row="3"/>
+          <Button Name="AddP3LightingFixturesInViewButton" Command="{Binding AddP3FixturesInViewCmd}" CommandParameter="{Binding ElementName = WindowBase}" Style="{StaticResource MarathonRed}" Content="Add Fixtures In View" Margin="2,2,0,2" Background="Transparent" Foreground="White" BorderThickness="1" Width="auto" Height="auto" Grid.Column="1" Grid.Row="3"/>
+          <Button Name="SelectP3LightingNetworkButton" Command="{Binding SelectP3LightingNetworkCmd}" CommandParameter="{Binding ElementName = WindowBase}" Style="{StaticResource MarathonRed}" Content="Select Network" Margin="2,2,0,2" Background="Transparent" Foreground="White" BorderThickness="1" Width="auto" Height="auto" Grid.Column="2" Grid.Row="3"/>
         </Grid>
       </TabItem>
 
@@ -475,13 +487,14 @@
             <ColumnDefinition Width="*"/>
           </Grid.ColumnDefinitions>
           <Grid.RowDefinitions>
+            <RowDefinition Height="40"/>
             <RowDefinition Height="30*"/>
             <RowDefinition Height="{Binding Source={StaticResource Datagrid_Size}}"/>
             <RowDefinition Height="auto"/>
           </Grid.RowDefinitions>
           
-          <TextBlock Text="Selected Runs:" Margin="10,0,0,0" FontSize="18" TextDecorations="Underline" Foreground="White" Grid.Column="0" Grid.Row="0" Grid.ColumnSpan="3" VerticalAlignment="center"/>
-          <DataGrid Name="WireSelectedRunsBox" Style="{StaticResource DGrids}" RowStyle="{StaticResource DGSel}" ItemsSource="{Binding Selected_Run_Items}" Grid.Column="0" Grid.Row="1" Grid.ColumnSpan="3">
+          <TextBlock Text="Selected Runs:" Margin="10,0,0,0" FontSize="18" TextDecorations="Underline" Foreground="White" Grid.Column="0" Grid.Row="1" Grid.ColumnSpan="3" VerticalAlignment="center"/>
+          <DataGrid Name="WireSelectedRunsBox" Style="{StaticResource DGrids}" RowStyle="{StaticResource DGSel}" ItemsSource="{Binding Selected_Run_Items}" Grid.Column="0" Grid.Row="2" Grid.ColumnSpan="3">
             <DataGrid.Columns>
               <DataGridTextColumn CellStyle="{StaticResource RunCells}" IsReadOnly="True" Header="Has Wire" Binding="{Binding Path=Has_Wire}"/>
               <DataGridTextColumn CellStyle="{StaticResource RunCells}" IsReadOnly="True" Header="From" Binding="{Binding Path=From}"/>
@@ -492,8 +505,9 @@
               <DataGridTextColumn CellStyle="{StaticResource RunCells}" IsReadOnly="True" Header="Type" Binding="{Binding Path=Conduit_Type}"/>
             </DataGrid.Columns>
           </DataGrid>
-          <TextBlock Text="Wire:" Margin="10,0,0,0" FontSize="18" TextDecorations="Underline" Foreground="White" Grid.Column="4" Grid.Row="0" Grid.ColumnSpan="3" VerticalAlignment="center"/>
-          <DataGrid Name="WireBox" ItemsSource="{Binding Wire_Items}" Style="{StaticResource DGrids}" RowStyle="{StaticResource DGSel}" Grid.Column="4" Grid.Row="1" Grid.ColumnSpan="3">
+
+          <TextBlock Text="Wire:" Margin="10,0,0,0" FontSize="18" TextDecorations="Underline" Foreground="White" Grid.Column="4" Grid.Row="1" Grid.ColumnSpan="3" VerticalAlignment="center"/>
+          <DataGrid Name="WireBox" ItemsSource="{Binding Wire_Items}" Style="{StaticResource DGrids}" RowStyle="{StaticResource DGSel}" Grid.Column="4" Grid.Row="2" Grid.ColumnSpan="3">
             <DataGrid.Columns>
               <DataGridTextColumn IsReadOnly="True" CellStyle="{StaticResource RunCells}" Header="Circuit Number" Binding="{Binding Path=C_Num}"/>
               <DataGridTextColumn IsReadOnly="True" CellStyle="{StaticResource RunCells}" Header="Color" Binding="{Binding Path=Color}"/>
@@ -503,7 +517,7 @@
             </DataGrid.Columns>
           </DataGrid>
 
-          <TabControl Name="Wire_Tabs" Grid.Column="0" Grid.Row="2" Grid.ColumnSpan="7" Margin="0,5,0,0" Background="Maroon" SelectedIndex="0">
+          <TabControl Name="Wire_Tabs" Grid.Column="0" Grid.Row="3" Grid.ColumnSpan="7" Margin="0,5,0,0" Background="Maroon" SelectedIndex="0">
 
             <TabItem Header="Branch By Circuit Amp/Voltage">
 
@@ -675,7 +689,7 @@
             </TabItem>
           </TabControl>
 
-          <Button Name="RemoveWireButton" Command="{Binding RemoveWireCmd}" CommandParameter="{Binding ElementName = WindowBase}" Style="{StaticResource MarathonRed}" Content="Remove Selected Wire" Margin="2,2,0,2" Background="Transparent" Foreground="White" BorderThickness="1" Width="auto" Height="auto" Grid.Column="6" Grid.Row="0" Grid.ColumnSpan="1"/>
+          <Button Name="RemoveWireButton" Command="{Binding RemoveWireCmd}" CommandParameter="{Binding ElementName = WindowBase}" Style="{StaticResource MarathonRed}" Content="Remove Selected Wire" Margin="2,2,0,2" Background="Transparent" Foreground="White" BorderThickness="1" Width="auto" Height="auto" Grid.Column="6" Grid.Row="1" Grid.ColumnSpan="1"/>
         </Grid>
       </TabItem>
 
@@ -693,6 +707,7 @@
             <ColumnDefinition Width="*"/>
           </Grid.ColumnDefinitions>
           <Grid.RowDefinitions>
+          <RowDefinition Height="40*"/>
             <RowDefinition Height="40*"/>
             <RowDefinition Height="{Binding Source={StaticResource Datagrid_Size}}"/>
             <RowDefinition Height="50*"/>
@@ -855,6 +870,30 @@
       </TabItem>
       <!-- Single Hangers -->
       <TabItem Header="Hangers">
+        <Grid>
+              <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="10"/>
+                <ColumnDefinition Width="*"/>
+                <ColumnDefinition Width="*"/>
+                <ColumnDefinition Width="*"/>
+                <ColumnDefinition Width="*"/>
+                <ColumnDefinition Width="10"/>
+              </Grid.ColumnDefinitions>
+              <Grid.RowDefinitions>
+                <RowDefinition Height="40"/>
+                <RowDefinition Height="*"/>
+              </Grid.RowDefinitions>
+
+              <ComboBox Name="HangerSubPackageCB" SelectedIndex="{Binding Path=SelHangerPackage, Mode=TwoWay}" VerticalContentAlignment="Center" ItemsSource="{Binding HangerPackageNameItems}" Margin="3" Grid.Column="1" Grid.Row="0" Grid.ColumnSpan="1">
+                <i:Interaction.Triggers>
+                  <i:EventTrigger EventName="SelectionChanged">
+                    <i:InvokeCommandAction Command="{Binding HangerSubPackageSelectionChangedCmd}" CommandParameter="{Binding ElementName = WindowBase}"/>
+                  </i:EventTrigger>
+                </i:Interaction.Triggers>
+              </ComboBox>
+              <Button Name="AddNewHangerSubPackage" Command="{Binding AddNewHangerSubPackageCmd}" CommandParameter="{Binding ElementName = HangerSubPackageCB}" Style="{StaticResource MarathonRed}" Content="Add" Margin="2" Background="Transparent" Foreground="White" BorderThickness="1" Width="auto" Height="auto" Grid.Column="2" Grid.Row="0" Grid.ColumnSpan="1"/>
+              <Button Name="RemoveHangerSubPackage" Command="{Binding RemoveNewHangerSubPackageCmd}" CommandParameter="{Binding ElementName = HangerSubPackageCB}" Style="{StaticResource MarathonRed}" Content="Remove" Margin="2" Background="Transparent" Foreground="White" BorderThickness="1" Width="auto" Height="auto" Grid.Column="3" Grid.Row="0" Grid.ColumnSpan="1"/>
+
         <TabControl Name="Hanger_Tabs" Grid.Column="1" Grid.Row="{Binding Source={StaticResource List_Tabs}}" Grid.ColumnSpan="4" Margin="0" Background="Maroon" SelectedIndex="0">
           <TabItem Header="Single">
             <Grid>
@@ -1003,6 +1042,7 @@
             </Grid>
           </TabItem>
         </TabControl>
+        </Grid>
       </TabItem>
       <TabItem Header="Labor">
         <Grid>
@@ -1048,24 +1088,37 @@
             <ColumnDefinition Width="*"/>
           </Grid.ColumnDefinitions>
           <Grid.RowDefinitions>
+            <RowDefinition Height="40"/>
             <RowDefinition Height="{Binding Source={StaticResource Datagrid_Size}}"/>
             <RowDefinition Height="40*"/>
             <RowDefinition Height="40*"/>
             <RowDefinition Height="40*"/>
           </Grid.RowDefinitions>
-          <DataGrid Name="MiscHardwareBox" ItemsSource="{Binding Hardware_Items}" Style="{StaticResource DGrids}" RowStyle="{StaticResource DGSel}" Grid.Column="0" Grid.Row="0" Grid.ColumnSpan="4">
+
+          <ComboBox Name="HardwareSubPackageCB" SelectedIndex="{Binding Path=SelHardwarePackage, Mode=TwoWay}" VerticalContentAlignment="Center" ItemsSource="{Binding HardwarePackageNameItems}" Margin="3" Grid.Column="0" Grid.Row="0" Grid.ColumnSpan="1">
+            <i:Interaction.Triggers>
+              <i:EventTrigger EventName="SelectionChanged">
+                <i:InvokeCommandAction Command="{Binding HardwareSubPackageSelectionChangedCmd}" CommandParameter="{Binding ElementName = WindowBase}"/>
+              </i:EventTrigger>
+            </i:Interaction.Triggers>
+          </ComboBox>
+          <Button Name="AddNewHardwareSubPackage" Command="{Binding AddNewHardwareSubPackageCmd}" CommandParameter="{Binding ElementName = HardwareSubPackageCB}" Style="{StaticResource MarathonRed}" Content="Add" Margin="2" Background="Transparent" Foreground="White" BorderThickness="1" Width="auto" Height="auto" Grid.Column="1" Grid.Row="0" Grid.ColumnSpan="1"/>
+          <Button Name="RemoveHardwareSubPackage" Command="{Binding RemoveNewHardwareSubPackageCmd}" CommandParameter="{Binding ElementName = HardwareSubPackageCB}" Style="{StaticResource MarathonRed}" Content="Remove" Margin="2" Background="Transparent" Foreground="White" BorderThickness="1" Width="auto" Height="auto" Grid.Column="2" Grid.Row="0" Grid.ColumnSpan="1"/>
+
+          <DataGrid Name="MiscHardwareBox" ItemsSource="{Binding Hardware_Items}" Style="{StaticResource DGrids}" RowStyle="{StaticResource DGSel}" Grid.Column="0" Grid.Row="1" Grid.ColumnSpan="4">
             <DataGrid.Columns>
               <DataGridTextColumn IsReadOnly="True" CellStyle="{StaticResource RunCells}" Header="Entry Name" Binding="{Binding Path=Entry_Name}"/>
               <DataGridTextColumn IsReadOnly="True" CellStyle="{StaticResource RunCells}" Header="Qty" Binding="{Binding Path=Quantity}"/>
             </DataGrid.Columns>
           </DataGrid>
-	  <!-- Misc Hardware Entry Boxes -->
-          <TextBlock Text="Entry Name:" Margin="10,0,0,0" FontSize="14" Foreground="White" Grid.Column="0" Grid.Row="1" VerticalAlignment="center"/>
-          <TextBox Text="{Binding Path=Hardware_Entry_Name_Txt, Mode=TwoWay}" VerticalContentAlignment="Center" Margin="3" Grid.Column="3" Grid.Row="1" Grid.ColumnSpan="1"/>
-          <TextBlock Text="Quantity:" Margin="10,0,0,0" FontSize="14" Foreground="White" Grid.Column="0" Grid.Row="2" VerticalAlignment="center"/>
-          <TextBox Text="{Binding Path=Hardware_Qty_Txt, Mode=TwoWay}" VerticalContentAlignment="Center" Margin="3" Grid.Column="3" Grid.Row="2" Grid.ColumnSpan="1"/>
-          <Button Name="AddHardwareButton" Command="{Binding AddHardwareEntryCmd}" CommandParameter="{Binding ElementName = WindowBase}" Style="{StaticResource MarathonRed}" Content="Add" Margin="2,2,0,2" Background="Transparent" Foreground="White" BorderThickness="1" Width="auto" Height="auto" Grid.Column="2" Grid.Row="3"/>
-          <Button Name="RemoveHardwareButton" Command="{Binding RemoveHardwareEntryCmd}" CommandParameter="{Binding ElementName = WindowBase}" Style="{StaticResource MarathonRed}" Content="Remove" Margin="2,2,0,2" Background="Transparent" Foreground="White" BorderThickness="1" Width="auto" Height="auto" Grid.Column="3" Grid.Row="3"/>
+
+	        <!-- Misc Hardware Entry Boxes -->
+          <TextBlock Text="Entry Name:" Margin="10,0,0,0" FontSize="14" Foreground="White" Grid.Column="0" Grid.Row="2" VerticalAlignment="center"/>
+          <TextBox Text="{Binding Path=Hardware_Entry_Name_Txt, Mode=TwoWay}" VerticalContentAlignment="Center" Margin="3" Grid.Column="3" Grid.Row="2" Grid.ColumnSpan="1"/>
+          <TextBlock Text="Quantity:" Margin="10,0,0,0" FontSize="14" Foreground="White" Grid.Column="0" Grid.Row="3" VerticalAlignment="center"/>
+          <TextBox Text="{Binding Path=Hardware_Qty_Txt, Mode=TwoWay}" VerticalContentAlignment="Center" Margin="3" Grid.Column="3" Grid.Row="3" Grid.ColumnSpan="1"/>
+          <Button Name="AddHardwareButton" Command="{Binding AddHardwareEntryCmd}" CommandParameter="{Binding ElementName = WindowBase}" Style="{StaticResource MarathonRed}" Content="Add" Margin="2,2,0,2" Background="Transparent" Foreground="White" BorderThickness="1" Width="auto" Height="auto" Grid.Column="2" Grid.Row="4"/>
+          <Button Name="RemoveHardwareButton" Command="{Binding RemoveHardwareEntryCmd}" CommandParameter="{Binding ElementName = WindowBase}" Style="{StaticResource MarathonRed}" Content="Remove" Margin="2,2,0,2" Background="Transparent" Foreground="White" BorderThickness="1" Width="auto" Height="auto" Grid.Column="3" Grid.Row="4"/>
         </Grid>
       </TabItem>
       <!-- Elec Room -->
@@ -1209,6 +1262,7 @@
             <ColumnDefinition Width="*"/>
           </Grid.ColumnDefinitions>
           <Grid.RowDefinitions>
+            <RowDefinition Height="40"/>
             <RowDefinition Height="40"/> <!-- Header -->
 
             <RowDefinition Height="40"/> <!-- Branch Sheet Name -->
@@ -1224,30 +1278,40 @@
             <RowDefinition Height="40"/>
           </Grid.RowDefinitions>
 
-          <TextBlock Text="Package Settings" Margin="10,0,0,0" FontSize="18" Foreground="White" Grid.Column="0" Grid.Row="0" Grid.ColumnSpan="2" VerticalAlignment="center" TextDecorations="Underline"/>
+          <ComboBox Name="GlobalSettingsSubPackageCB" SelectedIndex="{Binding Path=SelGlobalSettingsPackage, Mode=TwoWay}" VerticalContentAlignment="Center" ItemsSource="{Binding GlobalSettingsPackageNameItems}" Margin="3" Grid.Column="0" Grid.Row="0" Grid.ColumnSpan="1">
+            <i:Interaction.Triggers>
+              <i:EventTrigger EventName="SelectionChanged">
+                <i:InvokeCommandAction Command="{Binding GlobalSettingsSubPackageSelectionChangedCmd}" CommandParameter="{Binding ElementName = WindowBase}"/>
+              </i:EventTrigger>
+            </i:Interaction.Triggers>
+          </ComboBox>
+          <Button Name="AddNewGlobalSettingsSubPackage" Command="{Binding AddNewGlobalSettingsSubPackageCmd}" CommandParameter="{Binding ElementName = GlobalSettingsSubPackageCB}" Style="{StaticResource MarathonRed}" Content="Add" Margin="2" Background="Transparent" Foreground="White" BorderThickness="1" Width="auto" Height="auto" Grid.Column="1" Grid.Row="0" Grid.ColumnSpan="1"/>
+          <Button Name="RemoveGlobalSettingsSubPackage" Command="{Binding RemoveNewGlobalSettingsSubPackageCmd}" CommandParameter="{Binding ElementName = GlobalSettingsSubPackageCB}" Style="{StaticResource MarathonRed}" Content="Remove" Margin="2" Background="Transparent" Foreground="White" BorderThickness="1" Width="auto" Height="auto" Grid.Column="2" Grid.Row="0" Grid.ColumnSpan="1"/>
 
-          <TextBlock Text="Branch Export Sheet Name:" Margin="10,0,0,0" FontSize="14" Foreground="White" Grid.Column="0" Grid.ColumnSpan="2" Grid.Row="1" VerticalAlignment="center"/>
-          <TextBox Text="{Binding Path=Branch_Export_Sheet_Name_Txt, Mode=TwoWay}" VerticalContentAlignment="Center" Margin="3" Grid.Column="2" Grid.Row="1" Grid.ColumnSpan="2"/>
+          <TextBlock Text="Package Settings" Margin="10,0,0,0" FontSize="18" Foreground="White" Grid.Column="0" Grid.Row="1" Grid.ColumnSpan="2" VerticalAlignment="center" TextDecorations="Underline"/>
 
-          <TextBlock Text="Distribution Export Sheet Name:" Margin="10,0,0,0" FontSize="14" Foreground="White" Grid.Column="0" Grid.ColumnSpan="2" Grid.Row="2" VerticalAlignment="center"/>
-          <TextBox Text="{Binding Path=Distribution_Export_Sheet_Name_Txt, Mode=TwoWay}" VerticalContentAlignment="Center" Margin="3" Grid.Column="2" Grid.Row="2" Grid.ColumnSpan="2"/>
+          <TextBlock Text="Branch Export Sheet Name:" Margin="10,0,0,0" FontSize="14" Foreground="White" Grid.Column="0" Grid.ColumnSpan="2" Grid.Row="2" VerticalAlignment="center"/>
+          <TextBox Text="{Binding Path=Branch_Export_Sheet_Name_Txt, Mode=TwoWay}" VerticalContentAlignment="Center" Margin="3" Grid.Column="2" Grid.Row="2" Grid.ColumnSpan="2"/>
 
-          <TextBlock Text="Low Voltage Export Sheet Name:" Margin="10,0,0,0" FontSize="14" Foreground="White" Grid.Column="0" Grid.ColumnSpan="2" Grid.Row="3" VerticalAlignment="center"/>
-          <TextBox Text="{Binding Path=Low_Voltage_Export_Sheet_Name_Txt, Mode=TwoWay}" VerticalContentAlignment="Center" Margin="3" Grid.Column="2" Grid.Row="3" Grid.ColumnSpan="2"/>
+          <TextBlock Text="Distribution Export Sheet Name:" Margin="10,0,0,0" FontSize="14" Foreground="White" Grid.Column="0" Grid.ColumnSpan="2" Grid.Row="3" VerticalAlignment="center"/>
+          <TextBox Text="{Binding Path=Distribution_Export_Sheet_Name_Txt, Mode=TwoWay}" VerticalContentAlignment="Center" Margin="3" Grid.Column="2" Grid.Row="3" Grid.ColumnSpan="2"/>
 
-          <TextBlock Text="Hangers Export Sheet Name:" Margin="10,0,0,0" FontSize="14" Foreground="White" Grid.Column="0" Grid.ColumnSpan="2" Grid.Row="4" VerticalAlignment="center"/>
-          <TextBox Text="{Binding Path=Hangers_Export_Sheet_Name_Txt, Mode=TwoWay}" VerticalContentAlignment="Center" Margin="3" Grid.Column="2" Grid.Row="4" Grid.ColumnSpan="2"/>
+          <TextBlock Text="Low Voltage Export Sheet Name:" Margin="10,0,0,0" FontSize="14" Foreground="White" Grid.Column="0" Grid.ColumnSpan="2" Grid.Row="4" VerticalAlignment="center"/>
+          <TextBox Text="{Binding Path=Low_Voltage_Export_Sheet_Name_Txt, Mode=TwoWay}" VerticalContentAlignment="Center" Margin="3" Grid.Column="2" Grid.Row="4" Grid.ColumnSpan="2"/>
 
-          <TextBlock Text="Wire Makeup Length:" Margin="10,0,0,0" FontSize="14" Foreground="White" Grid.Column="0" Grid.ColumnSpan="2" Grid.Row="5" VerticalAlignment="center"/>
-          <TextBox Text="{Binding Path=Wire_Makeup_Length_Txt, Mode=TwoWay}" VerticalContentAlignment="Center" Margin="3" Grid.Column="2" Grid.Row="5" Grid.ColumnSpan="2"/>
+          <TextBlock Text="Hangers Export Sheet Name:" Margin="10,0,0,0" FontSize="14" Foreground="White" Grid.Column="0" Grid.ColumnSpan="2" Grid.Row="5" VerticalAlignment="center"/>
+          <TextBox Text="{Binding Path=Hangers_Export_Sheet_Name_Txt, Mode=TwoWay}" VerticalContentAlignment="Center" Margin="3" Grid.Column="2" Grid.Row="5" Grid.ColumnSpan="2"/>
 
-          <TextBlock Text="Coupling Material Type:" Margin="10,0,0,0" FontSize="14" Foreground="White" Grid.Column="0" Grid.ColumnSpan="2" Grid.Row="6" VerticalAlignment="center"/>
-          <ComboBox SelectedIndex="{Binding Path=Sel_Coupling_Mat_Type, Mode=TwoWay}" VerticalContentAlignment="Center" ItemsSource="{Binding Coupling_Mat_Items}" Margin="3" Grid.Column="2" Grid.ColumnSpan="2" Grid.Row="6"/>
+          <TextBlock Text="Wire Makeup Length:" Margin="10,0,0,0" FontSize="14" Foreground="White" Grid.Column="0" Grid.ColumnSpan="2" Grid.Row="6" VerticalAlignment="center"/>
+          <TextBox Text="{Binding Path=Wire_Makeup_Length_Txt, Mode=TwoWay}" VerticalContentAlignment="Center" Margin="3" Grid.Column="2" Grid.Row="6" Grid.ColumnSpan="2"/>
 
-          <Button Name="SaveSettingsButton" Command="{Binding SaveGlobalSettingsCmd}" CommandParameter="{Binding ElementName = WindowBase}" Style="{StaticResource MarathonRed}" Content="Save Settings" Margin="2,2,0,2" Background="Transparent" Foreground="White" BorderThickness="1" Width="auto" Height="auto" Grid.Column="3" Grid.Row="7"/>
+          <TextBlock Text="Coupling Material Type:" Margin="10,0,0,0" FontSize="14" Foreground="White" Grid.Column="0" Grid.ColumnSpan="2" Grid.Row="7" VerticalAlignment="center"/>
+          <ComboBox SelectedIndex="{Binding Path=Sel_Coupling_Mat_Type, Mode=TwoWay}" VerticalContentAlignment="Center" ItemsSource="{Binding Coupling_Mat_Items}" Margin="3" Grid.Column="2" Grid.ColumnSpan="2" Grid.Row="7"/>
 
-          <TextBlock Text="Hanger Settings" Margin="10,0,0,0" FontSize="18" Foreground="White" Grid.Column="0" Grid.Row="7" Grid.ColumnSpan="2" VerticalAlignment="center" TextDecorations="Underline"/>
-          <Button Name="RestoreHangersButton" Command="{Binding RestoreHangersCmd}" CommandParameter="{Binding ElementName = WindowBase}" Style="{StaticResource MarathonRed}" Content="Restore Hangers" Margin="10,2,0,2" Background="Transparent" Foreground="White" BorderThickness="1" Width="auto" Height="auto" Grid.Column="0" Grid.Row="9"/>
+          <Button Name="SaveSettingsButton" Command="{Binding SaveGlobalSettingsCmd}" CommandParameter="{Binding ElementName = WindowBase}" Style="{StaticResource MarathonRed}" Content="Save Settings" Margin="2,2,0,2" Background="Transparent" Foreground="White" BorderThickness="1" Width="auto" Height="auto" Grid.Column="3" Grid.Row="8"/>
+
+          <TextBlock Text="Hanger Settings" Margin="10,0,0,0" FontSize="18" Foreground="White" Grid.Column="0" Grid.Row="8" Grid.ColumnSpan="2" VerticalAlignment="center" TextDecorations="Underline"/>
+          <Button Name="RestoreHangersButton" Command="{Binding RestoreHangersCmd}" CommandParameter="{Binding ElementName = WindowBase}" Style="{StaticResource MarathonRed}" Content="Restore Hangers" Margin="10,2,0,2" Background="Transparent" Foreground="White" BorderThickness="1" Width="auto" Height="auto" Grid.Column="0" Grid.Row="10"/>
         </Grid>
       </TabItem>
       <!-- Help -->

@@ -71,7 +71,7 @@ namespace JPMorrow.UI.ViewModels
                 
                 singles.AddRange(hangers);
 
-                ALS.AppData.SingleHangers.AddRange(singles);
+                ALS.AppData.GetSelectedHangerPackage().SingleHangers.AddRange(singles);
                 single_cnt += singles.Count();
 
                 RefreshDataGrids(BOMDataGrid.Hangers);
@@ -109,12 +109,12 @@ namespace JPMorrow.UI.ViewModels
                         ).Select(y => y.Id).ToList();
 
                 // add junction boxes to hardware if fixture hangers are coming
-                if (!ALS.AppData.MiscHardwareEntries.Any(x => x.name.Equals("4 in. sq. box")))
+                if (!ALS.AppData.GetSelectedHardwarePackage().MiscHardwareEntries.Any(x => x.name.Equals("4 in. sq. box")))
                 {
                     HardwareEntry entry = new HardwareEntry();
                     entry.name = "4 in. sq. box";
                     entry.qty = jboxes.Count();
-                    ALS.AppData.MiscHardwareEntries.Add(entry);
+                    ALS.AppData.GetSelectedHardwarePackage().MiscHardwareEntries.Add(entry);
                     WriteToLog("Added hardware entry for '4 in. sq. box'");
                 }
 
@@ -143,12 +143,12 @@ namespace JPMorrow.UI.ViewModels
                     var jbox_hanger = FixtureHanger.CreateFixtureHanger(
                         ALS.Info, ThisApplication.Hanger_View, new ElementId(jbox_info.jbox), opts);
 
-                    ALS.AppData.FixtureHangers.Add(jbox_hanger);
+                    ALS.AppData.GetSelectedHangerPackage().FixtureHangers.Add(jbox_hanger);
                     jbis.Add(jbox_info);
                 }
 
                 RefreshDataGrids(BOMDataGrid.Hangers);
-                WriteToLog("Added " + ALS.AppData.FixtureHangers.Count().ToString() + " hangers.");
+                WriteToLog("Added " + ALS.AppData.GetSelectedHangerPackage().FixtureHangers.Count().ToString() + " hangers.");
             }
             catch (Exception ex)
             {
@@ -213,8 +213,8 @@ namespace JPMorrow.UI.ViewModels
                 
                 ALS.Info.SEL.SetElementIds(hangers.Select(x => new ElementId(x.HangerFamilyInstanceId)).ToArray());
 
-                ALS.AppData.StrutHangers.AddRange(hangers);
-                var strut_cnt = ALS.AppData.StrutHangers.Count;
+                ALS.AppData.GetSelectedHangerPackage().StrutHangers.AddRange(hangers);
+                var strut_cnt = ALS.AppData.GetSelectedHangerPackage().StrutHangers.Count;
                 RefreshDataGrids(BOMDataGrid.Hangers);
                 WriteToLog("Added " + strut_cnt + " strut hangers.");
                 UpdateTotalStrutLengthLabel();
@@ -239,14 +239,14 @@ namespace JPMorrow.UI.ViewModels
             if (single_presenters.Any())
             {
                 single_presenters.ForEach(x => Single_Hanger_Items.Remove(x));
-                single_presenters.Select(x => x.Value).ToList().ForEach(x => ALS.AppData.SingleHangers.Remove(x));
+                single_presenters.Select(x => x.Value).ToList().ForEach(x => ALS.AppData.GetSelectedHangerPackage().SingleHangers.Remove(x));
                 WriteToLog("Removed " + single_presenters.Count + " single hangers.");
             }
 
             if (fixture_presenters.Any())
             {
                 fixture_presenters.ForEach(x => Fixture_Hanger_Items.Remove(x));
-                fixture_presenters.Select(x => x.Value).ToList().ForEach(x => ALS.AppData.FixtureHangers.Remove(x));
+                fixture_presenters.Select(x => x.Value).ToList().ForEach(x => ALS.AppData.GetSelectedHangerPackage().FixtureHangers.Remove(x));
                 WriteToLog("Removed " + fixture_presenters.Count + " fixture hangers.");
             }
 
@@ -262,7 +262,7 @@ namespace JPMorrow.UI.ViewModels
             var hanger_fam_ids = presenters.Select(x => x.Value.HangerFamilyInstanceId).ToList();
             RvtElementDeletion.DeleteRevitElements(ALS.Info, hanger_fam_ids.Select(x => new ElementId(x)));
             presenters.ForEach(x => Strut_Hanger_Items.Remove(x));
-            presenters.Select(x => x.Value).ToList().ForEach(x => ALS.AppData.StrutHangers.Remove(x));
+            presenters.Select(x => x.Value).ToList().ForEach(x => ALS.AppData.GetSelectedHangerPackage().StrutHangers.Remove(x));
 
             RefreshDataGrids(BOMDataGrid.Hangers);
             WriteToLog("Removed " + presenters.Count + " Strut hangers.");
@@ -305,7 +305,7 @@ namespace JPMorrow.UI.ViewModels
 
         public void UpdateTotalStrutLengthLabel()
         {
-            var len = RMeasure.LengthFromDbl(ALS.Info.DOC, ALS.AppData.StrutHangers.Select(x => x.StrutLength).Sum());
+            var len = RMeasure.LengthFromDbl(ALS.Info.DOC, ALS.AppData.GetSelectedHangerPackage().StrutHangers.Select(x => x.StrutLength).Sum());
             Total_Unistrut_Hanger_Length_Txt = "Total Unistrut Length: " + len;
         }
     }

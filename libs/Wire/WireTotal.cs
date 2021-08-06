@@ -48,7 +48,7 @@ namespace JPMorrow.Revit.Wires {
 		public static WireTotal GetTotaledWire(MasterDataPackage package, WireType type) {
 			
 			WireTotal t = new WireTotal();
-			t.PushWire(package.Cris, package.WireManager, type);
+			t.PushWire(package.GetSelectedConduitPackage().Cris, package.GetSelectedConduitPackage().WireManager, type);
 			t.OrderWire();
 			return t;
 		}

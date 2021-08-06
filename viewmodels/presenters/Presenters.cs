@@ -35,7 +35,7 @@ namespace JPMorrow.UI.ViewModels
 
             public void RefreshDisplay(ModelInfo info)
             {
-                Has_Wire = ALS.AppData.WireManager.CheckConduitWire(Value.WireIds) ? "Yes" : "No";
+                Has_Wire = ALS.AppData.GetSelectedConduitPackage().WireManager.CheckConduitWire(Value.WireIds) ? "Yes" : "No";
                 Length = RMeasure.LengthFromDbl(info.DOC, Value.Length);
                 From = Value.From;
                 To = Value.To;
@@ -119,7 +119,7 @@ namespace JPMorrow.UI.ViewModels
 
             public void RefreshDisplay(ModelInfo info)
             {
-                Has_Wire = ALS.AppData.WireManager.CheckConduitWire(Value.WireIds) ? "Yes" : "No";
+                Has_Wire = ALS.AppData.GetSelectedConduitPackage().WireManager.CheckConduitWire(Value.WireIds) ? "Yes" : "No";
                 Length = RMeasure.LengthFromDbl(info.DOC, Value.Length);
                 From = Value.From;
                 To = Value.To;

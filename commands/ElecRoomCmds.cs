@@ -21,7 +21,7 @@ namespace JPMorrow.UI.ViewModels
         public void AddElecRoom(Window window)
         {
             ALS.ElecRoom.RoomName = Elec_Room_Title_Txt;
-            ALS.AppData.ElectricalRoomPack.AddRoom(ALS.ElecRoom);
+            ALS.AppData.GetSelectedElecRoomPackage().ElectricalRoomPack.AddRoom(ALS.ElecRoom);
             ALS.ElecRoom = new ElecRoom();
             RefreshDataGrids(BOMDataGrid.ElecRoom);
         }
@@ -30,7 +30,10 @@ namespace JPMorrow.UI.ViewModels
         {
             var presenters = Elec_Room_Items.Where(x => x.IsSelected);
             if(!presenters.Any()) return;
-            presenters.Select(x => x.Value).ToList().ForEach(p => ALS.AppData.ElectricalRoomPack.RemoveRoom(p));
+            
+            presenters.Select(x => x.Value).ToList()
+                .ForEach(p => ALS.AppData.GetSelectedElecRoomPackage().ElectricalRoomPack.RemoveRoom(p));
+
             RefreshDataGrids(BOMDataGrid.ElecRoom);
         }
 
@@ -188,19 +191,27 @@ namespace JPMorrow.UI.ViewModels
 
                     if(Wall_Override_Switch && GB_Lug_Override_Switch) {
                         bar = new GroundBar(ALS.Info, el, masonry_anchor_size, wall_override);
-                        bar.SearchLugs(ALS.Info, ALS.AppData.WireManager, ALS.AppData.Cris, lug_override);
+                        bar.SearchLugs(
+                            ALS.Info, ALS.AppData.GetSelectedConduitPackage().WireManager, 
+                            ALS.AppData.GetSelectedConduitPackage().Cris, lug_override);
                     }
                     else if(Wall_Override_Switch) {
                         bar = new GroundBar(ALS.Info, el, masonry_anchor_size, wall_override);
-                        bar.SearchLugs(ALS.Info, ALS.AppData.WireManager, ALS.AppData.Cris);
+                        bar.SearchLugs(
+                            ALS.Info, ALS.AppData.GetSelectedConduitPackage().WireManager, 
+                            ALS.AppData.GetSelectedConduitPackage().Cris);
                     }
                     else if(GB_Lug_Override_Switch) {
                         bar = new GroundBar(ALS.Info, el, masonry_anchor_size);
-                        bar.SearchLugs(ALS.Info, ALS.AppData.WireManager, ALS.AppData.Cris, wall_override);
+                        bar.SearchLugs(
+                            ALS.Info, ALS.AppData.GetSelectedConduitPackage().WireManager, 
+                            ALS.AppData.GetSelectedConduitPackage().Cris, wall_override);
                     }
                     else {
                         bar = new GroundBar(ALS.Info, el, masonry_anchor_size);
-                        bar.SearchLugs(ALS.Info, ALS.AppData.WireManager, ALS.AppData.Cris);
+                        bar.SearchLugs(
+                            ALS.Info, ALS.AppData.GetSelectedConduitPackage().WireManager, 
+                            ALS.AppData.GetSelectedConduitPackage().Cris);
                     }
 
                     bars.Add(bar);
@@ -396,21 +407,20 @@ namespace JPMorrow.UI.ViewModels
             var coll = new FilteredElementCollector(ALS.Info.DOC, ALS.Info.DOC.ActiveView.Id);
             var els = coll.OfCategory(BuiltInCategory.OST_Conduit).ToElements().ToList();
             var ids = els.Where(x =>
-
 				!string.IsNullOrWhiteSpace(x.LookupParameter("From").AsString()) &&
 				!string.IsNullOrWhiteSpace(x.LookupParameter("To").AsString()))
-
-		.Select(x => x.Id).ToList();
+		        .Select(x => x.Id).ToList();
 
             if(!ids.Any()) return;
 
             var cutoff = RMeasure.LengthDbl(ALS.Info.DOC, Elec_Room_Conduit_Cutoff_Txt);
             if(cutoff == -1) cutoff = 10.0; // 10' length
 
-            var conduits = ALS.ElecRoom.AddElecRoomConduit(ALS.Info, cutoff, ALS.AppData.Cris, ids.Select(x => x.IntegerValue));
+            var conduits = ALS.ElecRoom.AddElecRoomConduit(
+                ALS.Info, cutoff, ALS.AppData.GetSelectedConduitPackage().Cris, 
+                ids.Select(x => x.IntegerValue));
 
-	    ALS.Info.SEL.SetElementIds(conduits.SelectMany(x => x.Ids.Select(y => new ElementId(y))).ToList());
-
+	        ALS.Info.SEL.SetElementIds(conduits.SelectMany(x => x.Ids.Select(y => new ElementId(y))).ToList());
 
             var count = ALS.ElecRoom.Conduit.Count().ToString();
             Elec_Room_Conduit_Txt = "Buildout Conduit Runs: " + count;

@@ -43,7 +43,7 @@ namespace JPMorrow.Revit.Couplings {
 		public static CouplingTotal GetTotaledCouplings(ModelInfo info, MasterDataPackage package, WireType type) {
 			
 			CouplingTotal t = new CouplingTotal();
-			t.PushCouplings(info, package.Cris, type);
+			t.PushCouplings(info, package.GetSelectedConduitPackage().Cris, type);
 			t.OrderCoupling();
 			return t;
 		}

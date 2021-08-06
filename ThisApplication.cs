@@ -52,7 +52,7 @@ namespace MainApp
                 return Result.Succeeded;
             }
 
-            //check for families and parameters
+            // check for families and parameters
             string fam_path = ModelInfo.GetDataDirectory("families", true);
 
 			FamilyLoader.LoadFamilies(revit_info, fam_path,
@@ -72,8 +72,9 @@ namespace MainApp
 			handler_iml = new InsertModelLine();
 			exEvent_iml = ExternalEvent.Create(handler_iml);
 			HangerDrawing.HangerDebugPointCreationSignUp();
-			StrutHanger.StrutHangerCreationSignUp();
-			SingleHanger.SingleHangerCreationSignUp();
+			StrutHanger.ConduitStrutHangerModelCreationSignUp();
+            StrutHanger.CableTrayStrutHangerModelCreationSignUp();
+            SingleHanger.SingleHangerCreationSignUp();
 			ScheduleCreation.ScheduleCreationSignUp();
 			ScheduleUpdate.ScheduleUpdateSignUp();
 			RvtElementDeletion.DeleteRevitElementsSignUp();

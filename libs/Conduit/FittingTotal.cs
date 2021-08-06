@@ -39,7 +39,7 @@ namespace JPMorrow.Revit.Tools.ConduitFittings {
 		public static FittingTotal GetTotaledFittings(ModelInfo info, MasterDataPackage package, WireType type) {
 			
 			FittingTotal t = new FittingTotal();
-			t.PushFittings(info, package.Cris, package.WireManager, type);
+			t.PushFittings(info, package.GetSelectedConduitPackage().Cris, package.GetSelectedConduitPackage().WireManager, type);
 			t.OrderFittings();
 			return t;
 		}

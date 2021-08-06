@@ -21,11 +21,11 @@ namespace JPMorrow.UI.ViewModels
             ALS.WirePackSettings.CouplingType = Coupling_Mat_Items[Sel_Coupling_Mat_Type];
 
             var makeup = RMeasure.LengthDbl(ALS.Info.DOC, Wire_Makeup_Length_Txt);
-            ALS.AppData.WireMakeupLength = makeup;
-            ALS.AppData.BranchExportSheetName = Branch_Export_Sheet_Name_Txt;
-            ALS.AppData.DistributionExportSheetName = Distribution_Export_Sheet_Name_Txt;
-            ALS.AppData.LowVoltageExportSheetName = Low_Voltage_Export_Sheet_Name_Txt;
-            ALS.AppData.HangerExportSheetName = Hangers_Export_Sheet_Name_Txt;
+            ALS.AppData.GetSelectedGlobalSettingsPackage().WireMakeupLength = makeup;
+            ALS.AppData.GetSelectedGlobalSettingsPackage().BranchExportSheetName = Branch_Export_Sheet_Name_Txt;
+            ALS.AppData.GetSelectedGlobalSettingsPackage().DistributionExportSheetName = Distribution_Export_Sheet_Name_Txt;
+            ALS.AppData.GetSelectedGlobalSettingsPackage().LowVoltageExportSheetName = Low_Voltage_Export_Sheet_Name_Txt;
+            ALS.AppData.GetSelectedGlobalSettingsPackage().HangerExportSheetName = Hangers_Export_Sheet_Name_Txt;
 
             WirePackageSettings.Save(ALS.WirePackSettings);
         }
@@ -68,9 +68,9 @@ namespace JPMorrow.UI.ViewModels
             !ResetP3InWall && !ResetPackageSettings && !ResetAutomaticWire) return;
 
             if(ResetRuns) {
-                ALS.AppData.WireManager.Clear();
+                ALS.AppData.GetSelectedConduitPackage().WireManager.Clear();
                 Wire_Items.Clear();
-                ALS.AppData.Cris.Clear();
+                ALS.AppData.GetSelectedConduitPackage().Cris.Clear();
                 Run_Items.Clear();
 
                 RefreshDataGrids(BOMDataGrid.Runs, BOMDataGrid.SelectedRuns, BOMDataGrid.Wire);
@@ -78,7 +78,7 @@ namespace JPMorrow.UI.ViewModels
 
             if(ResetWire)
             {
-                ALS.AppData.WireManager.Clear();
+                ALS.AppData.GetSelectedConduitPackage().WireManager.Clear();
                 Wire_Items.Clear();
 
                 RefreshDataGrids(BOMDataGrid.SelectedRuns, BOMDataGrid.Wire);
@@ -86,11 +86,11 @@ namespace JPMorrow.UI.ViewModels
 
             if(ResetHangers)
             {
-                ALS.AppData.SingleHangers.Clear();
+                ALS.AppData.GetSelectedHangerPackage().SingleHangers.Clear();
                 Single_Hanger_Items.Clear();
-                ALS.AppData.FixtureHangers.Clear();
+                ALS.AppData.GetSelectedHangerPackage().FixtureHangers.Clear();
                 Fixture_Hanger_Items.Clear();
-                ALS.AppData.StrutHangers.Clear();
+                ALS.AppData.GetSelectedHangerPackage().StrutHangers.Clear();
                 Strut_Hanger_Items.Clear();
 
                 RefreshDataGrids(BOMDataGrid.Hangers);
@@ -106,14 +106,14 @@ namespace JPMorrow.UI.ViewModels
 
             if(ResetHardware)
             {
-                ALS.AppData.MiscHardwareEntries.Clear();
+                ALS.AppData.GetSelectedHardwarePackage().MiscHardwareEntries.Clear();
                 Hardware_Items.Clear();
 
                 RefreshDataGrids(BOMDataGrid.Hardware);
             }
 
             if(ResetElecRoom) {
-                ALS.AppData.ElectricalRoomPack.Rooms.Clear();
+                ALS.AppData.GetSelectedElecRoomPackage().ElectricalRoomPack.Rooms.Clear();
                 ALS.ElecRoom = new ElecRoom();
                 Elec_Room_Title_Txt = "";
                 Update("Elec_Room_Title_Txt");
@@ -138,10 +138,10 @@ namespace JPMorrow.UI.ViewModels
                 Update("Low_Voltage_Export_Sheet_Name_Txt");
                 Update(Hangers_Export_Sheet_Name_Txt);
 
-                ALS.AppData.BranchExportSheetName = "";
-                ALS.AppData.LowVoltageExportSheetName = "";
-                ALS.AppData.DistributionExportSheetName = "";
-                ALS.AppData.HangerExportSheetName = "";
+                ALS.AppData.GetSelectedGlobalSettingsPackage().BranchExportSheetName = "";
+                ALS.AppData.GetSelectedGlobalSettingsPackage().LowVoltageExportSheetName = "";
+                ALS.AppData.GetSelectedGlobalSettingsPackage().DistributionExportSheetName = "";
+                ALS.AppData.GetSelectedGlobalSettingsPackage().HangerExportSheetName = "";
             }
 
             var o = "Reset Project: { ";

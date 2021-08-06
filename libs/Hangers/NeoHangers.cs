@@ -623,6 +623,15 @@ namespace JPMorrow.Revit.Hangers
                     
                     foreach(var d in placement_data) {
                         var add_hangers = PlaceCableTrayHangers(info, view,  d, opts);
+
+                        if(opts.DrawRayLines)
+                        {
+                            foreach(var hanger in add_hangers)
+                            {
+                                var fam = await GenerateCableTrayStrutHangerGeometry(info, view, hanger, opts, d);
+                                hanger.SetFamilyInstanceId(fam.Id);
+                            }
+                        }
                         
                         // draw hangers in model
                         hangers.AddRange(add_hangers);
@@ -868,7 +877,8 @@ namespace JPMorrow.Revit.Hangers
             opt.ComputeReferences = true;
             var geo_el = tray.get_Geometry(opt);
 
-            foreach (var obj in geo_el) {
+            foreach (var obj in geo_el) 
+            {
                 var solid = obj as Solid;
                 foreach (Edge edge in solid.Edges)
                     lines.Enqueue(edge.AsCurve() as Line);
@@ -907,11 +917,13 @@ namespace JPMorrow.Revit.Hangers
         }
 
         // Data generated to place a strut hanger on cable tray
-        internal class CableTrayHangerPlacementData {
+        internal class CableTrayHangerPlacementData 
+        {
 
             public CableTrayHangerPlacementData(
                 ElementId tray_id, XYZ[] pts,
-                Line min_bb_line, Line max_bb_line) {
+                Line min_bb_line, Line max_bb_line) 
+            {
 
                 TrayId = tray_id;
                 Pts = pts;
@@ -926,11 +938,13 @@ namespace JPMorrow.Revit.Hangers
         }
 
         // Data generated to place a strut hanger on a conduit rack
-        internal class ConduitHangerPlacementData {
+        internal class ConduitHangerPlacementData 
+        {
 
             public ConduitHangerPlacementData(
                 ModelInfo info, XYZ[] placement_pts, ElementId left,
-                ElementId right, ElementId[] raw_tiers) {
+                ElementId right, ElementId[] raw_tiers) 
+            {
 
                 PlacementPts = placement_pts;
                 LeftmostConduitId = left;
@@ -945,8 +959,8 @@ namespace JPMorrow.Revit.Hangers
             public ElementId RightmostConduitId { get; set; }
             public ElementId[] RawTierConduitIds { get; set; }
 
-            public double TierZHeight(ModelInfo info, int tier_idx) {
-                
+            public double TierZHeight(ModelInfo info, int tier_idx) 
+            {
                 if(tier_idx > RawTierConduitIds.Count() - 1) return -1;
                 var curve = (info.DOC.GetElement(RawTierConduitIds[tier_idx]).Location as LocationCurve).Curve;
                 return curve.GetEndPoint(0).Z;
@@ -1215,13 +1229,13 @@ namespace JPMorrow.Revit.Hangers
         /// Strut Hanger Geometry Events
         ///
 
-		private static StrutHangerModelCreation handler_create_strut_hanger = null;
-		private static ExternalEvent exEvent_create_strut_hanger = null;
+		private static ConduitStrutHangerModelCreation handler_create_conduit_strut_hanger = null;
+		private static ExternalEvent exEvent_create_conduit_strut_hanger = null;
 
         // Sign up the event handlers
-        public static void StrutHangerCreationSignUp() {
-			handler_create_strut_hanger = new StrutHangerModelCreation();
-			exEvent_create_strut_hanger = ExternalEvent.Create(handler_create_strut_hanger.Clone() as IExternalEventHandler);
+        public static void ConduitStrutHangerModelCreationSignUp() {
+			handler_create_conduit_strut_hanger = new ConduitStrutHangerModelCreation();
+			exEvent_create_conduit_strut_hanger = ExternalEvent.Create(handler_create_conduit_strut_hanger.Clone() as IExternalEventHandler);
 		}
 
         // Create a strut hanger in the revit model and bind it to this program
@@ -1229,22 +1243,22 @@ namespace JPMorrow.Revit.Hangers
 			ModelInfo info, View view, StrutHanger hanger,
             HangerOptions opts, ConduitHangerPlacementData placement_data) {
             
-			handler_create_strut_hanger.Info = info;
-			handler_create_strut_hanger.View = view;
-            handler_create_strut_hanger.PlacementData = placement_data;
-            handler_create_strut_hanger.Hanger = hanger;
-            handler_create_strut_hanger.Options = opts;
+			handler_create_conduit_strut_hanger.Info = info;
+			handler_create_conduit_strut_hanger.View = view;
+            handler_create_conduit_strut_hanger.PlacementData = placement_data;
+            handler_create_conduit_strut_hanger.Hanger = hanger;
+            handler_create_conduit_strut_hanger.Options = opts;
 
-			exEvent_create_strut_hanger.Raise();
+			exEvent_create_conduit_strut_hanger.Raise();
 
-			while(exEvent_create_strut_hanger.IsPending) {
+			while(exEvent_create_conduit_strut_hanger.IsPending) {
 				await Task.Delay(100);
 			}
 
-			return handler_create_strut_hanger.ReturnHanger;
+			return handler_create_conduit_strut_hanger.ReturnHanger;
 		}
 
-        private class StrutHangerModelCreation : IExternalEventHandler, ICloneable
+        private class ConduitStrutHangerModelCreation : IExternalEventHandler, ICloneable
 		{
 			public ModelInfo Info { get; set; }
 			public View View { get; set; }
@@ -1454,6 +1468,210 @@ namespace JPMorrow.Revit.Hangers
 				catch(Exception ex)
 				{
                     debugger.show(header:"Strut Hangers", err:ex.Message);
+                    transGroup.RollBack();
+				}
+
+				transGroup.Assimilate();
+			}
+
+			public string GetName()
+			{
+				return "Insert Strut Hanger Models";
+			}
+		}
+
+        ///
+        /// Cable Tray Hanger Model Placement
+        ///
+
+        private static CableTrayStrutHangerModelCreation handler_create_cable_tray_strut_hanger = null;
+		private static ExternalEvent exEvent_create_cable_tray_strut_hanger = null;
+
+        // Sign up the event handlers
+        public static void CableTrayStrutHangerModelCreationSignUp() {
+			handler_create_cable_tray_strut_hanger = new CableTrayStrutHangerModelCreation();
+			exEvent_create_cable_tray_strut_hanger = ExternalEvent.Create(handler_create_cable_tray_strut_hanger.Clone() as IExternalEventHandler);
+		}
+
+        // Create a strut hanger in the revit model and bind it to this program
+		private static async Task<FamilyInstance> GenerateCableTrayStrutHangerGeometry(
+			ModelInfo info, View view, StrutHanger hanger,
+            HangerOptions opts, CableTrayHangerPlacementData placement_data) {
+            
+			handler_create_cable_tray_strut_hanger.Info = info;
+			handler_create_cable_tray_strut_hanger.View = view;
+            handler_create_cable_tray_strut_hanger.PlacementData = placement_data;
+            handler_create_cable_tray_strut_hanger.Hanger = hanger;
+            handler_create_cable_tray_strut_hanger.Options = opts;
+
+			exEvent_create_cable_tray_strut_hanger.Raise();
+
+			while(exEvent_create_cable_tray_strut_hanger.IsPending) {
+				await Task.Delay(100);
+			}
+
+			return handler_create_cable_tray_strut_hanger.ReturnHanger;
+		}
+
+        private class CableTrayStrutHangerModelCreation : IExternalEventHandler, ICloneable
+		{
+			public ModelInfo Info { get; set; }
+			public View View { get; set; }
+			public StrutHanger Hanger { get; set; }
+			public CableTrayHangerPlacementData PlacementData { get; set; }
+            public HangerOptions Options { get; set; }
+			public FamilyInstance ReturnHanger  { get; set; } = null;
+
+			public object Clone() => this;
+
+			private readonly string[] TierSpacingParamPrefixes = new string[] { "Second", "Third", "Fourth" };
+			private readonly string TierSpacingParamSuffix = " Tier Offset";
+
+			public void Execute(UIApplication app)
+			{
+				using var transGroup = new TransactionGroup( Info.DOC, "Model Strut Hangers" );
+				transGroup.Start();
+
+				try
+				{
+					FilteredElementCollector el_coll = new FilteredElementCollector(Info.DOC);
+					FamilySymbol sym = null;
+					var type_name = "1-5/8\" Strut w/ 1/2\" Rod";
+                    
+					var syms = el_coll
+                        .OfClass(typeof(FamilySymbol))
+                        .Where(x =>
+                                (x as FamilySymbol).FamilyName.Equals(StrutHanger.StrutHangerFamilyNameNoExt) &&
+                                (x as FamilySymbol).Name.Equals(type_name));
+
+                    if(syms.Any()) sym = syms.First() as FamilySymbol;
+                    if(sym == null) throw new Exception("Hanger symbol is null");
+
+                    using var tx1 = new Transaction(Info.DOC, "Create Sketch Plane");
+					tx1.Start();
+
+					//create sketch plane
+					Plane plane = Plane.CreateByNormalAndOrigin(
+						Info.DOC.ActiveView.ViewDirection, Info.UIDOC.Document.ActiveView.Origin);
+					SketchPlane sp = SketchPlane.Create(Info.DOC, plane);
+					Info.DOC.ActiveView.SketchPlane = sp;
+
+					tx1.Commit();
+
+					using var tx2 = new Transaction(Info.DOC, "Activate Symbol");
+					tx2.Start();
+
+					if(!sym.IsActive) FamilyLoader.ActivateSymbol(sym);
+
+					tx2.Commit();
+                    
+					using var tx3 = new Transaction(Info.DOC, "Place Family");
+					tx3.Start();
+
+					//place hanger
+					FamilyInstance fam = Info.DOC.Create.NewFamilyInstance(
+						Hanger.OriginPt.RevitPoint(), sym, Internal.HangerUtil.GetLevel(
+							Info, PlacementData.TrayId), StructuralType.NonStructural);
+                            
+					tx3.Commit();
+
+					using var tx4 = new Transaction(Info.DOC, "Position Family");
+					tx4.Start();
+
+					// rotate hanger
+                    double get_angle(Line line1, Line line2) 
+                    {
+                        var x1 = line1.GetEndPoint(0).X;
+                        var y1 = line1.GetEndPoint(0).Y;
+                        var x2 = line1.GetEndPoint(1).X;
+                        var y2 = line1.GetEndPoint(1).Y;
+
+                        var x3 = line2.GetEndPoint(0).X;
+                        var y3 = line2.GetEndPoint(0).Y;
+                        var x4 = line2.GetEndPoint(1).X;
+                        var y4 = line2.GetEndPoint(1).Y;
+                        return Math.Atan2(y2-y1, x2-x1) - Math.Atan2(y4-y3,x4-x3);
+                    }
+
+                    /* var up_sec_pt = new XYZ(Hanger.OriginPt.X, Hanger.OriginPt.Y, Hanger.OriginPt.Z + 5.0);
+					var axis = Line.CreateBound(Hanger.OriginPt.RevitPoint(), up_sec_pt);
+
+                    // get nested anchor points to get a strut line for the family instance
+					var nested_families = fam.GetSubComponentIds().Select(x => Info.DOC.GetElement(x)).ToList();
+                    var anchor1 = (nested_families[0].Location as LocationPoint).Point;
+					var anchor2 = (nested_families[1].Location as LocationPoint).Point;
+					var selected_pt = anchor1.DistanceTo(Hanger.OriginPt.RevitPoint()) > anchor2.DistanceTo(Hanger.OriginPt.RevitPoint()) ? anchor1 : anchor2;
+					var fam_strut_line = Line.CreateBound(Hanger.OriginPt.RevitPoint(), selected_pt);
+
+                    var rightmost_curve = ((Info.DOC.GetElement(PlacementData.MinBBLine).Location) as LocationCurve).Curve;
+                    var rightmost_aligned_origin = rightmost_curve.Project(Hanger.OriginPt.RevitPoint()).XYZPoint;
+                    var real_strut_line = Line.CreateBound(Hanger.OriginPt.RevitPoint(), rightmost_aligned_origin);
+                    var angle = get_angle(fam_strut_line, real_strut_line);
+
+                    var degrees_90 = RMeasure.AngleDbl(Info.DOC, "90");
+
+                    // double check against Basis axis to determine world flip
+                    var x_basis_line = Line.CreateBound(
+                        XYZ.BasisX, new XYZ(XYZ.BasisX.X + 2, XYZ.BasisX.Y, XYZ.BasisX.Z));
+
+                    bool flip1 = !RGeo.IsLeft(x_basis_line, selected_pt);
+                    bool flip2 = !RGeo.IsLeft(real_strut_line, selected_pt);
+                    if(flip1) angle = angle + (degrees_90 * 2);
+                    if(flip2) angle = angle - (degrees_90 * 2);
+
+                    var ang_str = RMeasure.AngleFromDouble(Info.DOC, angle);
+                    fam.Location.Rotate(axis, angle);
+
+					// set workset of hanger
+					var workset = Info.DOC.GetElement(PlacementData.LeftmostConduitId)
+                        .get_Parameter(BuiltInParameter.ELEM_PARTITION_PARAM ).AsInteger();
+                    
+					Parameter workset_param = fam.get_Parameter(BuiltInParameter.ELEM_PARTITION_PARAM );
+					workset_param.Set(workset);
+
+					// dimension the hanger
+					fam.LookupParameter("Extra Outside Strut Length").Set(Options.OutsideRodExtraLength);
+					fam.LookupParameter("Inside Rod Gap").Set(Options.InsideRodGap + (PlacementData.LeftMostDiameter(Info) / 2.0));
+					fam.LookupParameter("Length").Set(Hanger.StrutLine.Length);
+
+                    var y_origin = PlacementData.GetTierDiameter(Info,0) / 2.0;
+					fam.LookupParameter("Y Origin").Set(y_origin);
+
+                    var inch = RMeasure.AngleDbl(Info.DOC, "1\"");
+
+                    var rl1 = inch;
+                    var rl2 = inch;
+
+                    if(Hanger.RodOneLength != 0.0) rl1 = Hanger.RodOneLength;
+                    if(Hanger.RodTwoLength != 0.0) rl2 = Hanger.RodTwoLength;
+                    
+					if(Options.CeilingHangers) {
+						fam.LookupParameter("Rod Length").Set(rl1);
+					}
+					else {
+						fam.LookupParameter("Extra Bottom Rod Length").Set(0.2);
+						fam.LookupParameter("Rod 1 Length").Set(rl1);
+						fam.LookupParameter("Rod 2 Length").Set(rl2);
+
+						// tier spacing
+						var accumuated_spacing = 0.0;
+						for(int i = 0; i < Hanger.TierSpacings.Count(); i++) {
+                            
+							var spacing = Hanger.TierSpacings[i];
+							var prefix = TierSpacingParamPrefixes[i];
+							var final_spacing = accumuated_spacing + (spacing.Spacing - spacing.RadiusOffset);
+							fam.LookupParameter(prefix + TierSpacingParamSuffix).Set(final_spacing);
+							accumuated_spacing += (spacing.Spacing - spacing.RadiusOffset);
+						}
+					}
+
+					ReturnHanger = fam; */
+
+					tx4.Commit();
+				}
+				catch(Exception ex)
+				{
+                    debugger.show(header:"Strut Hangers", err:ex.ToString());
                     transGroup.RollBack();
 				}
 

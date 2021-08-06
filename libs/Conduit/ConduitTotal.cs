@@ -40,16 +40,16 @@ namespace JPMorrow.Revit.ConduitRuns {
 
 		private void PushConduit(ModelInfo info, MasterDataPackage package, WireType type) {
 
-			foreach(var run in package.Cris)
+			foreach(var run in package.GetSelectedConduitPackage().Cris)
 			{
-                Wire[] wires = package.WireManager.GetWires(run.WireIds.ToArray()).ToArray();
+                Wire[] wires = package.GetSelectedConduitPackage().WireManager.GetWires(run.WireIds.ToArray()).ToArray();
                 if(!wires.Any(x => x.WireType == type)) continue;
 
 				var diameter = RMeasure.LengthFromDbl(info.DOC, run.Diameter);
 				int index = Conduit.FindIndex(ind => ind.Type.Equals(run.ConduitMaterialType) && ind.Diameter.Equals(diameter));
 
 				var length = run.Length;
-				var rm = package.ElectricalRoomPack.GetMatchingConduit(run.WireIds);
+				var rm = package.GetSelectedElecRoomPackage().ElectricalRoomPack.GetMatchingConduit(run.WireIds);
 
 				if(rm != null && length - rm.Length <= 0)
 					length = 0;
@@ -65,7 +65,7 @@ namespace JPMorrow.Revit.ConduitRuns {
 					Conduit[index] = new_pipe;
 				}
 				else
-					Conduit.Add(new TotaledConduit(run.ConduitMaterialType, diameter, length + package.WireMakeupLength));
+					Conduit.Add(new TotaledConduit(run.ConduitMaterialType, diameter, length + package.GetSelectedGlobalSettingsPackage().WireMakeupLength));
 			}
 		}
 	}

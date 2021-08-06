@@ -23,9 +23,12 @@ namespace JPMorrow.UI.ViewModels
         {
             try
             {
-                List<ElementId> collected_els = ElementCollector.CollectElements(ALS.Info, BuiltInCategory.OST_Conduit, false, "BYPASS").Element_Ids.ToList();
+                List<ElementId> collected_els = ElementCollector.CollectElements(
+                    ALS.Info, BuiltInCategory.OST_Conduit, false, "BYPASS").Element_Ids.ToList();
 
-                FilteredElementCollector coll = new FilteredElementCollector(ALS.Info.DOC, ALS.Info.DOC.ActiveView.Id);
+                FilteredElementCollector coll = new FilteredElementCollector(
+                    ALS.Info.DOC, ALS.Info.DOC.ActiveView.Id);
+
                 collected_els.AddRange(coll.OfClass(typeof(FlexPipe)).ToElementIds().ToList());
 
                 if(!collected_els.Any()) {
@@ -33,13 +36,18 @@ namespace JPMorrow.UI.ViewModels
                     return;
                 }
 
-				ConduitRunInfo.ProcessCRIFromConduitId(ALS.Info, collected_els, ALS.AppData.Cris);
+				ConduitRunInfo.ProcessCRIFromConduitId(
+                    ALS.Info, collected_els, ALS.AppData.GetSelectedConduitPackage().Cris);
                 
                 // add low voltage wire automatically if devices are recognized in to parameter
                 if(Automate_Wire)
-                    LowVoltageDeviceAutomation.AddLowVoltageDeviceWire(ALS.AppData.Cris, ALS.AppData.WireManager, ALS.AppData.LowVoltageDevicePairings, ALS.AppData.LowVoltageWirePairings);
+                    LowVoltageDeviceAutomation.AddLowVoltageDeviceWire(
+                        ALS.AppData.GetSelectedConduitPackage().Cris, 
+                        ALS.AppData.GetSelectedConduitPackage().WireManager, 
+                        ALS.AppData.LowVoltageDevicePairings, 
+                        ALS.AppData.LowVoltageWirePairings);
 
-                WriteToLog("Runs Processed: " + ALS.AppData.Cris.Count().ToString());
+                WriteToLog("Runs Processed: " + ALS.AppData.GetSelectedConduitPackage().Cris.Count().ToString());
                 RefreshDataGrids(BOMDataGrid.All);
             }
             catch(Exception ex)
@@ -57,9 +65,12 @@ namespace JPMorrow.UI.ViewModels
                 AddConduitView acv = new AddConduitView(main_rvt_wind, ALS.Info);
                 acv.ShowDialog();
                 
-                List<ElementId> collected_els = ElementCollector.CollectElementsByFloorAndWorkset(ALS.Info, BuiltInCategory.OST_Conduit, new string[] {}, new string[] {}).Element_Ids.ToList();
+                List<ElementId> collected_els = ElementCollector.CollectElementsByFloorAndWorkset(
+                    ALS.Info, BuiltInCategory.OST_Conduit, new string[] {}, new string[] {}).Element_Ids.ToList();
 
-                FilteredElementCollector coll = new FilteredElementCollector(ALS.Info.DOC, ALS.Info.DOC.ActiveView.Id);
+                FilteredElementCollector coll = new FilteredElementCollector(
+                    ALS.Info.DOC, ALS.Info.DOC.ActiveView.Id);
+
                 collected_els.AddRange(coll.OfClass(typeof(FlexPipe)).ToElementIds().ToList());
 
                 if(!collected_els.Any()) {
@@ -67,14 +78,20 @@ namespace JPMorrow.UI.ViewModels
                     return;
                 }
 
-                var old_cris = new List<ConduitRunInfo>(ALS.AppData.Cris);
-				ConduitRunInfo.ProcessCRIFromConduitId(ALS.Info, collected_els, ALS.AppData.Cris);
+                var old_cris = new List<ConduitRunInfo>(ALS.AppData.GetSelectedConduitPackage().Cris);
+
+				ConduitRunInfo.ProcessCRIFromConduitId(
+                    ALS.Info, collected_els, ALS.AppData.GetSelectedConduitPackage().Cris);
                 
                 // add low voltage wire automatically if devices are recognized in to parameter
                 if(Automate_Wire)
-                    LowVoltageDeviceAutomation.AddLowVoltageDeviceWire(ALS.AppData.Cris, ALS.AppData.WireManager, ALS.AppData.LowVoltageDevicePairings, ALS.AppData.LowVoltageWirePairings);
+                    LowVoltageDeviceAutomation.AddLowVoltageDeviceWire(
+                        ALS.AppData.GetSelectedConduitPackage().Cris, 
+                        ALS.AppData.GetSelectedConduitPackage().WireManager, 
+                        ALS.AppData.LowVoltageDevicePairings, 
+                        ALS.AppData.LowVoltageWirePairings);
 
-                WriteToLog("Runs Processed: " + ALS.AppData.Cris.Count().ToString());
+                WriteToLog("Runs Processed: " + ALS.AppData.GetSelectedConduitPackage().Cris.Count().ToString());
                 RefreshDataGrids(BOMDataGrid.All);
             }
             catch(Exception ex)
@@ -95,13 +112,18 @@ namespace JPMorrow.UI.ViewModels
                     WriteToLog("No conduit is selected");
                 }
 
-                ConduitRunInfo.ProcessCRIFromConduitId(ALS.Info, ids, ALS.AppData.Cris);
+                ConduitRunInfo.ProcessCRIFromConduitId(
+                    ALS.Info, ids, ALS.AppData.GetSelectedConduitPackage().Cris);
                 
                 // add low voltage wire automatically if devices are recognized in to parameter
                 if(Automate_Wire)
-                    LowVoltageDeviceAutomation.AddLowVoltageDeviceWire(ALS.AppData.Cris, ALS.AppData.WireManager, ALS.AppData.LowVoltageDevicePairings, ALS.AppData.LowVoltageWirePairings);
+                    LowVoltageDeviceAutomation.AddLowVoltageDeviceWire(
+                        ALS.AppData.GetSelectedConduitPackage().Cris, 
+                        ALS.AppData.GetSelectedConduitPackage().WireManager, 
+                        ALS.AppData.LowVoltageDevicePairings, 
+                        ALS.AppData.LowVoltageWirePairings);
                 
-                WriteToLog("Runs Processed: " + ALS.AppData.Cris.Count().ToString());
+                WriteToLog("Runs Processed: " + ALS.AppData.GetSelectedConduitPackage().Cris.Count().ToString());
                 RefreshDataGrids(BOMDataGrid.All);
             }
             catch(Exception ex)
@@ -115,12 +137,13 @@ namespace JPMorrow.UI.ViewModels
         /// </summary>
         public void UpdateRuns(Window window) {
 
-            if(!ALS.AppData.Cris.Any()) return;
+            if(!ALS.AppData.GetSelectedConduitPackage().Cris.Any()) return;
 
-            var gen_ids = ALS.AppData.Cris.Select(x => new ElementId(x.ConduitIds.First())).ToList();
+            var gen_ids = ALS.AppData.GetSelectedConduitPackage().Cris
+                .Select(x => new ElementId(x.ConduitIds.First())).ToList();
 
-            ALS.AppData.Cris.Clear();
-            ConduitRunInfo.ProcessCRIFromConduitId(ALS.Info, gen_ids, ALS.AppData.Cris);
+            ALS.AppData.GetSelectedConduitPackage().Cris.Clear();
+            ConduitRunInfo.ProcessCRIFromConduitId(ALS.Info, gen_ids, ALS.AppData.GetSelectedConduitPackage().Cris);
             RefreshDataGrids(BOMDataGrid.Runs, BOMDataGrid.SelectedRuns, BOMDataGrid.Wire);
             WriteToLog("All runs have been updated");
         }
@@ -139,10 +162,10 @@ namespace JPMorrow.UI.ViewModels
 
             presenters.ForEach(x => Run_Items.Remove(x));
             var runs = presenters.Select(x => x.Value).ToList();
-            runs.ForEach(x => ALS.AppData.Cris.Remove(x));
+            runs.ForEach(x => ALS.AppData.GetSelectedConduitPackage().Cris.Remove(x));
 
             // clear wire
-            runs.ForEach(x => ALS.AppData.WireManager.RemoveWires(x.WireIds));
+            runs.ForEach(x => ALS.AppData.GetSelectedConduitPackage().WireManager.RemoveWires(x.WireIds));
 
             RefreshDataGrids(BOMDataGrid.Runs, BOMDataGrid.SelectedRuns, BOMDataGrid.Wire);
             WriteToLog(presenters.Count().ToString() + " selected runs were removed");
@@ -150,9 +173,12 @@ namespace JPMorrow.UI.ViewModels
 
         public void ClearRuns(Window window) {
 
-            var cri_cnt = ALS.AppData.Cris.Count();
-            ALS.AppData.Cris.ForEach(x => ALS.AppData.WireManager.RemoveWires(x.WireIds));
-            ALS.AppData.Cris.Clear();
+            var cri_cnt = ALS.AppData.GetSelectedConduitPackage().Cris.Count();
+
+            ALS.AppData.GetSelectedConduitPackage().Cris
+                .ForEach(x => ALS.AppData.GetSelectedConduitPackage().WireManager.RemoveWires(x.WireIds));
+
+            ALS.AppData.GetSelectedConduitPackage().Cris.Clear();
             Run_Items.Clear();
 
             WriteToLog("Cleared " + cri_cnt + " conduit runs");
@@ -184,7 +210,7 @@ namespace JPMorrow.UI.ViewModels
 
             List<Wire> wires = new List<Wire>();
             Run_Items.Where(x => x.IsSelected).ToList().ForEach(x =>
-                wires.AddRange(ALS.AppData.WireManager.GetWires(x.Value.WireIds)));
+                wires.AddRange(ALS.AppData.GetSelectedConduitPackage().WireManager.GetWires(x.Value.WireIds)));
 
             Wire_Items.Clear();
             wires.ForEach(x => Wire_Items.Add(new WirePresenter(x, ALS.Info)));
@@ -227,16 +253,16 @@ namespace JPMorrow.UI.ViewModels
 
                 foreach(var p in presenters)
                 {
-                    var new_cri = ConduitRunInfo.CombineRuns(ALS.Info, p.Value, ALS.AppData.Cris, out var old_cris);
+                    var new_cri = ConduitRunInfo.CombineRuns(ALS.Info, p.Value, ALS.AppData.GetSelectedConduitPackage().Cris, out var old_cris);
                     if(new_cri == null) continue;
 
                     // remove old presenters
                     var rem_presenters = Run_Items.Where(x => old_cris.Any(y => y.DeepEquals(x.Value))).ToList();
                     rem_presenters.ForEach(x => Run_Items.Remove(x));
                     var rem_runs = rem_presenters.Select(x => x.Value).ToList();
-                    rem_runs.ForEach(x => ALS.AppData.Cris.Remove(x));
+                    rem_runs.ForEach(x => ALS.AppData.GetSelectedConduitPackage().Cris.Remove(x));
 
-                    ALS.AppData.Cris.Add(new_cri);
+                    ALS.AppData.GetSelectedConduitPackage().Cris.Add(new_cri);
                     Run_Items.Add(new RunPresenter(new_cri, ALS.Info));
                 }
 
@@ -279,7 +305,10 @@ namespace JPMorrow.UI.ViewModels
                     double[] strut_lens = HangerUtil.GetStandardizedStrutLengthFromSelected(Info.DOC, ids);
                 */
                 var length = RMeasure.LengthDbl(ALS.Info.DOC, Load_Length_Txt);
-                var calc = ConduitLoadCalc.CalcSupportLoad(ALS.Info.DOC, cris, ALS.AppData.WireManager, length);
+
+                var calc = ConduitLoadCalc.CalcSupportLoad(
+                    ALS.Info.DOC, cris, ALS.AppData.GetSelectedConduitPackage().WireManager, length);
+                    
                 if(calc.HasFailedEntries) debugger.show(header:"Failed Load Calcs", err:calc.PrintFailedEntries(ALS.Info.DOC));
                 debugger.show(header:"Conduit Load Calc", err:calc.PrintCalcs(ALS.Info.DOC));
             }
@@ -308,7 +337,9 @@ namespace JPMorrow.UI.ViewModels
         {
             try
             {
-                var cris = ALS.AppData.Cris.Where(x => x.To.ToLower().Equals("unset") || x.From.ToLower().Equals("unset"));
+                var cris = ALS.AppData.GetSelectedConduitPackage().Cris
+                    .Where(x => x.To.ToLower().Equals("unset") || x.From.ToLower().Equals("unset"));
+
                 ConduitParameter.PushToFromParam(ALS.Info.DOC, cris);
                 //ClearRuns(null);
                 //AddAllRuns(null);
