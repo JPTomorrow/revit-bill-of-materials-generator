@@ -15,6 +15,11 @@ namespace JPMorrow.UI.ViewModels
 {
 	public partial class ParentViewModel
     {
+        private void ResetSubPackageComboBoxes()
+        { 
+            
+        }
+
         // new package
         public void NewPackage(Window window)
         {
@@ -45,6 +50,8 @@ namespace JPMorrow.UI.ViewModels
                 }
 
                 packagePath = sfd.FileName;
+
+
                 Header_Text = "Project: " + PackageName();
                 Update("Header_Text");
 
