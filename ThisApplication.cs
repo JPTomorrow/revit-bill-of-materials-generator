@@ -38,7 +38,7 @@ namespace MainApp
 
         public Result Execute(ExternalCommandData commandData, ref string message, ElementSet elements)
         {
-			string[] dataDirectories = new string[] { "action_log", "master_package", "wire_package", "hanger_opts", "labor", "families", "test_files" };
+            string[] dataDirectories = new string[] { "action_log", "master_package", "wire_package", "hanger_opts", "labor", "families", "test_files" };
 
 			//set revit model info
 			bool debugApp = false;

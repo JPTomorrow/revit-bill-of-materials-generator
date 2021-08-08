@@ -1,14 +1,18 @@
 <Project Sdk="Microsoft.NET.Sdk">
-  <PropertyGroup>
+  <PropertyGroup Condition="$(Configuration.Equals('Release'))">
     <PrefixAssembly>WireBOMLite</PrefixAssembly> <!-- Assembly name prefix (should be the name of the program) -->
+    <Configurations>Release</Configurations>
+    <OutputPath>./build/Release</OutputPath>
+  </PropertyGroup>
+
+  <PropertyGroup Condition="$(Configuration.Equals('Debug'))">
+    <PrefixAssembly>WireBOMLite_Debug</PrefixAssembly> <!-- Assembly name prefix (should be the name of the program) -->
+    <Configurations>Debug</Configurations>
+    <OutputPath>./build/Debug</OutputPath>
   </PropertyGroup>
 
   <PropertyGroup>
     <MSBuildWarningsAsMessages>$(MSBuildWarningsAsMessages);MSB3277</MSBuildWarningsAsMessages>
-  </PropertyGroup>
-
-  <PropertyGroup>
-    <Configurations>Release</Configurations>
     <PlatformTarget>x64</PlatformTarget>
     <DebugType>portable</DebugType>
     <EnableDefaultCompileItems>false</EnableDefaultCompileItems>
@@ -16,16 +20,7 @@
 	  <OutputType>Library</OutputType>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
-	  <OutputPath>./build</OutputPath>
   </PropertyGroup>
-
-  <!-- <PropertyGroup Condition="$(RevitYearArg.Contains('2017'))">
-    <LangVersion>8.0</LangVersion>
-    <DefineConstants>$(DefineConstants);NETFRAMEWORK452</DefineConstants>
-    <TargetFramework>net452</TargetFramework>
-    <TargetFrameworkVersion>v4.5.2</TargetFrameworkVersion>
-    <RevitVersion>2017</RevitVersion>
-  </PropertyGroup> -->
 
   <PropertyGroup Condition="$(RevitYearArg.Contains('2018'))">
     <LangVersion>8.0</LangVersion>
@@ -193,25 +188,25 @@
     <Message Importance="high" Text="Compacting DLLs with ILRepack"  />
     <!-- in this CreateItem stanza, we collect all the DLLs for the referenced projects -->
     <ItemGroup>
-      <_MergeItem Include="build/$(TargetFramework)\MoreLinq.dll" />
-      <_MergeItem Include="build/$(TargetFramework)\Newtonsoft.Json.dll" />
-      <_MergeItem Include="build/$(TargetFramework)\EPPLus.dll" />
-      <_MergeItem Include="build/$(TargetFramework)\$(AssemblyName).dll" />
+      <_MergeItem Include="build/$(Configuration)/$(TargetFramework)\MoreLinq.dll" />
+      <_MergeItem Include="build/$(Configuration)/$(TargetFramework)\Newtonsoft.Json.dll" />
+      <_MergeItem Include="build/$(Configuration)/$(TargetFramework)\EPPLus.dll" />
+      <_MergeItem Include="build/$(Configuration)/$(TargetFramework)\$(AssemblyName).dll" />
     </ItemGroup>
 
-    <CreateItem Include="build/$(TargetFramework)/$(AssemblyName).dll">
+    <CreateItem Include="build/$(Configuration)/$(TargetFramework)/$(AssemblyName).dll">
       <Output TaskParameter="Include" ItemName="AssembliesToMerge" />
     </CreateItem>
 
-    <CreateItem Include="build/$(TargetFramework)/EPPLus.dll">
+    <CreateItem Include="build/$(Configuration)/$(TargetFramework)/EPPLus.dll">
       <Output TaskParameter="Include" ItemName="AssembliesToMerge" />
     </CreateItem>
 
-    <CreateItem Include="build/$(TargetFramework)/MoreLinq.dll">
+    <CreateItem Include="build/$(Configuration)/$(TargetFramework)/MoreLinq.dll">
       <Output TaskParameter="Include" ItemName="AssembliesToMerge" />
     </CreateItem>
 
-    <CreateItem Include="build/$(TargetFramework)/Newtonsoft.Json.dll">
+    <CreateItem Include="build/$(Configuration)/$(TargetFramework)/Newtonsoft.Json.dll">
       <Output TaskParameter="Include" ItemName="AssembliesToMerge" />
     </CreateItem>
 
@@ -228,7 +223,7 @@
       Text="ILMerge cannot be found. You need to download and install ILMerge in order to build DotNetZip."
       Condition="!Exists('packages\ILRepack.2.0.18\tools\ILRepack.exe')" />
 
-    <Exec Command="packages\ILRepack.2.0.18\tools\ILRepack.exe /lib:build/$(TargetFramework) /xmldocs /out:build/$(TargetFramework)/merge/$(TargetFileName)  @(AssembliesToMerge -> '%(Fullpath)', ' ') " />
+    <Exec Command="packages\ILRepack.2.0.18\tools\ILRepack.exe /lib:build/$(Configuration)/$(TargetFramework) /xmldocs /out:build/$(Configuration)/$(TargetFramework)/merge/$(TargetFileName)  @(AssembliesToMerge -> '%(Fullpath)', ' ') " />
   </Target>
 
 
@@ -238,8 +233,8 @@
     <!-- for some reason the XML doc file does not get copied automatically from obj\Debug to bin\Debug. -->
     <!-- we do it here explicitly. -->
     <ItemGroup>
-      <_CopyItems Include="build\$(TargetFramework)\merge\*.*" />
-      <_CopyItems Include="build\$(TargetFramework)\RevitAPI*.*" />
+      <_CopyItems Include="build\$(Configuration)\$(TargetFramework)\merge\*.*" />
+      <_CopyItems Include="build\$(Configuration)\$(TargetFramework)\RevitAPI*.*" />
     </ItemGroup>
 
     <Copy SourceFiles="@(_CopyItems)" DestinationFolder="C:\ProgramData\Autodesk\Revit\Addins\MarathonScripts\$(PrefixAssembly)"
