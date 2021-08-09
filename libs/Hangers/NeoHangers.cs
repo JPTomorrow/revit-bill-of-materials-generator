@@ -1033,9 +1033,12 @@ namespace JPMorrow.Revit.Hangers
 
         // represents a spacing between the
         // different strut tiers in the conduit
+        [DataContract]
         internal class TierSpacing {
             
+            [DataMember]
             public double Spacing { get; private set; }
+            [DataMember]
             public double RadiusOffset { get; private set; }
 
             public TierSpacing(double spacing, double  radius) {

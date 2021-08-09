@@ -147,7 +147,7 @@ namespace JPMorrow.UI.ViewModels
                     jbis.Add(jbox_info);
                 }
 
-                RefreshDataGrids(BOMDataGrid.Hangers);
+                RefreshDataGrids(BOMDataGrid.Hangers, BOMDataGrid.Hardware);
                 WriteToLog("Added " + ALS.AppData.GetSelectedHangerPackage().FixtureHangers.Count().ToString() + " hangers.");
             }
             catch (Exception ex)

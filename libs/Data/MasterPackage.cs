@@ -182,6 +182,15 @@ namespace JPMorrow.Revit.BOMPackage
         public int SelectedElecRoomPackageIdx { get => selectedElecRoomPackageIdx; }
         public int SelectedGlobalSettingsPackageIdx { get => selectedGlobalSettingsPackageIdx; }
 
+        public string PrintSelectedIndexes()
+        {
+            return string.Format(
+                "Conduit: {0},\nHanger: {1},\nP3: {2},\nHardware: {3},\nElec Room: {4},\nGlobal Settings: {5}",
+                SelectedConduitPackageIdx.ToString(), SelectedHangerPackageIdx.ToString(),
+                SelectedP3PackageIdx.ToString(), SelectedHardwarePackageIdx.ToString(),
+                SelectedElecRoomPackageIdx.ToString(), SelectedGlobalSettingsPackageIdx.ToString());
+        }
+
         /// <summary>
         /// Add Package
         /// </summary>

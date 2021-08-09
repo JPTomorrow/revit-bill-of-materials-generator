@@ -332,7 +332,12 @@ namespace JPMorrow.UI.ViewModels
             }
 
             ALS.AppData.LoadPackageFromLocation(path);
+            UpdateSubPackages();
+            WriteToLog("Loaded package at: " + packagePath);
+        }
 
+        public void UpdateSubPackages()
+        {
             // fill in combo boxes
             ConduitPackageNameItems = new ObsStr(ALS.AppData.ConduitPackages.Select(x => x.PackageName));
             HangerPackageNameItems = new ObsStr(ALS.AppData.HangerPackages.Select(x => x.PackageName));
@@ -356,8 +361,25 @@ namespace JPMorrow.UI.ViewModels
             // set makeup length from ALS.AppData
             Wire_Makeup_Length_Txt = RMeasure.LengthFromDbl(ALS.Info.DOC, ALS.AppData.GetSelectedGlobalSettingsPackage().WireMakeupLength);
 
+            Update("SelConduitPackage");
+            Update("SelHangerPackage");
+            Update("SelP3Package");
+            Update("SelHardwarePackage");
+            Update("SelElecRoomPackage");
+            Update("SelGlobalSettingsPackage");
 
-            WriteToLog("Loaded package at: " + packagePath);
+            Update("ConduitPackageNameItems");
+            Update("HangerPackageNameItems");
+            Update("P3PackageNameItems");
+            Update("HardwarePackageNameItems");
+            Update("ElecRoomPackageNameItems");
+            Update("GlobalSettingsPackageNameItems");
+
+            Update("Branch_Export_Sheet_Name_Txt");
+            Update("Distribution_Export_Sheet_Name_Txt");
+            Update("Low_Voltage_Export_Sheet_Name_Txt");
+            Update("Hangers_Export_Sheet_Name_Txt");
+            Update("Wire_Makeup_Length_Txt");
         }
 
         public ParentViewModel(ModelInfo info)

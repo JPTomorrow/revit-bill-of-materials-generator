@@ -50,14 +50,10 @@ namespace JPMorrow.UI.ViewModels
                 }
 
                 packagePath = sfd.FileName;
-
-
                 Header_Text = "Project: " + PackageName();
                 Update("Header_Text");
-
+                UpdateSubPackages();
                 WriteToLog("New project file saved at" + sfd.FileName);
-
-
             }
             catch(Exception ex)
             {

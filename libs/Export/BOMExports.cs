@@ -641,14 +641,14 @@ namespace JPMorrow.Excel
                     gt += li.TotalLaborValue; code_one_gt += li.TotalLaborValue; NextRow(1);
                 }
 
-                foreach(var sn in ht.SpringNuts)
+                /* foreach(var sn in ht.SpringNuts)
                 {
                     var has_item = l.GetItem(out var li, (double)sn.Count, sn.Type, sn.Diameter);
                     if(!has_item) throw new Exception("No Labor item for spring nuts");
                     string nut_name = sn.Type + " - " + sn.Diameter + " Dia.";
                     InsertIntoRow(nut_name, li.Quantity, li.PerUnitLabor, li.LaborCodeLetter, li.TotalLaborValue);
                     gt += li.TotalLaborValue; code_one_gt += li.TotalLaborValue; NextRow(1);
-                }
+                } */
 
                 foreach(var c in ht.ConduitStraps)
                 {
