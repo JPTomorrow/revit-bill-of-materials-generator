@@ -10,15 +10,12 @@ using JPMorrow.Revit.Documents;
 using JPMorrow.Revit.Hangers;
 using JPMorrow.Revit.Wires;
 using JPMorrow.Tools.Diagnostics;
+using JPMorrow.Windows.IO;
 
 namespace JPMorrow.UI.ViewModels
 {
 	public partial class ParentViewModel
     {
-        private void ResetSubPackageComboBoxes()
-        { 
-            
-        }
 
         // new package
         public void NewPackage(Window window)
@@ -30,11 +27,8 @@ namespace JPMorrow.UI.ViewModels
                 if(result.Equals(MessageBoxResult.No)) return;
 
                 // open save file dialog
-                SaveFileDialog sfd = new SaveFileDialog();
-                sfd.Title = "New Project File Location";
-                sfd.Filter = "BOM files (*.bom)|*.bom";
-                var save_result = sfd.ShowDialog();
-                if(save_result != DialogResult.OK && save_result != DialogResult.Yes) return;
+                var save_result = SaveFileSelection.Prompt("New Project File Location", "bom");
+                if(!save_result.IsResult(DialogResult.OK, DialogResult.Yes)) return;
 
                 ALS.AppData = new MasterDataPackage();
                 RefreshDataGrids(BOMDataGrid.All);
@@ -43,17 +37,17 @@ namespace JPMorrow.UI.ViewModels
                 string path_file = ModelInfo.GetDataDirectory("master_package", true) + "package_path.txt";
                 File.WriteAllText(path_file, string.Empty);
 
-                ALS.AppData.SavePackageToLocation(sfd.FileName);
+                ALS.AppData.SavePackageToLocation(save_result.Filename);
 
                 using(StreamWriter sw = new StreamWriter(path_file)) {
-                    sw.WriteLine(sfd.FileName);
+                    sw.WriteLine(save_result.Filename);
                 }
 
-                packagePath = sfd.FileName;
+                packagePath = save_result.Filename;
                 Header_Text = "Project: " + PackageName();
                 Update("Header_Text");
                 UpdateSubPackages();
-                WriteToLog("New project file saved at" + sfd.FileName);
+                WriteToLog("New project file saved at" + save_result.Filename);
             }
             catch(Exception ex)
             {
@@ -68,32 +62,29 @@ namespace JPMorrow.UI.ViewModels
         {
             try
             {
-                OpenFileDialog ofd = new OpenFileDialog();
-                ofd.Filter = "BOM files (*.bom)|*.bom";
-                var result = ofd.ShowDialog();
-                if(result == DialogResult.OK || result == DialogResult.Yes)
+                var result = OpenFileSelection.Prompt("Choose BOM File to Load", "bom");
+                if(!result.IsResult(DialogResult.OK, DialogResult.Yes)) return;
+
+                string path_file = ModelInfo.GetDataDirectory("master_package", true) + "package_path.txt";
+                File.WriteAllText(path_file, string.Empty);
+
+                using(StreamWriter sw = new StreamWriter(path_file))
                 {
-                    string path_file = ModelInfo.GetDataDirectory("master_package", true) + "package_path.txt";
-                    File.WriteAllText(path_file, string.Empty);
-
-                    using(StreamWriter sw = new StreamWriter(path_file))
-                    {
-                        sw.WriteLine(ofd.FileName);
-                    }
-
-                    ALS.HangerOptions = HangerOptions.Load(ALS.Info);
-
-                    packagePath = ofd.FileName;
-                    LoadMasterPackage(packagePath);
-
-                    //header texts
-                    Wire_Items.Clear();
-                    RefreshDataGrids(BOMDataGrid.All);
-
-                    Header_Text = "Project: " + PackageName();
-                    Update("Header_Text");
-                    WriteToLog("Project file loaded from " + packagePath);
+                    sw.WriteLine(result.Filename);
                 }
+
+                ALS.HangerOptions = HangerOptions.Load(ALS.Info);
+
+                packagePath = result.Filename;
+                LoadMasterPackage(packagePath);
+
+                //header texts
+                Wire_Items.Clear();
+                RefreshDataGrids(BOMDataGrid.All);
+
+                Header_Text = "Project: " + PackageName();
+                Update("Header_Text");
+                WriteToLog("Project file loaded from " + packagePath);
             }
             catch(Exception ex)
             {
@@ -115,26 +106,22 @@ namespace JPMorrow.UI.ViewModels
                 }
                 else
                 {
-                    SaveFileDialog sfd = new SaveFileDialog();
-                    sfd.Filter = "BOM files (*.bom)|*.bom";
-                    var result = sfd.ShowDialog();
-                    if(result == DialogResult.OK || result == DialogResult.Yes)
-                    {
-                        string path_file = ModelInfo.GetDataDirectory("master_package", true) + "package_path.txt";
-                        File.WriteAllText(path_file, string.Empty);
-                        
-                        ALS.AppData.SavePackageToLocation(sfd.FileName);
+                    var result = SaveFileSelection.Prompt("Choose Save Location", "bom");
+                    if(!result.IsResult(DialogResult.OK, DialogResult.Yes)) return;
+                    string path_file = ModelInfo.GetDataDirectory("master_package", true) + "package_path.txt";
+                    File.WriteAllText(path_file, string.Empty);
+                    
+                    ALS.AppData.SavePackageToLocation(result.Filename);
 
-                        using(StreamWriter sw = new StreamWriter(path_file)) {
-                            sw.WriteLine(sfd.FileName);
-                        }
-
-                        packagePath = sfd.FileName;
-                        Header_Text = "Project: " + PackageName();
-                        Update("Header_Text");
-
-                        WriteToLog("package saved at: " + sfd.FileName);
+                    using(StreamWriter sw = new StreamWriter(path_file)) {
+                        sw.WriteLine(result.Filename);
                     }
+
+                    packagePath = result.Filename;
+                    Header_Text = "Project: " + PackageName();
+                    Update("Header_Text");
+
+                    WriteToLog("package saved at: " + result.Filename);
                 }
             }
             catch(Exception ex)

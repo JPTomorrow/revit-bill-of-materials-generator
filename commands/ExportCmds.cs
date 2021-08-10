@@ -13,6 +13,7 @@ using JPMorrow.Revit.Wires;
 using JPMorrow.Tools.Diagnostics;
 using JPMorrow.Tools.PDF;
 using JPMorrow.UI.Views;
+using JPMorrow.Windows.IO;
 
 namespace JPMorrow.UI.ViewModels
 {
@@ -58,13 +59,10 @@ namespace JPMorrow.UI.ViewModels
                 }
 
                 // user selects save file
-                SaveFileDialog sfd = new SaveFileDialog();
-                sfd.Filter = "Excel Files|*.xlsx;";
-                sfd.Title = "SELECT AN EXCEL FILE FOR Master BOM EXPORT";
-                DialogResult result = sfd.ShowDialog();
-                if (result != DialogResult.OK) return;
+                var result = SaveFileSelection.Prompt("Select an Excel File for Master BOM Export", "xlsx");
+                if (result.IsResult(DialogResult.OK)) return;
 
-                string filename = sfd.FileName;
+                string filename = result.Filename;
                 string clean_file_name = System.IO.Path.GetFileNameWithoutExtension(filename);
 			    clean_file_name = clean_file_name.Replace("_", " ");
                 if(!ExcelEngine.PrepExportFile(filename)) return;
