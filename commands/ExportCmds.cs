@@ -11,7 +11,6 @@ using JPMorrow.P3;
 using JPMorrow.Revit.ElementCollection;
 using JPMorrow.Revit.Wires;
 using JPMorrow.Tools.Diagnostics;
-using JPMorrow.Tools.PDF;
 using JPMorrow.UI.Views;
 using JPMorrow.Windows.IO;
 
@@ -41,7 +40,8 @@ namespace JPMorrow.UI.ViewModels
                 var open_excel = esv.OpenExcelBox.IsChecked ?? false;
                 var open_pdf = esv.OpenPDFBox.IsChecked ?? false;
 
-                bool exports_selected = export_branch || export_dist || export_lowvoltage || export_hanger_labor || 
+                bool exports_selected = 
+                    export_branch || export_dist || export_lowvoltage || export_hanger_labor || 
                     export_elecroom || export_conduit_wire_only || export_conduit_only || export_legacy_p3_in_wall;
 
                 if(!ALS.AppData.GetSelectedConduitPackage().Cris.Any()) 
@@ -186,7 +186,7 @@ namespace JPMorrow.UI.ViewModels
 
                 // start pdf and excel
                 var pdf_filename = filename.Split('.').First() + ".pdf";
-                bool pdf_created = PDFExport.ExceltoPdf(filename, pdf_filename);
+                bool pdf_created = exporter.ExportToPdf(pdf_filename);
 
                 if(open_excel) exporter.OpenExcel();
                 if(open_pdf && pdf_created) exporter.OpenPDF(pdf_filename);
