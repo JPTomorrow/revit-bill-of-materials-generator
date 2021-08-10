@@ -114,8 +114,6 @@ namespace JPMorrow.UI.ViewModels
         public bool IG_Checked {get; set;} = false;
         public bool Two_Pole_Override { get; set; } = false;
         public bool Three_Pole_Override { get; set; } = false;
-        public bool Draw_Single_Debug {get; set;} = false;
-        public bool Draw_Strut_Debug {get; set;} = false;
         public bool BOY_Reverse {get; set;} = false;
         public bool Staggered_Circs {get; set;} = false;
         public bool GB_Lug_Override_Switch {get; set;} = false;
@@ -124,6 +122,9 @@ namespace JPMorrow.UI.ViewModels
         public bool Automate_Wire {get; set;} = false;
         public bool NHA_Tag_Low_Voltage_Devices {get; set;} = false;
         public bool Treat_Dist_As_Branch {get; set;} = false;
+
+        public bool Draw_Single_Debug { get; set; } = false;
+        public bool Draw_Strut_Debug { get; set; } = false;
 
         public string VAmps_Txt { get; set; }
         public string Breaker_Size_Txt { get; set; }
@@ -323,7 +324,6 @@ namespace JPMorrow.UI.ViewModels
         {
             
             ALS.WirePackSettings = WirePackageSettings.Load();
-            ALS.HangerOptions = HangerOptions.Load(ALS.Info);
 
             if(path == "Untitled") 
             {
@@ -461,8 +461,8 @@ namespace JPMorrow.UI.ViewModels
             Export_Type_Items = new ObsStr(Wire.WireTypeNames);
             Reported_Wire_Panel_Voltage_Items = new ObsStr(Wire.PanelVoltages);
 
-            Draw_Single_Debug = true;
-            Draw_Strut_Debug = true;
+            Draw_Single_Debug = false;
+            Draw_Strut_Debug = false;
 
             Update("Panel_Phase_Items");
             Update("Load_Panel_Voltage_Items");

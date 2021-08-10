@@ -16,7 +16,6 @@ using System.Threading.Tasks;
 using Autodesk.Revit.DB.Structure;
 using Autodesk.Revit.UI;
 using MoreLinq;
-using System.Diagnostics;
 
 namespace JPMorrow.Revit.Hangers
 {
@@ -114,7 +113,7 @@ namespace JPMorrow.Revit.Hangers
                 var add_hangers = PlaceConduitSingleHangers(info, view, opts, data);
 
                 // draw hangers in model
-                if(opts.DrawRayLines) {
+                if(opts.DrawSingleHangerModelGeometry) {
                     foreach(var hanger in add_hangers) {
                         var fam = await GenerateConduitSingleHangerGeometry(info, view, hanger, data, opts);
                         hanger.SetFamilyInstanceId(fam.Id);
@@ -607,7 +606,7 @@ namespace JPMorrow.Revit.Hangers
                     var add_hangers = PlaceConduitHangers(info, view, ids, placement_data, opts);
 
                     // draw hangers in model
-                    if(opts.DrawRayLines) {
+                    if(opts.DrawStrutHangerModelGeometry) {
                         foreach(var hanger in add_hangers) {
                             var fam = await GenerateConduitStrutHangerGeometry(info, view, hanger, opts, placement_data);
                             hanger.SetFamilyInstanceId(fam.Id);
@@ -624,7 +623,7 @@ namespace JPMorrow.Revit.Hangers
                     foreach(var d in placement_data) {
                         var add_hangers = PlaceCableTrayHangers(info, view,  d, opts);
 
-                        if(opts.DrawRayLines)
+                        if(opts.DrawStrutHangerModelGeometry)
                         {
                             foreach(var hanger in add_hangers)
                             {

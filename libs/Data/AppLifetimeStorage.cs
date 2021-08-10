@@ -17,7 +17,6 @@ namespace JPMorrow.Data.Globals
         public static MasterDataPackage AppData { get; set; } = new MasterDataPackage();
 
         public static WirePackageSettings WirePackSettings { get; set; }
-        public static HangerOptions HangerOptions { get; set; }
         public static ElecRoom ElecRoom { get; set; } = new ElecRoom();
     }
 }

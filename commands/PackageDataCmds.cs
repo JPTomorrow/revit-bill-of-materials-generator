@@ -73,8 +73,6 @@ namespace JPMorrow.UI.ViewModels
                     sw.WriteLine(result.Filename);
                 }
 
-                ALS.HangerOptions = HangerOptions.Load(ALS.Info);
-
                 packagePath = result.Filename;
                 LoadMasterPackage(packagePath);
 

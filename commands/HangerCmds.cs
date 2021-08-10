@@ -63,7 +63,8 @@ namespace JPMorrow.UI.ViewModels
                 opts.MinRodLength = mrl;
                 opts.NominalSpacing = nominal_spacing;
                 opts.BendSpacing = bend_spacing;
-                opts.DrawRayLines = Draw_Single_Debug;
+                opts.DrawSingleHangerModelGeometry = Draw_Single_Debug;
+                opts.DrawStrutHangerModelGeometry = Draw_Strut_Debug;
 
                 int single_cnt = 0;
                 var hangers = await SingleHanger.CreateSingleHangers(
@@ -196,7 +197,8 @@ namespace JPMorrow.UI.ViewModels
                 opts.MinRodLength = mrl;
                 opts.NominalSpacing = nominal_spacing;
                 opts.BendSpacing = bend_spacing;
-                opts.DrawRayLines = Draw_Strut_Debug;
+                opts.DrawSingleHangerModelGeometry = Draw_Single_Debug;
+                opts.DrawStrutHangerModelGeometry = Draw_Strut_Debug;
                 
                 List<StrutHanger> hangers = new List<StrutHanger>();
                 if (conduit_ids.Any()) {

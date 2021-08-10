@@ -1,15 +1,15 @@
 using System.Diagnostics;
 using System.IO;
-using System.Linq;
 using JPMorrow.Tools.Diagnostics;
 using OfficeOpenXml;
 using Autodesk.Revit.DB;
 using Autodesk.Revit.UI;
-using ExcelInst =  Microsoft.Office.Interop.Excel;
+using ExcelInst = Microsoft.Office.Interop.Excel;
 
 namespace JPMorrow.Excel
 {
-    public class ExcelEngine {
+    public class ExcelEngine 
+    {
         public ExcelPackage ExcelInstance { get; private set; }
         public string FilePath { get; private set; } = "";
         public string Filename { get => Path.GetFileName(FilePath); }
