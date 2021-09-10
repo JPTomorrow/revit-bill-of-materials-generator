@@ -5,15 +5,13 @@ using JPMorrow.UI.ViewModels;
 using JPMorrow.Revit.Documents;
 using System;
 using System.Windows.Interop;
-using JPMorrow.Tools.Diagnostics;
-using System.Runtime.InteropServices;
 
 namespace JPMorrow.UI.Views
 {
-	/// <summary>
-	/// Code Behind landing for templateForm.xaml
-	/// </summary>
-	public partial class ParentView : Window, IComponentConnector
+    /// <summary>
+    /// Code Behind landing for templateForm.xaml
+    /// </summary>
+    public partial class ParentView : Window, IComponentConnector
 	{
 		/// <summary>
 		/// Default Constructor.static Bind DataContext

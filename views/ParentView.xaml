@@ -6,14 +6,20 @@
 	xmlns:i="http://schemas.microsoft.com/expression/2010/interactivity"
 	xmlns:Sys="clr-namespace:System;assembly=mscorlib"
 	xmlns:local="clr-namespace:JPMorrow.UI.Views"
-	AllowsTransparency="True"
+  AllowsTransparency="True"
 	Height="auto" Width="auto"
-	MinWidth="600" MinHeight="650"
+	MinWidth="600" MinHeight="600"
 	ResizeMode="CanResizeWithGrip"
 	WindowStyle="None" WindowStartupLocation="CenterScreen" Title="Bill of Materials Generator"
-	FontSize="14" FontFamily="Segoe UI Light" Background="Maroon" mc:Ignorable="d">
-  <!-- Variables -->
+	FontSize="14" FontFamily="Segoe UI Light" Background="#252525" mc:Ignorable="d">
+
   <Window.Resources>
+    <Sys:String x:Key="Title">Bill of Materials Generator</Sys:String>
+    <Sys:String x:Key="Title_Bar">0</Sys:String>
+    <Sys:String x:Key="Header_Text_Row">1</Sys:String>
+    <Sys:String x:Key="List_Tabs">2</Sys:String>
+    <Sys:String x:Key="Datagrid_Size">400*</Sys:String>
+
     <Style x:Key="DGrids" TargetType="{x:Type DataGrid}">
       <Setter Property="SelectionMode" Value="Extended" />
       <Setter Property="FontFamily" Value="Consolas" />
@@ -27,6 +33,7 @@
       <Setter Property="BorderThickness" Value="1" />
       <Setter Property="VirtualizingStackPanel.IsVirtualizing" Value="False" />
     </Style>
+    
     <Style x:Key="DGSel" TargetType="DataGridRow">
       <Setter Property="IsSelected" Value="{Binding IsSelected}"/>
       <Style.Triggers>
@@ -37,17 +44,7 @@
       </Style.Triggers>
     </Style>
 
-    <Sys:String x:Key="Title">Bill of Materials Generator
-    </Sys:String>
-    <!-- Row titles -->
-    <Sys:String x:Key="Title_Bar">0
-    </Sys:String>
-    <Sys:String x:Key="Header_Text_Row">1
-    </Sys:String>
-    <Sys:String x:Key="List_Tabs">2
-    </Sys:String>
-    <Sys:String x:Key="Datagrid_Size">400*
-    </Sys:String>
+    
 
     <Style x:Key="ButtonHoverNav" TargetType="Button">
       <Setter Property="Template">
@@ -79,7 +76,25 @@
             </Border>
             <ControlTemplate.Triggers>
               <Trigger Property="IsMouseOver" Value="True">
-                <Setter Property="Background" Value="Red" TargetName="bg"/>
+
+                <!-- <Trigger.EnterActions>
+                  <BeginStoryboard>
+                    <Storyboard>
+                      <ColorAnimation Duration="0:0:0.01"
+                                      Storyboard.TargetProperty="Background"
+                                      To="#FF0000" />
+                    </Storyboard>
+                  </BeginStoryboard>
+                </Trigger.EnterActions>
+                <Trigger.ExitActions>
+                  <BeginStoryboard>
+                    <Storyboard>
+                      <ColorAnimation Duration="0:0:0.6"
+                                      Storyboard.TargetProperty="Background"
+                                      To="Transparent" />
+                    </Storyboard>
+                  </BeginStoryboard>
+                </Trigger.ExitActions> -->
               </Trigger>
             </ControlTemplate.Triggers>
           </ControlTemplate>
@@ -190,99 +205,144 @@
       </Style.Triggers>
     </Style>
 
+    <!-- TabControl Style -->
+    <Style x:Key="MainTabControlStyle" TargetType="TabControl">
+      <Setter Property="Template">
+        <Setter.Value>
+            <ControlTemplate TargetType="{x:Type TabControl}">
+                <Grid>
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="Auto" />
+                        <RowDefinition Height="*" />
+                    </Grid.RowDefinitions>
+
+                    <Border>
+                      <Border.Effect>
+                        <DropShadowEffect BlurRadius="10" Color="#ababab" Direction="235" Opacity=".5"
+                              RenderingBias="Quality" ShadowDepth="10" />
+                      </Border.Effect>
+                      <UniformGrid Height="40" x:Name="HeaderPanel" IsItemsHost="True" Rows="1" />
+                    </Border>
+
+                    <Border x:Name="Border" Grid.Row="1" BorderThickness="{TemplateBinding BorderThickness}" Background="{TemplateBinding Background}" BorderBrush="{TemplateBinding BorderBrush}">
+                      <ContentPresenter x:Name="PART_SelectedContentHost" ContentSource="SelectedContent" />
+                    </Border>
+                </Grid>
+            </ControlTemplate>
+        </Setter.Value>
+      </Setter>
+    </Style>
+
+    <!-- TabItem Styles -->
+    <Style x:Key="MainTabItemStyle" TargetType="TabItem">
+        <Setter Property="Foreground" Value="White" />
+        <Setter Property="Template">
+            <Setter.Value>
+                <ControlTemplate TargetType="TabItem">
+                    <Grid Name="Panel">
+                      <Border Name="Border" BorderThickness=".5,0,.5,.5" BorderBrush="#919191">
+                        <ContentPresenter x:Name="ContentSite"
+                            VerticalAlignment="Center"
+                            HorizontalAlignment="Center"
+                            ContentSource="Header"
+                            Margin="10,2"/>
+                      </Border>
+                    </Grid>
+                    <ControlTemplate.Triggers>
+                        <Trigger Property="IsSelected" Value="True">
+                            <Setter TargetName="Panel" Property="Background" Value="#FF0000" />
+                        </Trigger>
+                        <Trigger Property="IsSelected" Value="False">
+                            <Setter TargetName="Panel" Property="Background" Value="#414141" />
+                        </Trigger>
+                    </ControlTemplate.Triggers>
+                </ControlTemplate>
+            </Setter.Value>
+        </Setter>
+    </Style>
+
+    <!-- Grid Styles -->
+    <Style x:Key="MainGridStyle" TargetType="ItemsControl">
+        <Setter Property="ItemsPanel"> <Setter.Value> <ItemsPanelTemplate> <Grid>
+            <Grid.ColumnDefinitions>
+              <ColumnDefinition Width="20"/>
+              <ColumnDefinition Width="30*"/>
+              <ColumnDefinition Width="30*"/>
+              <ColumnDefinition Width="30*"/>
+              <ColumnDefinition Width="30*"/>
+              <ColumnDefinition Width="30*"/>
+              <ColumnDefinition Width="30*"/>
+              <ColumnDefinition Width="30*"/>
+              <ColumnDefinition Width="30*"/>
+              <ColumnDefinition Width="30*"/>
+              <ColumnDefinition Width="30*"/>
+              <ColumnDefinition Width="30*"/>
+              <ColumnDefinition Width="20"/>
+            </Grid.ColumnDefinitions>
+            <Grid.RowDefinitions>
+              <RowDefinition Height="65"/>
+              <RowDefinition Height="30"/>
+              <RowDefinition Height="500*"/>
+              <RowDefinition Height="30"/>
+              <RowDefinition Height="5"/>
+              <RowDefinition Height="40"/>
+              <RowDefinition Height="20"/>
+            </Grid.RowDefinitions>
+        </Grid> 
+        </ItemsPanelTemplate> </Setter.Value> </Setter>
+    </Style>
+
+    <Style x:Key="TabGridStyle" TargetType="ItemsControl">
+        <Setter Property="Margin" Value="0,10,0,0" />
+        <Setter Property="ItemsPanel"> <Setter.Value> <ItemsPanelTemplate> <Grid>
+            <Grid.ColumnDefinitions>
+              <ColumnDefinition Width="*"/>
+              <ColumnDefinition Width="*"/>
+              <ColumnDefinition Width="*"/>
+              <ColumnDefinition Width="*"/>
+              <ColumnDefinition Width="*"/>
+              <ColumnDefinition Width="*"/>
+              <ColumnDefinition Width="*"/>
+            </Grid.ColumnDefinitions>
+            <Grid.RowDefinitions>
+              <RowDefinition Height="40"/>
+              <RowDefinition Height="40"/>
+              <RowDefinition Height="{Binding Source={StaticResource Datagrid_Size}}" />
+              <RowDefinition Height="40"/>
+              <RowDefinition Height="auto"/>
+              <RowDefinition Height="20"/> <!-- padding -->
+            </Grid.RowDefinitions>
+        </Grid> 
+        </ItemsPanelTemplate> </Setter.Value> </Setter>
+    </Style>
   </Window.Resources>
-  <!-- Master Grid -->
-  <Grid>
-    <Grid.ColumnDefinitions>
-      <ColumnDefinition Width="20"/>
-      <ColumnDefinition Width="50*"/>
-      <ColumnDefinition Width="50*"/>
-      <ColumnDefinition Width="50*"/>
-      <ColumnDefinition Width="50*"/>
-      <ColumnDefinition Width="50*"/>
-      <ColumnDefinition Width="50*"/>
-      <ColumnDefinition Width="50*"/>
-      <ColumnDefinition Width="50*"/>
-      <ColumnDefinition Width="20"/>
-    </Grid.ColumnDefinitions>
-    <Grid.RowDefinitions>
-      <RowDefinition Height="65"/>
-      <RowDefinition Height="30"/>
-      <RowDefinition Height="500*"/>
-      <RowDefinition Height="30"/>
-      <RowDefinition Height="5"/>
-      <RowDefinition Height="40"/>
-      <RowDefinition Height="20"/>
-    </Grid.RowDefinitions>
+  
+  <ItemsControl Style="{StaticResource MainGridStyle}">
     <!-- Title Bar -->
-    <Border Opacity="1" Grid.Column="0" Grid.Row="{Binding Source={StaticResource Title_Bar}}" Grid.ColumnSpan="11"
+    <Border Opacity="1" Grid.Column="0" Grid.Row="{Binding Source={StaticResource Title_Bar}}" Grid.ColumnSpan="14"
 	    MouseLeftButtonDown="WindowDrag" Height="65" Background="Gainsboro" Margin="0,0,0,5">
       <TextBlock Margin="20,0,0,0" FontSize="24" Text="{Binding Source={StaticResource Title}}" VerticalAlignment="center" Foreground="Gray"/>
     </Border>
     <Button Command="{Binding MasterCloseCmd}" CommandParameter="{Binding ElementName = WindowBase}" Style="{StaticResource ButtonHoverNav}"
-	    Background="Transparent" BorderThickness="0" Name="HelpButton" Grid.Column="8" Grid.Row="0" HorizontalAlignment="Right">
+	    Background="Transparent" BorderThickness="0" Name="HelpButton" Grid.Column="11" Grid.Row="0" HorizontalAlignment="Right">
       <Image Source="./res/exit.png" Stretch="fill" VerticalAlignment="center"/>
     </Button>
 
     <TextBlock Text="{Binding Header_Text}" FontSize="14" Foreground="White" Grid.Column="1" Grid.Row="{Binding Source={StaticResource Header_Text_Row}}" Grid.ColumnSpan="4" VerticalAlignment="center"/>
-    <Button Name="NewButton" Command="{Binding NewPackageCmd}" CommandParameter="{Binding ElementName = WindowBase}" Style="{StaticResource MarathonRed}" Content="New" Margin="2,2,0,2" Background="Transparent" Foreground="White" BorderThickness="1" Width="auto" Height="auto" Grid.Column="6" Grid.Row="{Binding Source={StaticResource Header_Text_Row}}"/>
-    <Button Name="LoadButton" Command="{Binding LoadPackageCmd}" CommandParameter="{Binding ElementName = WindowBase}" Style="{StaticResource MarathonRed}" Content="Load" Margin="2,2,0,2" Background="Transparent" Foreground="White" BorderThickness="1" Width="auto" Height="auto" Grid.Column="7" Grid.Row="{Binding Source={StaticResource Header_Text_Row}}"/>
-    <Button Name="SaveButton" Command="{Binding SavePackageCmd}" CommandParameter="{Binding ElementName = WindowBase}" Style="{StaticResource MarathonRed}" Content="Save" Margin="2,2,0,2" Background="Transparent" Foreground="White" BorderThickness="1" Width="auto" Height="auto" Grid.Column="8" Grid.Row="{Binding Source={StaticResource Header_Text_Row}}"/>
+    <Button Name="NewButton" Command="{Binding NewPackageCmd}" CommandParameter="{Binding ElementName = WindowBase}" Style="{StaticResource MarathonRed}" Content="New" Margin="2,2,0,2" Background="Transparent" Foreground="White" BorderThickness="1" Width="auto" Height="auto" Grid.Column="9" Grid.Row="{Binding Source={StaticResource Header_Text_Row}}"/>
+    <Button Name="LoadButton" Command="{Binding LoadPackageCmd}" CommandParameter="{Binding ElementName = WindowBase}" Style="{StaticResource MarathonRed}" Content="Load" Margin="2,2,0,2" Background="Transparent" Foreground="White" BorderThickness="1" Width="auto" Height="auto" Grid.Column="10" Grid.Row="{Binding Source={StaticResource Header_Text_Row}}"/>
+    <Button Name="SaveButton" Command="{Binding SavePackageCmd}" CommandParameter="{Binding ElementName = WindowBase}" Style="{StaticResource MarathonRed}" Content="Save" Margin="2,2,0,2" Background="Transparent" Foreground="White" BorderThickness="1" Width="auto" Height="auto" Grid.Column="11" Grid.Row="{Binding Source={StaticResource Header_Text_Row}}"/>
     
-    <TextBox Text="{Binding Current_Action_String}" IsReadOnly="true" FontSize="16" FontWeight="700" Foreground="White" Background="Maroon" Margin="0,0,0,0" Padding="5,0,0,0" Height="30" Grid.Column="1" Grid.Row="3" Grid.ColumnSpan="8" Grid.RowSpan="1" VerticalAlignment="center"/>
+    <TextBox Text="{Binding Current_Action_String}" IsReadOnly="true" FontSize="16" FontWeight="700" Foreground="White" Background="Transparent" Margin="0,0,0,0" Padding="5,0,0,0" Height="30" Grid.Column="1" Grid.Row="3" Grid.ColumnSpan="11" Grid.RowSpan="1" VerticalAlignment="center"/>
     <Button Name="ALButton" Command="{Binding FullActionLogCmd}" CommandParameter="{Binding ElementName = WindowBase}" Style="{StaticResource MarathonRed}" FontSize="16" Content="Log" Margin="0" Background="Transparent" Foreground="White" BorderThickness="1" Width="auto" Height="auto" Grid.Column="1" Grid.Row="5" Grid.RowSpan="1"/>
 
-    <Button Name="ResetProjectFileButton" Command="{Binding ResetProjectFileCmd}" CommandParameter="{Binding ElementName = WindowBase}" Style="{StaticResource MarathonRed}" FontSize="16" Content="Reset Project" Margin="0,2,0,0" Background="Transparent" Foreground="White" BorderThickness="1" Width="auto" Height="auto" Grid.Column="7" Grid.Row="5" Grid.RowSpan="1"/>
-    <Button Name="ExportButton" Command="{Binding ExportCmd}" CommandParameter="{Binding ElementName = WindowBase}" Style="{StaticResource MarathonRed}" FontSize="16" Content="Export" Margin="0,2,0,0" Background="Transparent" Foreground="White" BorderThickness="1" Width="auto" Height="auto" Grid.Column="8" Grid.Row="5" Grid.RowSpan="1"/>
+    <Button Name="ResetProjectFileButton" Command="{Binding ResetProjectFileCmd}" CommandParameter="{Binding ElementName = WindowBase}" Style="{StaticResource MarathonRed}" FontSize="16" Content="Reset Project" Margin="0,2,0,0" Background="Transparent" Foreground="White" BorderThickness="1" Width="auto" Height="auto" Grid.Column="10" Grid.Row="5" Grid.RowSpan="1"/>
+    <Button Name="ExportButton" Command="{Binding ExportCmd}" CommandParameter="{Binding ElementName = WindowBase}" Style="{StaticResource MarathonRed}" FontSize="16" Content="Export" Margin="0,2,0,0" Background="Transparent" Foreground="White" BorderThickness="1" Width="auto" Height="auto" Grid.Column="11" Grid.Row="5" Grid.RowSpan="1"/>
 
-    <TabControl Name="List_Tabs" Grid.Column="1" Grid.Row="{Binding Source={StaticResource List_Tabs}}"
-		Grid.ColumnSpan="8" Margin="0,5,0,0" Background="Maroon" SelectedIndex="0">
-      <!-- View -->
-      <!--
-          <TabItem Header="View" IsEnabled="False">
-          <Grid>
-          <Grid.ColumnDefinitions>
-          <ColumnDefinition Width="*"/>
-          <ColumnDefinition Width="*"/>
-          <ColumnDefinition Width="*"/>
-          </Grid.ColumnDefinitions>
-          <Grid.RowDefinitions>
-          <RowDefinition Height="40"/>
-          <RowDefinition Height="40"/>
-          <RowDefinition Height="40"/>
-          <RowDefinition Height="40"/>
-          <RowDefinition Height="40"/>
-          <RowDefinition Height="40"/>
-          <RowDefinition Height="40"/>
-          </Grid.RowDefinitions>
-          <TextBlock Text="Floor Plan View Preparation" Margin="10,0,0,0" FontSize="18" TextDecorations="Underline" Foreground="White" Grid.Column="0" Grid.Row="0" Grid.ColumnSpan="7" VerticalAlignment="center"/>
-          <TextBlock Text="Use this menu to make a copy of the floor plan, and prepare it for generating an accurate Bill of Material: " Margin="10,0,0,0" FontSize="12" Foreground="White" Grid.Column="0" Grid.Row="1" Grid.ColumnSpan="7" VerticalAlignment="center"/>
-          <TextBlock Text="1. Open the floor plan that you want to use for a Bill of Material." Margin="10,0,0,0" FontSize="12" Foreground="White" Grid.Column="0" Grid.Row="2" Grid.ColumnSpan="7" VerticalAlignment="center" TextWrapping="Wrap"/>
-          <TextBlock Text="2. Click the &apos;Generate BOM View&apos; button below." Margin="10,0,0,0" FontSize="12" Foreground="White" Grid.Column="0" Grid.Row="3" Grid.ColumnSpan="7" VerticalAlignment="center" TextWrapping="Wrap"/>
-          <TextBlock Text="3. A new view will be generated in Revit with the same view name as the floorplan with &apos;BOM&apos; appended to the end of the view name. Check this view to make sure that the appropriate worksets have been enabled." Margin="10,0,0,0" FontSize="12" Foreground="White" Grid.Column="0" Grid.Row="4" Grid.ColumnSpan="7" VerticalAlignment="center" TextWrapping="Wrap"/>
-          <Button Name="PrepViewButton" Command="{Binding PrepViewCmd}" CommandParameter="{Binding ElementName = WindowBase}" Style="{StaticResource MarathonRed}" Content="Generate BOM View" Margin="2" Background="Transparent" Foreground="White" BorderThickness="1" Width="auto" Height="auto" Grid.Column="2" Grid.Row="6"/>
-          </Grid>
-          </TabItem>
-      -->
-      <TabItem Header="Runs">
-        <Grid>
-          <Grid.ColumnDefinitions>
-            <ColumnDefinition Width="*"/>
-            <ColumnDefinition Width="*"/>
-            <ColumnDefinition Width="*"/>
-            <ColumnDefinition Width="*"/>
-            <ColumnDefinition Width="*"/>
-	          <ColumnDefinition Width="*"/>
-            <ColumnDefinition Width="*"/>
-          </Grid.ColumnDefinitions>
-          <Grid.RowDefinitions>
-            <RowDefinition Height="40"/>
-            <RowDefinition Height="40"/>
-            <RowDefinition Height="{Binding Source={StaticResource Datagrid_Size}}" />
-            <RowDefinition Height="40"/>
-            <RowDefinition Height="auto"/>
-            <RowDefinition Height="20"/> <!-- padding -->
-          </Grid.RowDefinitions>
+    <TabControl Name="List_Tabs" Style="{StaticResource MainTabControlStyle}" Grid.Column="0" Grid.Row="{Binding Source={StaticResource List_Tabs}}" Grid.ColumnSpan="13" Margin="0,5,0,0" BorderThickness="0" Background="Transparent" SelectedIndex="0">
+
+      <TabItem Header="Runs" Style="{StaticResource MainTabItemStyle}">
+        <ItemsControl Style="{StaticResource TabGridStyle}">
 
           <ComboBox Name="ConduitSubPackageCB" SelectedIndex="{Binding Path=SelConduitPackage, Mode=TwoWay}" VerticalContentAlignment="Center" ItemsSource="{Binding ConduitPackageNameItems}" Margin="3" Grid.Column="0" Grid.Row="0" Grid.ColumnSpan="1">
             <i:Interaction.Triggers>
@@ -317,7 +377,7 @@
           <TextBlock Text="Conduit Modifications &amp; Information" Margin="10,0,0,0" FontSize="18" Foreground="White" Grid.Column="0" Grid.Row="3" Grid.ColumnSpan="2" VerticalAlignment="center" TextDecorations="Underline"/>
           
           <TabControl Name="Revit_Conduit_Modification_Tabs" Grid.Column="0" Grid.Row="4"
-		                  Grid.ColumnSpan="3" Margin="10" Background="Maroon" SelectedIndex="0">
+		                  Grid.ColumnSpan="3" Margin="10" Background="Transparent" SelectedIndex="0">
             <TabItem Header="Material Type">
               <Grid>
                   <Grid.ColumnDefinitions>
@@ -358,7 +418,7 @@
 
           <TextBlock Text="Add / Remove Conduit" Margin="10,0,0,0" FontSize="18" Foreground="White" Grid.Column="4" Grid.Row="3" Grid.ColumnSpan="2" VerticalAlignment="center" TextDecorations="Underline"/>
           <TabControl Name="Revit_Conduit_Tabs" Grid.Column="4" Grid.Row="4"
-		                  Grid.ColumnSpan="4" Margin="10" Background="Maroon" SelectedIndex="0">
+		                  Grid.ColumnSpan="4" Margin="10" Background="Transparent" SelectedIndex="0">
                       
               <TabItem Header="By View">
                 <Grid>
@@ -395,10 +455,10 @@
                 </Grid>
               </TabItem>
           </TabControl>
-        </Grid>
+        </ItemsControl>
       </TabItem>
       <!-- P3 -->
-      <TabItem Header="P3 Lighting">
+      <TabItem Header="P3 Lighting" Style="{StaticResource MainTabItemStyle}">
         <Grid>
           <Grid.ColumnDefinitions>
             <ColumnDefinition Width="*"/>
@@ -438,7 +498,7 @@
         </Grid>
       </TabItem>
 
-      <TabItem Header="P3 In Wall" IsEnabled="false">
+      <TabItem Header="P3 In Wall" IsEnabled="false" Style="{StaticResource MainTabItemStyle}">
         <Grid>
           <Grid.ColumnDefinitions>
             <ColumnDefinition Width="*"/>
@@ -475,7 +535,7 @@
         </Grid>
       </TabItem>
       <!-- Wire -->
-      <TabItem Header="Wire">
+      <TabItem Header="Wire" Style="{StaticResource MainTabItemStyle}">
         <Grid>
           <Grid.ColumnDefinitions>
             <ColumnDefinition Width="*"/>
@@ -517,7 +577,7 @@
             </DataGrid.Columns>
           </DataGrid>
 
-          <TabControl Name="Wire_Tabs" Grid.Column="0" Grid.Row="3" Grid.ColumnSpan="7" Margin="0,5,0,0" Background="Maroon" SelectedIndex="0">
+          <TabControl Name="Wire_Tabs" Grid.Column="0" Grid.Row="3" Grid.ColumnSpan="7" Margin="0,5,0,0" Background="Transparent" SelectedIndex="0">
 
             <TabItem Header="Branch By Circuit Amp/Voltage">
 
@@ -695,7 +755,7 @@
 
 
 
-      <TabItem Header="Wire Automation">
+      <TabItem Header="Wire Automation" Style="{StaticResource MainTabItemStyle}">
         <Grid>
           <Grid.ColumnDefinitions>
             <ColumnDefinition Width="*"/>
@@ -743,7 +803,7 @@
         </Grid>
       </TabItem>
 
-      <TabItem Header="Wire Migration">
+      <TabItem Header="Wire Migration" Style="{StaticResource MainTabItemStyle}">
         <Grid>
           <Grid.ColumnDefinitions>
             <ColumnDefinition Width="*"/>
@@ -797,7 +857,7 @@
         </Grid>
       </TabItem>
 
-      <TabItem Header="Voltage Drop">
+      <TabItem Header="Voltage Drop" Style="{StaticResource MainTabItemStyle}">
         <Grid>
           <Grid.ColumnDefinitions>
             <ColumnDefinition Width="*"/>
@@ -869,7 +929,7 @@
         </Grid>
       </TabItem>
       <!-- Single Hangers -->
-      <TabItem Header="Hangers">
+      <TabItem Header="Hangers" Style="{StaticResource MainTabItemStyle}">
         <Grid>
               <Grid.ColumnDefinitions>
                 <ColumnDefinition Width="10"/>
@@ -894,7 +954,7 @@
               <Button Name="AddNewHangerSubPackage" Command="{Binding AddNewHangerSubPackageCmd}" CommandParameter="{Binding ElementName = HangerSubPackageCB}" Style="{StaticResource MarathonRed}" Content="Add" Margin="2" Background="Transparent" Foreground="White" BorderThickness="1" Width="auto" Height="auto" Grid.Column="2" Grid.Row="0" Grid.ColumnSpan="1"/>
               <Button Name="RemoveHangerSubPackage" Command="{Binding RemoveNewHangerSubPackageCmd}" CommandParameter="{Binding ElementName = HangerSubPackageCB}" Style="{StaticResource MarathonRed}" Content="Remove" Margin="2" Background="Transparent" Foreground="White" BorderThickness="1" Width="auto" Height="auto" Grid.Column="3" Grid.Row="0" Grid.ColumnSpan="1"/>
 
-        <TabControl Name="Hanger_Tabs" Grid.Column="1" Grid.Row="{Binding Source={StaticResource List_Tabs}}" Grid.ColumnSpan="4" Margin="0" Background="Maroon" SelectedIndex="0">
+        <TabControl Name="Hanger_Tabs" Grid.Column="1" Grid.Row="{Binding Source={StaticResource List_Tabs}}" Grid.ColumnSpan="4" Margin="0" Background="Transparent" SelectedIndex="0">
           <TabItem Header="Single">
             <Grid>
               <Grid.ColumnDefinitions>
@@ -1044,7 +1104,7 @@
         </TabControl>
         </Grid>
       </TabItem>
-      <TabItem Header="Labor">
+      <TabItem Header="Labor" Style="{StaticResource MainTabItemStyle}">
         <Grid>
           <Grid.ColumnDefinitions>
             <ColumnDefinition Width="*"/>
@@ -1079,7 +1139,7 @@
         </Grid>
       </TabItem>
       <!-- Hardware -->
-      <TabItem Header="Hardware">
+      <TabItem Header="Hardware" Style="{StaticResource MainTabItemStyle}">
         <Grid>
           <Grid.ColumnDefinitions>
             <ColumnDefinition Width="*"/>
@@ -1122,7 +1182,7 @@
         </Grid>
       </TabItem>
       <!-- Elec Room -->
-      <TabItem Header="Elec Room">
+      <TabItem Header="Elec Room" Style="{StaticResource MainTabItemStyle}">
         <Grid>
           <Grid.ColumnDefinitions>
             <ColumnDefinition Width="*"/>
@@ -1247,7 +1307,7 @@
         </Grid>
       </TabItem>
       <!-- Settings -->
-      <TabItem Header="Settings">
+      <TabItem Header="Settings" Style="{StaticResource MainTabItemStyle}">
         <Grid>
           <Grid.ColumnDefinitions>
             <ColumnDefinition Width="*"/>
@@ -1315,7 +1375,7 @@
         </Grid>
       </TabItem>
       <!-- Help -->
-      <TabItem Header="Help">
+      <TabItem Header="Help" Style="{StaticResource MainTabItemStyle}">
         <ScrollViewer Width="600" Height="500" Grid.Column="1" Grid.Row="2" Grid.ColumnSpan="4" HorizontalAlignment="Center">
           <Grid>
             <Grid.ColumnDefinitions>
@@ -1382,5 +1442,5 @@
         </ScrollViewer>
       </TabItem>
     </TabControl>
-  </Grid>
+  </ItemsControl>
 </Window>

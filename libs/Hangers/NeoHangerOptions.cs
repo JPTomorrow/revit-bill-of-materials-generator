@@ -1,11 +1,6 @@
-using System.IO;
-using System.Runtime.Serialization;
-using JPMorrow.Revit.Documents;
-using JPMorrow.Tools.Data;
-
 namespace JPMorrow.Revit.Hangers
 {
-	public class HangerOptions
+    public class HangerOptions
 	{
 		public double NominalSpacing { get; set; } = 8;
 		public double BendSpacing { get; set; } = 3;
