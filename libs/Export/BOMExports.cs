@@ -1091,7 +1091,6 @@ namespace JPMorrow.Excel
             ModelInfo info, string project_file_name,
             MasterDataPackage data_package, IEnumerable<P3PartCollection> colls)
         {
-
             if (HasData) throw new Exception("The sheet already has data");
 
             var package = data_package;
