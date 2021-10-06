@@ -76,7 +76,7 @@
             </Border>
             <ControlTemplate.Triggers>
               <Trigger Property="IsMouseOver" Value="True">
-
+                <Setter Property="Background" Value="Maroon"/>
                 <!-- <Trigger.EnterActions>
                   <BeginStoryboard>
                     <Storyboard>
@@ -1181,6 +1181,7 @@
           <Button Name="RemoveHardwareButton" Command="{Binding RemoveHardwareEntryCmd}" CommandParameter="{Binding ElementName = WindowBase}" Style="{StaticResource MarathonRed}" Content="Remove" Margin="2,2,0,2" Background="Transparent" Foreground="White" BorderThickness="1" Width="auto" Height="auto" Grid.Column="3" Grid.Row="4"/>
         </Grid>
       </TabItem>
+      
       <!-- Elec Room -->
       <TabItem Header="Elec Room" Style="{StaticResource MainTabItemStyle}">
         <Grid>
