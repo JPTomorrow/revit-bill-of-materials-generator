@@ -59,10 +59,12 @@ namespace JPMorrow.Excel
             var single_hangers = package.GetSelectedHangerPackage().SingleHangers;
             var strut_hangers = package.GetSelectedHangerPackage().StrutHangers;
             var totaled_cris = ConduitTotal.GetTotaledConduit(info, package, pull_type).Conduit;
-            var elbows = FittingTotal.GetTotaledFittings(info, package, pull_type).Fittings;
             var couplings = CouplingTotal.GetTotaledCouplings(info, package, pull_type).Couplings;
             var connectors = ConnectorTotal.GetTotaledConnectors(info, package, pull_type).Connectors;
             var wires = WireTotal.GetTotaledWire(package, pull_type).Wires;
+
+            // @DELETE @TODO discontinued services. delete later.
+            // var elbows = FittingTotal.GetTotaledFittings(info, package, pull_type).Fittings;
 
             InsertSingleDivider(Draw.Color.SlateGray, Draw.Color.White, "Conduit");
 
@@ -126,6 +128,7 @@ namespace JPMorrow.Excel
             }
             #endregion
 
+            /* @DELETE @TODO discontinued service. delete later.
             #region Elbow Fittings Labor
             if (elbows.Any())
             {
@@ -160,6 +163,7 @@ namespace JPMorrow.Excel
                 InsertGrandTotal("Sub Total", ref gt, true, false, true);
             }
             #endregion
+            */
 
             #region Couplings Labor
             if (couplings.Any())
