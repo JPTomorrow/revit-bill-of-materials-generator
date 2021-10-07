@@ -110,18 +110,18 @@ namespace JPMorrow.UI.ViewModels
         public int Sel_Export_Type { get; set; }
         public int Sel_Reported_Wire_Panel_Voltage { get; set; }
 
-        public bool Phase_Nuet_Checked {get; set;} = false;
-        public bool IG_Checked {get; set;} = false;
+        public bool Phase_Nuet_Checked { get; set; } = false;
+        public bool IG_Checked { get; set; } = false;
         public bool Two_Pole_Override { get; set; } = false;
         public bool Three_Pole_Override { get; set; } = false;
-        public bool BOY_Reverse {get; set;} = false;
-        public bool Staggered_Circs {get; set;} = false;
-        public bool GB_Lug_Override_Switch {get; set;} = false;
-        public bool Wall_Override_Switch {get; set;} = false;
-        public bool Ceiling_Supported_Strut_Hanger {get; set;} = false;
-        public bool Automate_Wire {get; set;} = false;
-        public bool NHA_Tag_Low_Voltage_Devices {get; set;} = false;
-        public bool Treat_Dist_As_Branch {get; set;} = false;
+        public bool BOY_Reverse { get; set; } = false;
+        public bool Staggered_Circs { get; set; } = false;
+        public bool GB_Lug_Override_Switch { get; set; } = false;
+        public bool Wall_Override_Switch { get; set; } = false;
+        public bool Ceiling_Supported_Strut_Hanger { get; set; } = false;
+        public bool Automate_Wire { get; set; } = false;
+        public bool NHA_Tag_Low_Voltage_Devices { get; set; } = false;
+        public bool Treat_Dist_As_Branch { get; set; } = false;
 
         public bool Draw_Single_Debug { get; set; } = false;
         public bool Draw_Strut_Debug { get; set; } = false;
@@ -153,7 +153,7 @@ namespace JPMorrow.UI.ViewModels
         public string Hangers_Export_Sheet_Name_Txt { get; set; }
         public string Load_Length_Txt { get; set; }
         public string Total_Unistrut_Hanger_Length_Txt { get; set; }
-    
+
         public ICommand MasterCloseCmd => new RelayCommand<Window>(MasterClose);
         public ICommand TestCmd => new RelayCommand<Window>(Test);
         public ICommand NewPackageCmd => new RelayCommand<Window>(NewPackage);
@@ -168,12 +168,12 @@ namespace JPMorrow.UI.ViewModels
         public ICommand RemoveSelectedRunsCmd => new RelayCommand<Window>(RemoveSelectedRuns);
         public ICommand AddAllRunsByWorksetAndLevelCmd => new RelayCommand<Window>(AddAllRunsByWorksetAndLevel);
         public ICommand RunSelectionChangedCmd => new RelayCommand<Window>(SelectRun);
-        public ICommand ClearRunsCmd  => new RelayCommand<Window>(ClearRuns);
+        public ICommand ClearRunsCmd => new RelayCommand<Window>(ClearRuns);
         public ICommand ChangeConduitMaterialTypeCmd => new RelayCommand<Window>(ChangeConduitMaterialType);
-        public ICommand MarkConduitNoWireExportCmd  => new RelayCommand<Window>(MarkConduitNoWireExport);
-        public ICommand CombineLikeRunsCmd  => new RelayCommand<Window>(CombineLikeRuns);
-        public ICommand SelectAllRunsCmd  => new RelayCommand<Window>(SelectAllRuns);
-        public ICommand FixToFromCmd  => new RelayCommand<Window>(FixToFrom);
+        public ICommand MarkConduitNoWireExportCmd => new RelayCommand<Window>(MarkConduitNoWireExport);
+        public ICommand CombineLikeRunsCmd => new RelayCommand<Window>(CombineLikeRuns);
+        public ICommand SelectAllRunsCmd => new RelayCommand<Window>(SelectAllRuns);
+        public ICommand FixToFromCmd => new RelayCommand<Window>(FixToFrom);
 
         public ICommand SelectP3LightingNetworkCmd => new RelayCommand<Window>(SelectP3LightingNetwork);
         public ICommand P3LightingFixtureSelChangedCmd => new RelayCommand<Window>(P3LightingFixtureSelChanged);
@@ -186,47 +186,47 @@ namespace JPMorrow.UI.ViewModels
         public ICommand RemoveWireCmd => new RelayCommand<Window>(RemoveWire);
         public ICommand AddReportedWiresCmd => new RelayCommand<Window>(AddReportedWires);
 
-        public ICommand ImportDeviceWirePairingsCmd  => new RelayCommand<Window>(ImportDeviceWirePairings);
-        public ICommand RemoveDevicePairingsCmd  => new RelayCommand<Window>(RemoveDevicePairings);
-        public ICommand RemoveWirePairingsCmd  => new RelayCommand<Window>(RemoveWirePairings);
-        public ICommand AutomateDeviceTaggingCmd  => new RelayCommand<Window>(AutomateDeviceTagging);
+        public ICommand ImportDeviceWirePairingsCmd => new RelayCommand<Window>(ImportDeviceWirePairings);
+        public ICommand RemoveDevicePairingsCmd => new RelayCommand<Window>(RemoveDevicePairings);
+        public ICommand RemoveWirePairingsCmd => new RelayCommand<Window>(RemoveWirePairings);
+        public ICommand AutomateDeviceTaggingCmd => new RelayCommand<Window>(AutomateDeviceTagging);
 
-        public ICommand LoadMigrateProjectCmd  => new RelayCommand<Window>(LoadMigrateProject);
-        public ICommand MigrateWireCmd  => new RelayCommand<Window>(MigrateWire);
-        public ICommand MigrateWireSelectionChangedCmd  => new RelayCommand<DataGrid>(MigrateWireSelectionChanged);
+        public ICommand LoadMigrateProjectCmd => new RelayCommand<Window>(LoadMigrateProject);
+        public ICommand MigrateWireCmd => new RelayCommand<Window>(MigrateWire);
+        public ICommand MigrateWireSelectionChangedCmd => new RelayCommand<DataGrid>(MigrateWireSelectionChanged);
 
         public ICommand AddSingleHangersCmd => new RelayCommand<Window>(AddSingleHangers);
         public ICommand AddFixtureHangersCmd => new RelayCommand<Window>(AddFixtureHangers);
         public ICommand AddStrutHangersCmd => new RelayCommand<Window>(AddStrutHangers);
         public ICommand RemoveSingleHangersCmd => new RelayCommand<Window>(RemoveSingleHangers);
         public ICommand RemoveStrutHangersCmd => new RelayCommand<Window>(RemoveStrutHangers);
-        public ICommand RestoreHangersCmd  => new RelayCommand<Window>(RestoreHangers);
-        public ICommand SingleHangerSelChangedCmd  => new RelayCommand<Window>(SingleHangerSelChanged);
-        public ICommand StrutHangerSelChangedCmd  => new RelayCommand<Window>(StrutHangerSelChanged);
+        public ICommand RestoreHangersCmd => new RelayCommand<Window>(RestoreHangers);
+        public ICommand SingleHangerSelChangedCmd => new RelayCommand<Window>(SingleHangerSelChanged);
+        public ICommand StrutHangerSelChangedCmd => new RelayCommand<Window>(StrutHangerSelChanged);
 
         public ICommand AddLaborEntryCmd => new RelayCommand<Window>(AddLaborEntry);
         public ICommand RemoveLaborEntryCmd => new RelayCommand<Window>(RemoveLaborEntry);
         public ICommand AddHardwareEntryCmd => new RelayCommand<Window>(AddHardwareEntry);
         public ICommand RemoveHardwareEntryCmd => new RelayCommand<Window>(RemoveHardwareEntry);
 
-        public ICommand AddVoltageDropRuleCmd  => new RelayCommand<Window>(AddVoltageDropRule);
-        public ICommand RemoveVoltageDropRuleCmd  => new RelayCommand<Window>(RemoveVoltageDropRule);
+        public ICommand AddVoltageDropRuleCmd => new RelayCommand<Window>(AddVoltageDropRule);
+        public ICommand RemoveVoltageDropRuleCmd => new RelayCommand<Window>(RemoveVoltageDropRule);
 
-        public ICommand ElecRoomSelectionChangedCmd  => new RelayCommand<Window>(SelectRoom);
-        public ICommand AddElecRoomCmd  => new RelayCommand<Window>(AddElecRoom);
-        public ICommand RemoveElecRoomCmd  => new RelayCommand<Window>(RemoveElecRoom);
-        public ICommand AddAllUnistrutCmd  => new RelayCommand<Window>(AddUnistrut);
-        public ICommand RemoveUnistrutCmd  => new RelayCommand<Window>(RemoveUnistrut);
-        public ICommand AddAllGrdBarCmd  => new RelayCommand<Window>(AddGrdBar);
-        public ICommand RemoveGrdBarCmd  => new RelayCommand<Window>(RemoveGrdBar);
-        public ICommand AddAllPanelBackingCmd  => new RelayCommand<Window>(AddPanelBacking);
-        public ICommand RemovePanelBackingCmd  => new RelayCommand<Window>(RemovePanelBacking);
-        public ICommand AddAllPanelboardCmd  => new RelayCommand<Window>(AddPanelboard);
-        public ICommand RemovePanelboardCmd  => new RelayCommand<Window>(RemovePanelboard);
-        public ICommand GetElecRoomConduitCmd  => new RelayCommand<Window>(GetElecRoomConduit);
-        public ICommand ClearElecRoomConduitCmd  => new RelayCommand<Window>(ClearElecRoomConduit);
+        public ICommand ElecRoomSelectionChangedCmd => new RelayCommand<Window>(SelectRoom);
+        public ICommand AddElecRoomCmd => new RelayCommand<Window>(AddElecRoom);
+        public ICommand RemoveElecRoomCmd => new RelayCommand<Window>(RemoveElecRoom);
+        public ICommand AddAllUnistrutCmd => new RelayCommand<Window>(AddUnistrut);
+        public ICommand RemoveUnistrutCmd => new RelayCommand<Window>(RemoveUnistrut);
+        public ICommand AddAllGrdBarCmd => new RelayCommand<Window>(AddGrdBar);
+        public ICommand RemoveGrdBarCmd => new RelayCommand<Window>(RemoveGrdBar);
+        public ICommand AddAllPanelBackingCmd => new RelayCommand<Window>(AddPanelBacking);
+        public ICommand RemovePanelBackingCmd => new RelayCommand<Window>(RemovePanelBacking);
+        public ICommand AddAllPanelboardCmd => new RelayCommand<Window>(AddPanelboard);
+        public ICommand RemovePanelboardCmd => new RelayCommand<Window>(RemovePanelboard);
+        public ICommand GetElecRoomConduitCmd => new RelayCommand<Window>(GetElecRoomConduit);
+        public ICommand ClearElecRoomConduitCmd => new RelayCommand<Window>(ClearElecRoomConduit);
 
-        public ICommand FullActionLogCmd  => new RelayCommand<Window>(FullActionLog);
+        public ICommand FullActionLogCmd => new RelayCommand<Window>(FullActionLog);
         public ICommand ExportCmd => new RelayCommand<Window>(ExportSelection);
         public ICommand PrepViewCmd => new RelayCommand<Window>(PrepView);
 
@@ -236,7 +236,7 @@ namespace JPMorrow.UI.ViewModels
         /// <summary>
         /// Package Selection UI
         /// </summary>
-        
+
         public ObsStr ConduitPackageNameItems { get; set; } = new ObsStr();
         public ObsStr HangerPackageNameItems { get; set; } = new ObsStr();
         public ObsStr P3PackageNameItems { get; set; } = new ObsStr();
@@ -266,7 +266,7 @@ namespace JPMorrow.UI.ViewModels
         public ICommand AddNewGlobalSettingsSubPackageCmd => new RelayCommand<ComboBox>(AddNewGlobalSettingsSubPackage);
         public ICommand RemoveGlobalSettingsSubPackageCmd => new RelayCommand<Window>(RemoveGlobalSettingsSubPackage);
         public ICommand GlobalSettingsSubPackageSelectionChangedCmd => new RelayCommand<Window>(GlobalSettingsSubPackageSelectionChanged);
-        
+
         //Action Log Text
         public string Action_Log { get; set; }
         public string Current_Action_String { get; set; }
@@ -275,7 +275,7 @@ namespace JPMorrow.UI.ViewModels
         /// <summary>
         /// Log writing function that can be passed around between views
         /// </summary>
-        public void WriteToLog(string str) 
+        public void WriteToLog(string str)
         {
 
             var append_line = str + "\n";
@@ -290,27 +290,27 @@ namespace JPMorrow.UI.ViewModels
         private static MasterDataPackage TransferPackage { get; set; } = new MasterDataPackage();
         private static string packagePath;
 
-        public string PackageName() 
-        { 
+        public string PackageName()
+        {
             var p = packagePath.Split('\\').Last().Split('.').ToList();
             p.Remove(p.Last());
             return string.Join(".", p);
         }
 
         // get master package path
-        public string GetPackagePath() 
+        public string GetPackagePath()
         {
 
             string path_file = ModelInfo.GetDataDirectory("master_package", true) + "package_path.txt";
 
-            if(!File.Exists(path_file))
+            if (!File.Exists(path_file))
                 File.WriteAllText(path_file, "Untitled");
 
             string ret_path = "";
-            
+
             ret_path = File.ReadAllText(path_file).Trim();
 
-            if(!File.Exists(ret_path)) 
+            if (!File.Exists(ret_path))
             {
                 File.WriteAllText(path_file, "Untitled");
                 ret_path = "Untitled";
@@ -320,12 +320,12 @@ namespace JPMorrow.UI.ViewModels
         }
 
         // load the master package
-        public void LoadMasterPackage(string path) 
+        public void LoadMasterPackage(string path)
         {
-            
+
             ALS.WirePackSettings = WirePackageSettings.Load();
 
-            if(path == "Untitled") 
+            if (path == "Untitled")
             {
                 WriteToLog("No package to load. Loading default package.");
                 return;
@@ -395,7 +395,7 @@ namespace JPMorrow.UI.ViewModels
             Update("Header_Text");
 
             //load master package
-            if(!ALS.AppData.LaborHourEntries.Any()) 
+            if (!ALS.AppData.LaborHourEntries.Any())
             {
                 LaborExchange ex = new LaborExchange(ModelInfo.SettingsBasePath);
                 string lfn = LaborExchange.DefaultLaborFilePath;
@@ -414,7 +414,7 @@ namespace JPMorrow.UI.ViewModels
             Voltage_Drop_Min_Distance_Txt = "0'";
             Voltage_Drop_Max_Distance_Txt = "100'";
             Load_Length_Txt = "0' 1\"";
-            
+
             UpdateTotalStrutLengthLabel();
 
             var ws_idx = Wire.WireSizes.ToList().IndexOf("#12");
@@ -427,7 +427,7 @@ namespace JPMorrow.UI.ViewModels
             Sel_Masonry_Anchor_Size = 0;
             Sel_Single_Att = 0;
             Sel_Single_Rod_Diameter = 0;
-            Sel_Strut_Rod_Diameter = 1;
+            Sel_Strut_Rod_Diameter = 2;
             Sel_Dist_Wire_Color = dwc_idx;
             Sel_Panel_Voltage = pv_idx;
             Sel_Dist_Wire_Size = ws_idx;
@@ -440,7 +440,7 @@ namespace JPMorrow.UI.ViewModels
             Sel_Export_Type = 0;
             Sel_Reported_Wire_Panel_Voltage = 0;
 
-            Panel_Phase_Items = new ObsStr(new string[] { "1", "3"} );
+            Panel_Phase_Items = new ObsStr(new string[] { "1", "3" });
             Load_Panel_Voltage_Items = new ObsStr(Wire.GranularPanelVoltages);
             Branch_Wire_Material_Items = new ObsStr(Wire.WireMaterialTypes);
             Dist_Wire_Material_Items = new ObsStr(Wire.WireMaterialTypes);
@@ -451,7 +451,7 @@ namespace JPMorrow.UI.ViewModels
             Dist_Wire_Color_Items = new ObsStr(WireColor.All_Colors);
             Rod_Diameter_Items = new ObsStr(HangerConstants.RodDiameterMeasurments);
             Single_Att_Type_Items = new ObsStr(HangerConstants.SingleHangerAttachmentTypes);
-            Labor_Code_Items = new ObsStr(LaborExchange.LetterCodes.Pairs.Select(x => x.Letter) );
+            Labor_Code_Items = new ObsStr(LaborExchange.LetterCodes.Pairs.Select(x => x.Letter));
             WallType_Items = new ObsStr(WallInfo.WallTypes.Select(x => x.WallName));
             Grd_Lug_Size_Items = new ObsStr(GrdBarLug.LugSizes);
             Masonry_Anchor_Size_Items = new ObsStr(Anchor.AnchorSizes);
@@ -481,7 +481,7 @@ namespace JPMorrow.UI.ViewModels
 
         // an enumeration of all the datagrids 
         // in the UI used with RefreshDataGrids to determine
-        public enum BOMDataGrid 
+        public enum BOMDataGrid
         {
             All,
             Runs,
@@ -504,23 +504,23 @@ namespace JPMorrow.UI.ViewModels
         {
             bool p(BOMDataGrid x) => grids.Contains(x) || grids.Contains(BOMDataGrid.All);
 
-            if(p(BOMDataGrid.Runs)) 
+            if (p(BOMDataGrid.Runs))
             {
                 Run_Items.Clear();
                 ALS.AppData.GetSelectedConduitPackage().Cris.ForEach(x => Run_Items.Add(new RunPresenter(x, ALS.Info)));
                 Update("Run_Items");
             }
 
-            if(p(BOMDataGrid.SelectedRuns)) 
+            if (p(BOMDataGrid.SelectedRuns))
             {
                 var presenters = Selected_Run_Items.ToList();
-                presenters.ForEach(x => x.RefreshDisplay(ALS.Info) );
+                presenters.ForEach(x => x.RefreshDisplay(ALS.Info));
                 Selected_Run_Items.Clear();
                 Selected_Run_Items = new ObsConduitRun(presenters);
                 Update("Selected_Run_Items");
             }
 
-            if(p(BOMDataGrid.Hangers)) 
+            if (p(BOMDataGrid.Hangers))
             {
                 Single_Hanger_Items.Clear();
                 Strut_Hanger_Items.Clear();
@@ -536,31 +536,31 @@ namespace JPMorrow.UI.ViewModels
                 Update("Fixture_Hanger_Items");
             }
 
-            if(p(BOMDataGrid.Hardware)) 
+            if (p(BOMDataGrid.Hardware))
             {
                 Hardware_Items.Clear();
                 ALS.AppData.GetSelectedHardwarePackage().MiscHardwareEntries.ForEach(x => Hardware_Items.Add(new HardwarePresenter(x, ALS.Info)));
                 Update("Hardware_Items");
             }
 
-            if(p(BOMDataGrid.Labor)) 
+            if (p(BOMDataGrid.Labor))
             {
                 Labor_Items.Clear();
                 ALS.AppData.LaborHourEntries.ForEach(x => Labor_Items.Add(new LaborPresenter(x, ALS.Info)));
                 Update("Labor_Items");
             }
 
-            if(p(BOMDataGrid.P3)) 
+            if (p(BOMDataGrid.P3))
             {
                 P3_Items.Clear();
                 ALS.AppData.GetSelectedP3Package().P3Boxes.ForEach(x => P3_Items.Add(new P3BoxPresenter(x, ALS.Info)));
                 Update("P3_Items");
             }
 
-            if(p(BOMDataGrid.Wire))
+            if (p(BOMDataGrid.Wire))
                 Update("Wire_Items");
 
-            if(p(BOMDataGrid.ElecRoom)) 
+            if (p(BOMDataGrid.ElecRoom))
             {
                 Elec_Room_Items.Clear();
                 ALS.AppData.GetSelectedElecRoomPackage().ElectricalRoomPack.Rooms.ForEach(room => Elec_Room_Items.Add(new ElecRoomPresenter(room)));
@@ -583,14 +583,14 @@ namespace JPMorrow.UI.ViewModels
                 Update("Backing_Items");
             }
 
-            if(p(BOMDataGrid.VoltageDropRules)) 
+            if (p(BOMDataGrid.VoltageDropRules))
             {
                 Voltage_Drop_Items.Clear();
                 ALS.AppData.VoltageDropRules.ForEach(x => Voltage_Drop_Items.Add(new VoltageDropPresenter(x, ALS.Info)));
                 Update("Voltage_Drop_Items");
             }
 
-            if(p(BOMDataGrid.DeviceWirePairings))
+            if (p(BOMDataGrid.DeviceWirePairings))
             {
                 Device_Pairing_Items.Clear();
                 Wire_Pairing_Items.Clear();

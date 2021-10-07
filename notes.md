@@ -28,13 +28,17 @@ img {
   - Nuts
   - Washers
 - Mineralac hangers should only apply to single conduit above 2"
-- HR boxes should use 1/4" thread by default
 
 ## The pdf document that these chagnes came from (provided by elmor):
-![PDF IS MISSING](/markdown-assets/bom_review_1_Page_1.png "bom pdf 1")
-![PDF IS MISSING](/markdown-assets/bom_review_1_Page_2.png "bom pdf 1")
-<br/><br/><br/><br/><br/>
+![PDF IS MISSING](./markdown-assets/bom_review_1_Page_1.png "bom pdf")
+![PDF IS MISSING](./markdown-assets/bom_review_1_Page_2.png "bom pdf")
 
+# Completed
+- Remove 10' from all runs to account for elec rooms
+- HR boxes should use 1/4" thread by default
+- On Strut, default to 1/2" all thread
+
+<br/><br/><br/><br/><br/>
 # table test
 |||
 |-----|------|

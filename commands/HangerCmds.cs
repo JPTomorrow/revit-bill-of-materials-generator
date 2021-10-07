@@ -7,6 +7,7 @@ using JPMorrow.Data.Globals;
 using JPMorrow.Revit.ElementDeletion;
 using JPMorrow.Revit.Hangers;
 using JPMorrow.Revit.Hardware;
+using JPMorrow.Revit.JunctionBox;
 using JPMorrow.Revit.Labor;
 using JPMorrow.Revit.Measurements;
 using JPMorrow.Revit.Tools;
@@ -50,13 +51,13 @@ namespace JPMorrow.UI.ViewModels
                 if (!ids.Any()) return;
 
                 List<SingleHanger> singles = new List<SingleHanger>();
-                
+
                 var mrl = RMeasure.LengthDbl(ALS.Info.DOC, HO_Single_Min_Rod_Len_Txt);
                 var diameter = RMeasure.LengthDbl(ALS.Info.DOC, Rod_Diameter_Items[Sel_Single_Rod_Diameter]);
                 var nominal_spacing = RMeasure.LengthDbl(ALS.Info.DOC, Nominal_Hanger_Spacing_Txt);
                 var bend_spacing = RMeasure.LengthDbl(ALS.Info.DOC, Bend_Hanger_Spacing_Txt);
                 var att_type = Single_Att_Type_Items[Sel_Single_Att];
-                
+
                 HangerOptions opts = new HangerOptions();
                 opts.SingleAttType = att_type;
                 opts.RodDiameter = diameter;
@@ -69,7 +70,7 @@ namespace JPMorrow.UI.ViewModels
                 int single_cnt = 0;
                 var hangers = await SingleHanger.CreateSingleHangers(
                     ALS.Info, ThisApplication.Hanger_View, ids, opts);
-                
+
                 singles.AddRange(hangers);
 
                 ALS.AppData.GetSelectedHangerPackage().SingleHangers.AddRange(singles);
@@ -109,26 +110,15 @@ namespace JPMorrow.UI.ViewModels
                         p_exists(x, "Height")
                         ).Select(y => y.Id).ToList();
 
-                // add junction boxes to hardware if fixture hangers are coming
-                if (!ALS.AppData.GetSelectedHardwarePackage().MiscHardwareEntries.Any(x => x.name.Equals("4 in. sq. box")))
-                {
-                    HardwareEntry entry = new HardwareEntry();
-                    entry.name = "4 in. sq. box";
-                    entry.qty = jboxes.Count();
-                    ALS.AppData.GetSelectedHardwarePackage().MiscHardwareEntries.Add(entry);
-                    WriteToLog("Added hardware entry for '4 in. sq. box'");
-                }
+                bool made_box_entries = JunctionBoxUtil.AddFourSquareBoxToHardware(jboxes.Count());
 
-                // make harware entries for jboxes
-                if (!ALS.AppData.LaborHourEntries.Any(x => x.EntryName.Equals("4 in. sq. box")))
-                {
-                    double jbox_labor = 0.23;
-                    var ldata = new LaborData(LaborExchange.LetterCodes.GetByLetter('E'), jbox_labor);
-                    LaborEntry entry = new LaborEntry("4 in. sq. box", ldata);
-                    if (ALS.AppData.LaborHourEntries.Any(x => x.EntryName == entry.EntryName)) return;
-                    ALS.AppData.LaborHourEntries.Add(entry);
+                if (made_box_entries)
+                    WriteToLog("Added hardware entry for '4 in. sq. box'");
+
+                bool made_hardware_labor_entry = JunctionBoxUtil.MakeFourSquareBoxLaborEntry();
+
+                if (made_hardware_labor_entry)
                     WriteToLog("Added labor entry for '4 in. sq. box'");
-                }
 
                 var mrl = RMeasure.LengthDbl(ALS.Info.DOC, HO_Single_Min_Rod_Len_Txt);
                 var diameter = RMeasure.LengthDbl(ALS.Info.DOC, Rod_Diameter_Items[Sel_Single_Rod_Diameter]);
@@ -146,6 +136,8 @@ namespace JPMorrow.UI.ViewModels
 
                     ALS.AppData.GetSelectedHangerPackage().FixtureHangers.Add(jbox_hanger);
                     jbis.Add(jbox_info);
+
+
                 }
 
                 RefreshDataGrids(BOMDataGrid.Hangers, BOMDataGrid.Hardware);
@@ -164,11 +156,12 @@ namespace JPMorrow.UI.ViewModels
             {
                 List<ElementId> ids = ALS.Info.SEL.GetElementIds().ToList();
 
-                if(!ids.Any()) {
-                    debugger.show(header:"Strut Hangers", err:"No Conduit was selected. Please select a conduit rack.");
+                if (!ids.Any())
+                {
+                    debugger.show(header: "Strut Hangers", err: "No Conduit was selected. Please select a conduit rack.");
                     return;
                 }
-                
+
                 List<ElementId> conduit_ids = new List<ElementId>();
                 List<ElementId> tray_ids = new List<ElementId>(); // cable tray
 
@@ -199,20 +192,22 @@ namespace JPMorrow.UI.ViewModels
                 opts.BendSpacing = bend_spacing;
                 opts.DrawSingleHangerModelGeometry = Draw_Single_Debug;
                 opts.DrawStrutHangerModelGeometry = Draw_Strut_Debug;
-                
+
                 List<StrutHanger> hangers = new List<StrutHanger>();
-                if (conduit_ids.Any()) {
+                if (conduit_ids.Any())
+                {
                     var current_hangers = await StrutHanger.CreateStrutHangers(
                         ALS.Info, ThisApplication.Hanger_View, conduit_ids, opts, StrutHangerRackType.Conduit);
-                    if(current_hangers != null) hangers.AddRange(current_hangers);
+                    if (current_hangers != null) hangers.AddRange(current_hangers);
                 }
 
-                if (tray_ids.Any()) {
+                if (tray_ids.Any())
+                {
                     var current_hangers = await StrutHanger.CreateStrutHangers(
                         ALS.Info, ThisApplication.Hanger_View, tray_ids, opts, StrutHangerRackType.CableTray);
-                    if(current_hangers != null) hangers.AddRange(current_hangers);
+                    if (current_hangers != null) hangers.AddRange(current_hangers);
                 }
-                
+
                 ALS.Info.SEL.SetElementIds(hangers.Select(x => new ElementId(x.HangerFamilyInstanceId)).ToArray());
 
                 ALS.AppData.GetSelectedHangerPackage().StrutHangers.AddRange(hangers);
@@ -221,8 +216,9 @@ namespace JPMorrow.UI.ViewModels
                 WriteToLog("Added " + strut_cnt + " strut hangers.");
                 UpdateTotalStrutLengthLabel();
             }
-            catch (Exception ex) {
-                debugger.show(header:"HangerCmds", err: ex.Message);
+            catch (Exception ex)
+            {
+                debugger.show(header: "HangerCmds", err: ex.Message);
             }
         }
 
