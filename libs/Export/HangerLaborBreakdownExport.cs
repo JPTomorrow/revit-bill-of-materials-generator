@@ -44,6 +44,7 @@ namespace JPMorrow.Excel
                 string sslen(SingleHanger x) => RMeasure.LengthFromDbl(info.DOC, x.RodDiameter);
                 string stlen(StrutHanger x) => RMeasure.LengthFromDbl(info.DOC, x.RodDiameter);
                 string sflen(FixtureHanger x) => RMeasure.LengthFromDbl(info.DOC, x.RodDiameter);
+
                 // strut
                 strut_hangers.ForEach(x => ht.PushStrut("Slotted Strut", x.StrutSize, x.StrutLength * x.TierCount));
 
@@ -54,17 +55,7 @@ namespace JPMorrow.Excel
                 strut_hangers.ForEach(x => ht.PushAnchors(x.AnchorTwoType, stlen(x), 1));
 
                 // Attachments
-                single_hangers.ForEach(x =>
-                {
-
-                    // change to mineralac attachment if it is above cutoff size
-                    var cuttoff = RMeasure.LengthDbl(info.DOC, "1\"");
-                    var dia = RMeasure.LengthDbl(info.DOC, x.AttachmentSize);
-                    var a_type = x.AnchorType;
-                    a_type = dia < cuttoff ? "Batwing" : "Mineralac";
-
-                    ht.PushIndividualAttachments(x.AttachmentType, x.AttachmentSize, 1);
-                });
+                single_hangers.ForEach(x => { ht.PushIndividualAttachments(info.DOC, x); });
 
                 // Hex Nuts
                 fixture_hangers.ForEach(x => ht.PushHexNuts(
@@ -152,21 +143,7 @@ namespace JPMorrow.Excel
 
                 foreach (var a in ht.SingleAttachments)
                 {
-                    string AttachmentType = a.Type;
-                    if (AttachmentType == "Batwing")
-                    {
-                        double diameter_dbl = RMeasure.LengthDbl(info.DOC, a.Size);
-                        double limit_diameter = RMeasure.LengthDbl(info.DOC, "3/4\"");
-
-                        if (diameter_dbl == -1 || limit_diameter == -1)
-                            throw new Exception("No way to resolve batwing attachment type");
-                        if (diameter_dbl <= limit_diameter)
-                            AttachmentType += " - K-12";
-                        else
-                            AttachmentType += " - K-16";
-                    }
-
-                    var has_item = l.GetItem(out var li, (double)a.Count, AttachmentType, a.Size);
+                    var has_item = l.GetItem(out var li, (double)a.Count, a.Type, a.Size);
                     if (!has_item) throw new Exception("No Labor item for attachments");
                     InsertIntoRow(li.EntryName, li.Quantity, li.PerUnitLabor, li.LaborCodeLetter, li.TotalLaborValue);
                     gt += li.TotalLaborValue; code_one_gt += li.TotalLaborValue; NextRow(1);

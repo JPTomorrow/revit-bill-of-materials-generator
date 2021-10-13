@@ -90,17 +90,16 @@ namespace JPMorrow.UI.ViewModels
         {
             try
             {
-                List<ElementId> jboxes = new List<ElementId>();
                 List<JBoxInfo> jbis = new List<JBoxInfo>();
 
+                // collect jboxes
                 //@REFACTOR - this will not work like this in the final version of jbox assemblies
                 FilteredElementCollector jbox_coll = new FilteredElementCollector(ALS.Info.DOC, ALS.Info.UIDOC.ActiveView.Id);
 
                 Parameter p(Element x, string str) => x.LookupParameter(str);
                 bool p_exists(Element x, string str) => p(x, str) != null;
 
-                // collect jboxes
-                jboxes = jbox_coll
+                List<ElementId> box_ids = jbox_coll
                     .OfCategory(BuiltInCategory.OST_ElectricalFixtures)
                     .Where(x =>
                         p_exists(x, "From") &&
@@ -110,16 +109,14 @@ namespace JPMorrow.UI.ViewModels
                         p_exists(x, "Height")
                         ).Select(y => y.Id).ToList();
 
-                bool made_box_entries = JunctionBoxUtil.AddFourSquareBoxToHardware(jboxes.Count());
+                // add the boxes to hardware and create hoardware labor entry if it is not already created
+                JunctionBoxUtil.MakeFourSquareBoxLaborEntries();
+                JunctionBoxUtil.AddFourSquareBoxToHardware(box_ids.Count());
 
-                if (made_box_entries)
-                    WriteToLog("Added hardware entry for '4 in. sq. box'");
+                WriteToLog("Added hardware entry for '4 in. sq. box'");
+                WriteToLog("Added labor entry for '4 in. sq. box'");
 
-                bool made_hardware_labor_entry = JunctionBoxUtil.MakeFourSquareBoxLaborEntry();
-
-                if (made_hardware_labor_entry)
-                    WriteToLog("Added labor entry for '4 in. sq. box'");
-
+                // generate fixture hangers
                 var mrl = RMeasure.LengthDbl(ALS.Info.DOC, HO_Single_Min_Rod_Len_Txt);
                 var diameter = RMeasure.LengthDbl(ALS.Info.DOC, Rod_Diameter_Items[Sel_Single_Rod_Diameter]);
 
@@ -127,7 +124,7 @@ namespace JPMorrow.UI.ViewModels
                 opts.RodDiameter = diameter;
                 opts.MinRodLength = mrl;
 
-                foreach (var id in jboxes)
+                foreach (var id in box_ids)
                 {
                     JBoxInfo jbox_info = RJBI.ParseJunctionBox(id, ALS.Info);
 

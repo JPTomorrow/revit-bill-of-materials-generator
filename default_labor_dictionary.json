@@ -632,6 +632,11 @@
             "1 1/4\"" :     [ "C", 0.080 ]
         }
     },
+    "CaddyM4I Conduit Clip":  {
+        "1 1/4\"":          [ "C", 0.080 ],
+        "1 1/2\"":          [ "C", 0.080 ],
+        "2\"":              [ "C", 0.080 ]
+    },
     "Mineralac" : {
         "1 1/4\"" :         [ "C", 0.080 ],
         "1 1/2\"" :         [ "C", 0.080 ],
@@ -709,7 +714,7 @@
         "3/8\"" :           [ "C", 0.080 ],
         "1/2\"" :           [ "C", 0.080 ]
     },
-    "Hilti Concrete Anchor" : {
+    "Hilti KH-EZ I - Concrete Anchor" : {
         "1/4\"" :           [ "C", 0.078 ],
         "3/8\"" :           [ "C", 0.078 ],
         "1/2\"" :           [ "C", 0.078 ]
@@ -836,7 +841,7 @@
         "L Type" :                 [ "C", 0.030 ],
         "X Type" :                 [ "C", 0.030 ]
     },
-    "Unistrut Hilti Concrete Anchor" : {
+    "Unistrut Hilti KH-EZ I - Concrete Anchor" : {
         "1/4\"" :                  [ "C", 0.078 ],
         "3/8\"" :                  [ "C", 0.078 ]
     },
@@ -884,7 +889,7 @@
     "Ground Bar Sheet Metal Screw" : {
         "#8 x 1/2\"" :             [ "C", 0.024 ]
     },
-    "Ground Bar Hilti Concrete Anchor" : {
+    "Ground Bar Hilti KH-EZ I - Concrete Anchor" : {
         "1/4\"" :                  [ "C", 0.078 ],
         "3/8\"" :                  [ "C", 0.078 ]
     },
@@ -901,7 +906,7 @@
     "Panel Backing Sheet Metal Screw" : {
         "#8 x 1/2\"" :             [ "C", 0.024 ]
     },
-    "Panel Backing Hilti Concrete Anchor" : {
+    "Panel Backing Hilti KH-EZ I - Concrete Anchor" : {
         "1/4\"" :                  [ "C", 0.078 ],
         "3/8\"" :                  [ "C", 0.078 ]
     },
@@ -926,7 +931,7 @@
     "Panelboard Sheet Metal Screw" : {
         "#8 x 1/2\"" :                   [ "C", 0.024 ] 
     },
-    "Panelboard Hilti Concrete Anchor" : {
+    "Panelboard Hilti KH-EZ I - Concrete Anchor" : {
         "1/4\"" :                   [ "C", 0.078 ],
         "3/8\"" :                   [ "C", 0.078 ] 
     },
@@ -1100,6 +1105,7 @@
     },
     
     "Ground Stinger #12 Copper" :            [ "C", 0.025 ],
+    "Ground Stinger" :            [ "C", 0.025 ],
     "1/4\"x20 - 1/2\" Long Screw" :          [ "M", 0.078 ],
     "Wafer Head Tek Screw" :                 [ "M", 0.030 ],
     "Mounting Bracket" :                     [ "E", 0.078 ],
@@ -1117,5 +1123,10 @@
     },
     "Glue" :                            [ "E", 1.0 ],
     "Cleaner" :                         [ "E", 0.5 ],
+
+    "Blank Box Cover":                  [ "E", 1.0 ],
+    "Helicopter Bracket":               [ "E", 1.0 ],
+    "Washer for 4 sq. box":             [ "C", 0.016 ],
+    "Hex nut for 4 sq. box":            [ "C", 0.016 ],
     "4 in. sq. box" :                   [ "E", 1.0 ]
 }

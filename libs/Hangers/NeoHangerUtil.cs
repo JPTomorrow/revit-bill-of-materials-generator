@@ -8,13 +8,17 @@ using JPMorrow.Revit.Measurements;
 using JPMorrow.Revit.Tools;
 using JPMorrow.Tools.Diagnostics;
 
-namespace JPMorrow.Revit.Hangers {
-    namespace Internal {
-        
-        internal static class HangerUtil {
-            
-            public static Level GetLevel(ModelInfo info, ElementId id) {
-                
+namespace JPMorrow.Revit.Hangers
+{
+    namespace Internal
+    {
+
+        internal static class HangerUtil
+        {
+
+            public static Level GetLevel(ModelInfo info, ElementId id)
+            {
+
                 var el = info.DOC.GetElement(id);
                 string level_str = el.LookupParameter("Reference Level").AsValueString();
                 info.SEL.SetElementIds(new ElementId[] { el.Id });
@@ -22,8 +26,9 @@ namespace JPMorrow.Revit.Hangers {
                 return levels.First() as Level;
             }
 
-            public static XYZ[] GetPlacementPoints(double nominal_spacing, double bend_spacing, Curve curve) {
-                
+            public static XYZ[] GetPlacementPoints(double nominal_spacing, double bend_spacing, Curve curve)
+            {
+
                 List<XYZ> ret_pts = new List<XYZ>();
                 XYZ start = curve.GetEndPoint(0);
                 XYZ end = curve.GetEndPoint(1);
@@ -31,29 +36,33 @@ namespace JPMorrow.Revit.Hangers {
                 XYZ point = start;
 
                 // if conduit piece is too short for bend spacing and less than nominal
-                if (cl <= nominal_spacing) {
+                if (cl <= nominal_spacing)
+                {
                     point = RGeo.DerivePointBetween(point, end, cl / 2);
                     ret_pts.Add(point);
                     return ret_pts.ToArray();
                 }
 
                 // if conduit is not too short for bend spacing and is less than nominal
-                if (cl < nominal_spacing + (bend_spacing * 2)) {
+                if (cl < nominal_spacing + (bend_spacing * 2))
+                {
                     point = RGeo.DerivePointBetween(start, end, bend_spacing);
                     ret_pts.Add(point);
-                    
-                    if ((cl - (bend_spacing * 2)) >= nominal_spacing) {
+
+                    if ((cl - (bend_spacing * 2)) >= nominal_spacing)
+                    {
                         point = RGeo.DerivePointBetween(start, end, cl / 2.0);
                         ret_pts.Add(point);
                     }
-                    
+
                     point = RGeo.DerivePointBetween(start, end, cl - bend_spacing);
                     ret_pts.Add(point);
                     return ret_pts.ToArray();
                 }
 
                 // if conduit is not to short for bend spacing and is greater than nominal
-                if (cl >= nominal_spacing + (bend_spacing * 2)) {
+                if (cl >= nominal_spacing + (bend_spacing * 2))
+                {
                     bool passed = true;
                     double totalLen = 0;
                     point = RGeo.DerivePointBetween(point, end, bend_spacing);
@@ -61,8 +70,9 @@ namespace JPMorrow.Revit.Hangers {
                     ret_pts.Add(point);
 
                     double newNominalSpacing = (cl - (bend_spacing * 2)) / Math.Ceiling((cl - (bend_spacing * 2)) / nominal_spacing);
-                    
-                    while (passed) {
+
+                    while (passed)
+                    {
                         point = RGeo.DerivePointBetween(point, end, newNominalSpacing);
                         totalLen += nominal_spacing;
                         if (totalLen <= cl - bend_spacing)
@@ -70,7 +80,7 @@ namespace JPMorrow.Revit.Hangers {
                         else
                             passed = false;
                     }
-                    
+
                     point = RGeo.DerivePointBetween(start, end, cl - bend_spacing);
                     ret_pts.Add(point);
                 }
@@ -84,31 +94,35 @@ namespace JPMorrow.Revit.Hangers {
                 Element collision_element = info.DOC.GetElement(collision_element_id);
                 string category = collision_element.Category.Name;
 
-                if (collision_element.Category.Name == "RVT Links") {
+                if (collision_element.Category.Name == "RVT Links")
+                {
                     RevitLinkInstance link = info.DOC.GetElement(collision_element.Id) as RevitLinkInstance;
                     Document linkDoc = link.GetLinkDocument();
                     FilteredElementCollector link_coll = new FilteredElementCollector(linkDoc)
                         .WherePasses(new ElementMulticategoryFilter(BICategoryCollection.NormalHangerClash));
 
-                    foreach (Element el in link_coll) {
+                    foreach (Element el in link_coll)
+                    {
                         Reference refer = new Reference(el).CreateLinkReference(link);
                         if (el.Id != refer.LinkedElementId) continue;
                         category = el.Category.Name;
                     }
                 }
-                
+
                 return category;
             }
 
             // Change the type of anchor based on what
             // the category of the ray collision object is.
-            public static string GetAnchortype(string category) {
-                
-                string anchType = "Hilti Concrete Anchor";
-                switch (category) {
-                    
+            public static string GetAnchortype(string category)
+            {
+
+                string anchType = "Hilti KH-EZ I - Concrete Anchor";
+                switch (category)
+                {
+
                     case "Floors":
-                        anchType = "Hilti Concrete Anchor";
+                        anchType = "Hilti KH-EZ I - Concrete Anchor";
                         break;
                     case "Structural Framing (Joist)":
                         anchType = "Steel City Beam Clamp";
@@ -134,7 +148,7 @@ namespace JPMorrow.Revit.Hangers {
                 var con1 = doc.GetElement(ids[0]);
                 var con2 = doc.GetElement(ids[1]);
 
-                if(!con1.Category.Name.Equals("Conduits") || !con2.Category.Name.Equals("Conduits"))
+                if (!con1.Category.Name.Equals("Conduits") || !con2.Category.Name.Equals("Conduits"))
                     throw new Exception("ids are not of type conduit.");
 
                 var sel_con = len(con1) >= len(con2) ? con2 : con1;
@@ -152,7 +166,7 @@ namespace JPMorrow.Revit.Hangers {
                 raw_length += (dia(con1) + dia(con2));
 
                 var idx = standard_lengths.BinarySearch(raw_length);
-                if(idx < 0) idx = ~idx;
+                if (idx < 0) idx = ~idx;
                 return new[] { raw_length, standard_lengths[idx] };
             }
         }

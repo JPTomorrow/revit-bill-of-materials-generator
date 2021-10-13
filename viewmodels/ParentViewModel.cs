@@ -261,6 +261,7 @@ namespace JPMorrow.UI.ViewModels
 
         public ICommand AddNewHardwareSubPackageCmd => new RelayCommand<ComboBox>(AddNewHardwareSubPackage);
         public ICommand RemoveHardwareSubPackageCmd => new RelayCommand<Window>(RemoveHardwareSubPackage);
+        public ICommand AddPullBoxHardwareCmd => new RelayCommand<Window>(AddPullBoxHardware);
         public ICommand HardwareSubPackageSelectionChangedCmd => new RelayCommand<Window>(HardwareSubPackageSelectionChanged);
 
         public ICommand AddNewGlobalSettingsSubPackageCmd => new RelayCommand<ComboBox>(AddNewGlobalSettingsSubPackage);

@@ -1153,6 +1153,7 @@
             <RowDefinition Height="40*"/>
             <RowDefinition Height="40*"/>
             <RowDefinition Height="40*"/>
+            <RowDefinition Height="40*"/>
           </Grid.RowDefinitions>
 
           <ComboBox Name="HardwareSubPackageCB" SelectedIndex="{Binding Path=SelHardwarePackage, Mode=TwoWay}" VerticalContentAlignment="Center" ItemsSource="{Binding HardwarePackageNameItems}" Margin="3" Grid.Column="0" Grid.Row="0" Grid.ColumnSpan="1">
@@ -1179,6 +1180,7 @@
           <TextBox Text="{Binding Path=Hardware_Qty_Txt, Mode=TwoWay}" VerticalContentAlignment="Center" Margin="3" Grid.Column="3" Grid.Row="3" Grid.ColumnSpan="1"/>
           <Button Name="AddHardwareButton" Command="{Binding AddHardwareEntryCmd}" CommandParameter="{Binding ElementName = WindowBase}" Style="{StaticResource MarathonRed}" Content="Add" Margin="2,2,0,2" Background="Transparent" Foreground="White" BorderThickness="1" Width="auto" Height="auto" Grid.Column="2" Grid.Row="4"/>
           <Button Name="RemoveHardwareButton" Command="{Binding RemoveHardwareEntryCmd}" CommandParameter="{Binding ElementName = WindowBase}" Style="{StaticResource MarathonRed}" Content="Remove" Margin="2,2,0,2" Background="Transparent" Foreground="White" BorderThickness="1" Width="auto" Height="auto" Grid.Column="3" Grid.Row="4"/>
+          <Button Name="AddPullBoxHardwareButton" Command="{Binding AddPullBoxHardwareCmd}" CommandParameter="{Binding ElementName = WindowBase}" Style="{StaticResource MarathonRed}" Content="Add Pull Boxes" Margin="2,2,0,2" Background="Transparent" Foreground="White" BorderThickness="1" Width="auto" Height="auto" Grid.Column="3" Grid.Row="5"/>
         </Grid>
       </TabItem>
       

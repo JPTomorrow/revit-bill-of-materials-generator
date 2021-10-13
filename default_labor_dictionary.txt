@@ -725,13 +725,13 @@ Steel City Beam Clamp - 1/4"								|C|0.080
 Steel City Beam Clamp - 3/8"								|C|0.080
 Steel City Beam Clamp - 1/2"								|C|0.080
 
-#Hilti Concrete Anchor
-Hilti Concrete Anchor - 1/4"								|C|0.078
-Hilti Concrete Anchor - 3/8"								|C|0.078
-Hilti Concrete Anchor - 1/2"								|C|0.078
-Hilti Concrete Anchor - 0'  0 1/4"							|C|0.078
-Hilti Concrete Anchor - 0'  0 3/8"							|C|0.078
-Hilti Concrete Anchor - 0'  0 1/2"							|C|0.078
+#Hilti KH-EZ I - Concrete Anchor
+Hilti KH-EZ I - Concrete Anchor - 1/4"								|C|0.078
+Hilti KH-EZ I - Concrete Anchor - 3/8"								|C|0.078
+Hilti KH-EZ I - Concrete Anchor - 1/2"								|C|0.078
+Hilti KH-EZ I - Concrete Anchor - 0'  0 1/4"							|C|0.078
+Hilti KH-EZ I - Concrete Anchor - 0'  0 3/8"							|C|0.078
+Hilti KH-EZ I - Concrete Anchor - 0'  0 1/2"							|C|0.078
 
 #Close Beam Clamp
 Close Beam Clamp - 1/4"										|C|0.080
@@ -849,8 +849,8 @@ Unistrut Machine Screw - 1/4" x 20							|C|0.030
 Unistrut Flat Plate Fitting - T Type						|C|0.030
 Unistrut Flat Plate Fitting - L Type						|C|0.030
 Unistrut Flat Plate Fitting - X Type						|C|0.030
-Unistrut Hilti Concrete Anchor - 1/4"						|C|0.078
-Unistrut Hilti Concrete Anchor - 3/8"						|C|0.078
+Unistrut Hilti KH-EZ I - Concrete Anchor - 1/4"						|C|0.078
+Unistrut Hilti KH-EZ I - Concrete Anchor - 3/8"						|C|0.078
 Unistrut Post Base											|C|0.030
 
 #Ground Bar
@@ -891,8 +891,8 @@ Ground Bar Washer - 3/8" x 1 1/4" 							|C|0.016
 Ground Bar Toggle Bolt - 1/4" x 4"							|C|0.08
 Ground Bar Toggle Bolt - 3/8" x 4"							|C|0.12
 Ground Bar Sheet Metal Screw - #8 x 1/2"					|C|0.024
-Ground Bar Hilti Concrete Anchor - 1/4"						|C|0.078
-Ground Bar Hilti Concrete Anchor - 3/8"						|C|0.078
+Ground Bar Hilti KH-EZ I - Concrete Anchor - 1/4"						|C|0.078
+Ground Bar Hilti KH-EZ I - Concrete Anchor - 3/8"						|C|0.078
 
 #Panel Backing
 Panel Backing												|E|0.084
@@ -902,8 +902,8 @@ Panel Backing Washer - 3/8" x 1 1/4" 						|C|0.016
 Panel Backing Toggle Bolt - 1/4" x 4"						|C|0.08
 Panel Backing Toggle Bolt - 3/8" x 4"						|C|0.12
 Panel Backing Sheet Metal Screw - #8 x 1/2"					|C|0.024
-Panel Backing Hilti Concrete Anchor - 1/4"					|C|0.078
-Panel Backing Hilti Concrete Anchor - 3/8"					|C|0.078
+Panel Backing Hilti KH-EZ I - Concrete Anchor - 1/4"					|C|0.078
+Panel Backing Hilti KH-EZ I - Concrete Anchor - 3/8"					|C|0.078
 
 #Panelboard
 Panelboard Can - No Amps									|E|1.00
@@ -919,8 +919,8 @@ Panelboard Washer - 3/8" x 1" 								|C|0.016
 Panelboard Toggle Bolt - 1/4" x 4"							|C|0.080
 Panelboard Toggle Bolt - 3/8" x 4"							|C|0.120
 Panelboard Sheet Metal Screw - #8 x 1/2"					|C|0.024
-Panelboard Hilti Concrete Anchor - 1/4"						|C|0.078
-Panelboard Hilti Concrete Anchor - 3/8"						|C|0.078
+Panelboard Hilti KH-EZ I - Concrete Anchor - 1/4"						|C|0.078
+Panelboard Hilti KH-EZ I - Concrete Anchor - 3/8"						|C|0.078
 
 #####P3 In Wall#####
 

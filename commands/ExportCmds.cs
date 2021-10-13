@@ -40,11 +40,11 @@ namespace JPMorrow.UI.ViewModels
                 var open_excel = esv.OpenExcelBox.IsChecked ?? false;
                 var open_pdf = esv.OpenPDFBox.IsChecked ?? false;
 
-                bool exports_selected =
-                    export_branch || export_dist || export_lowvoltage || export_hanger_labor ||
-                    export_elecroom || export_conduit_wire_only || export_conduit_only || export_legacy_p3_in_wall;
+                bool conduit_exports_selected = export_branch || export_dist || export_lowvoltage || export_conduit_wire_only || export_conduit_only;
+                bool hanger_exports_selected = export_hanger_labor;
+                bool other_export_selected = export_elecroom || export_legacy_p3_in_wall;
 
-                if (!ALS.AppData.GetSelectedConduitPackage().Cris.Any())
+                if (!ALS.AppData.GetSelectedConduitPackage().Cris.Any() && conduit_exports_selected)
                 {
                     debugger.show(
                         header: "Export",
@@ -52,7 +52,7 @@ namespace JPMorrow.UI.ViewModels
                     return;
                 }
 
-                if (!exports_selected)
+                if (!conduit_exports_selected && !hanger_exports_selected && !other_export_selected)
                 {
                     debugger.show(header: "BOM Export", err: "No exports were selected");
                     return;

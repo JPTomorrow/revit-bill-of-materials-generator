@@ -25,8 +25,8 @@ img {
   - Blank Covers
   - Ground Stingers
   - Helicopter Brackets
-  - Nuts
-  - Washers
+  - 3x Hex Nuts
+  - 3x Washers
 - Mineralac hangers should only apply to single conduit above 2"
 
 ## The pdf document that these chagnes came from (provided by elmor):
