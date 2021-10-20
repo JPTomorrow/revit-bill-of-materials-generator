@@ -169,7 +169,7 @@
     <Reference Include="PresentationCore"/>
     <Reference Include="PresentationFramework"/>
     <Reference Include="./packages/System.Windows.Interactivity.WPF.2.0.20525/lib/net40/System.Windows.Interactivity.dll"/>
-    <Reference Include="C:/Users/Jmorrow/Desktop/Code/Revit-Bill-of-Materials-Generator/packages/Newtonsoft.Json.13.0.1/lib/net45/Newtonsoft.Json.dll"/>
+    <Reference Include="./packages/Newtonsoft.Json.13.0.1/lib/net45/Newtonsoft.Json.dll"/>
     <Reference Include="./packages/morelinq.3.3.2/lib/net451/MoreLinq.dll"/>
   </ItemGroup>
 
@@ -210,14 +210,8 @@
       <Output TaskParameter="Include" ItemName="AssembliesToMerge" />
     </CreateItem>
 
-
-    <!-- This weird bit of hieroglyphics is the assemblies to merge, quoted, and separated by spaces -->
-    <!-- Example:  "c:\foo\project1\bin\Debug\ProjectOne.dll"   "c:\foo\project2\bin\Debug\ProjectTwo.dll"  -->
     <Message Text="AssembliesToMerge= @(AssembliesToMerge -> '&quot;%(Fullpath)&quot;', ' ')" />
-    <!-- Message Text="TargetPath= $(TargetPath)" / -->
     <Message Text="TargetFileName= $(TargetFileName)" />
-    <!-- produce the merged assembly - putting the output in the "IntermediateOutputPath" eg obj\Debug. -->
-    <!-- it will be copied later by the CopyFilestoOutputDirectory task defined in Microsoft.Common.Targets -->
 
     <Error
       Text="ILMerge cannot be found. You need to download and install ILMerge in order to build DotNetZip."

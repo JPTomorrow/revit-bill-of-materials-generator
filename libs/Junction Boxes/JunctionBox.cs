@@ -13,8 +13,10 @@ namespace JPMorrow.Revit.JunctionBox
             string box_name = "4 in. sq. box";
             string bc_name = "Blank Box Cover";
             string gs_name = "Ground Stinger";
-            string washer_name = "Washer for 4 sq. box";
-            string hn_name = "Hex nut for 4 sq. box";
+            string bracket_name = "Helicopter Bracket";
+            string strap_name = "Caddy Conduit Straps 812M4I";
+            string washer_name = "Washer - 1/4\"";
+            string hn_name = "Hex Nut - 1/4\"";
 
             bool has_hardware(string name) => ALS.AppData.GetSelectedHardwarePackage().MiscHardwareEntries.Any(x => x.name.Equals(name));
             int remove_hardware(string name) => ALS.AppData.GetSelectedHardwarePackage().MiscHardwareEntries.RemoveAll(x => x.name.Equals(name));
@@ -22,6 +24,8 @@ namespace JPMorrow.Revit.JunctionBox
             bool has_box_hw = has_hardware(box_name);
             bool has_blank_cover_hw = has_hardware(bc_name);
             bool has_stinger_hw = has_hardware(gs_name);
+            bool has_bracket_hw = has_hardware(bracket_name);
+            bool has_strap_hw = has_hardware(strap_name);
             bool has_washer_hw = has_hardware(washer_name);
             bool has_hex_hw = has_hardware(hn_name);
 
@@ -42,6 +46,12 @@ namespace JPMorrow.Revit.JunctionBox
             if (has_stinger_hw) remove_hardware(gs_name);
             make_hardware_entry(gs_name, jbox_cnt);
 
+            if (has_bracket_hw) remove_hardware(bracket_name);
+            make_hardware_entry(bracket_name, jbox_cnt);
+
+            if (has_strap_hw) remove_hardware(strap_name);
+            make_hardware_entry(strap_name, jbox_cnt);
+
             if (has_washer_hw) remove_hardware(washer_name);
             make_hardware_entry(washer_name, jbox_cnt * 3);
 
@@ -51,11 +61,21 @@ namespace JPMorrow.Revit.JunctionBox
 
         public static void MakeFourSquareBoxLaborEntries()
         {
-            bool has_box_entry = ALS.AppData.LaborHourEntries.Any(x => x.EntryName.Equals("4 in. sq. box"));
-            bool has_blank_cover_entry = ALS.AppData.LaborHourEntries.Any(x => x.EntryName.Equals("Blank Box Cover"));
-            bool has_stinger_entry = ALS.AppData.LaborHourEntries.Any(x => x.EntryName.Equals("Ground Stinger"));
-            bool has_washer_entry = ALS.AppData.LaborHourEntries.Any(x => x.EntryName.Equals("Washer for 4 sq. box"));
-            bool has_hex_entry = ALS.AppData.LaborHourEntries.Any(x => x.EntryName.Equals("Hex nut for 4 sq. box"));
+            string box_name = "4 in. sq. box";
+            string bc_name = "Blank Box Cover";
+            string gs_name = "Ground Stinger";
+            string bracket_name = "Helicopter Bracket";
+            string strap_name = "Caddy Conduit Straps 812M4I";
+            string washer_name = "Washer - 1/4\"";
+            string hn_name = "Hex Nut - 1/4\"";
+
+            bool has_box_entry = ALS.AppData.LaborHourEntries.Any(x => x.EntryName.Equals(box_name));
+            bool has_blank_cover_entry = ALS.AppData.LaborHourEntries.Any(x => x.EntryName.Equals(bc_name));
+            bool has_stinger_entry = ALS.AppData.LaborHourEntries.Any(x => x.EntryName.Equals(gs_name));
+            bool has_bracket_entry = ALS.AppData.LaborHourEntries.Any(x => x.EntryName.Equals(bracket_name));
+            bool has_strap_entry = ALS.AppData.LaborHourEntries.Any(x => x.EntryName.Equals(strap_name));
+            bool has_washer_entry = ALS.AppData.LaborHourEntries.Any(x => x.EntryName.Equals(washer_name));
+            bool has_hex_entry = ALS.AppData.LaborHourEntries.Any(x => x.EntryName.Equals(hn_name));
 
             void add_entry(string name, double labor, LetterCodePair pair)
             {
@@ -63,21 +83,28 @@ namespace JPMorrow.Revit.JunctionBox
                 LaborEntry entry = new LaborEntry(name, ldata);
                 ALS.AppData.LaborHourEntries.Add(entry);
             }
+
             // make harware entries for jboxes
             if (!has_box_entry)
-                add_entry("4 in. sq. box", 0.23, LaborExchange.LetterCodes.GetByLetter('E'));
+                add_entry(box_name, 0.23, LaborExchange.LetterCodes.GetByLetter('E'));
 
             if (!has_blank_cover_entry)
-                add_entry("Blank Box Cover", 0.23, LaborExchange.LetterCodes.GetByLetter('E'));
+                add_entry(bc_name, 0.23, LaborExchange.LetterCodes.GetByLetter('E'));
 
             if (!has_stinger_entry)
-                add_entry("Ground Stinger", 0.23, LaborExchange.LetterCodes.GetByLetter('E'));
+                add_entry(gs_name, 0.23, LaborExchange.LetterCodes.GetByLetter('E'));
+
+            if (!has_bracket_entry)
+                add_entry(bracket_name, 0.5, LaborExchange.LetterCodes.GetByLetter('E'));
+
+            if (!has_strap_entry)
+                add_entry(strap_name, 0.07, LaborExchange.LetterCodes.GetByLetter('C'));
 
             if (!has_washer_entry)
-                add_entry("Washer for 4 sq. box", 0.23, LaborExchange.LetterCodes.GetByLetter('E'));
+                add_entry(washer_name, 0.23, LaborExchange.LetterCodes.GetByLetter('E'));
 
             if (!has_hex_entry)
-                add_entry("Hex nut for 4 sq. box", 0.23, LaborExchange.LetterCodes.GetByLetter('E'));
+                add_entry(hn_name, 0.23, LaborExchange.LetterCodes.GetByLetter('E'));
         }
 
         public static void AddPullBoxesToHardware(string entry_name, int box_cnt)

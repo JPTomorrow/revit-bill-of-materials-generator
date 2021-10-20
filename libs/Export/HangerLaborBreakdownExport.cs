@@ -57,16 +57,6 @@ namespace JPMorrow.Excel
                 // Attachments
                 single_hangers.ForEach(x => { ht.PushIndividualAttachments(info.DOC, x); });
 
-                // Hex Nuts
-                fixture_hangers.ForEach(x => ht.PushHexNuts(
-                    "Hex Nut", sflen(x), x.Hardware.Where(x => x == "Hex Nut").Count()));
-                single_hangers.ForEach(x => ht.PushHexNuts(
-                    "Hex Nut", sslen(x), x.Hardware.Where(x => x == "Hex Nut").Count()));
-                strut_hangers.ForEach(x => ht.PushHexNuts(
-                    "Hex Nut", stlen(x), x.Hardware.Where(x => x == "Hex Nut").Count()));
-
-                ht.HexNuts.RemoveAll(x => x.Count == 0);
-
                 //spring nuts
                 fixture_hangers.ForEach(x => ht.PushSpringNuts(
                     "Spring Nut", sflen(x), x.Hardware.Where(x => x == "Spring Nut").Count()));
@@ -76,16 +66,6 @@ namespace JPMorrow.Excel
                     "Spring Nut", stlen(x), x.Hardware.Where(x => x == "Spring Nut").Count()));
 
                 ht.SpringNuts.RemoveAll(x => x.Count == 0);
-
-                // Washers
-                fixture_hangers.ForEach(x => ht.PushWashers(
-                    "Washer", sflen(x), x.Hardware.Where(x => x == "Washer").Count()));
-                single_hangers.ForEach(x => ht.PushWashers(
-                    "Washer", sslen(x), x.Hardware.Where(x => x == "Washer").Count()));
-                strut_hangers.ForEach(x => ht.PushWashers(
-                    "Washer", stlen(x), x.Hardware.Where(x => x == "Washer").Count()));
-
-                ht.Washers.RemoveAll(x => x.Count == 0);
 
                 // Lock Washers
                 fixture_hangers.ForEach(x => ht.PushLockWashers(
@@ -144,7 +124,7 @@ namespace JPMorrow.Excel
                 foreach (var a in ht.SingleAttachments)
                 {
                     var has_item = l.GetItem(out var li, (double)a.Count, a.Type, a.Size);
-                    if (!has_item) throw new Exception("No Labor item for attachments");
+                    if (!has_item) throw new Exception("No Labor item for attachment -> " + a.Type + " - " + a.Size);
                     InsertIntoRow(li.EntryName, li.Quantity, li.PerUnitLabor, li.LaborCodeLetter, li.TotalLaborValue);
                     gt += li.TotalLaborValue; code_one_gt += li.TotalLaborValue; NextRow(1);
                 }
@@ -169,6 +149,7 @@ namespace JPMorrow.Excel
                     gt += li.TotalLaborValue; code_one_gt += li.TotalLaborValue; NextRow(1);
                 }
 
+                /* @TODO: washers removed from the page per elmore. Delete later 
                 foreach (var w in ht.Washers)
                 {
                     var has_item = l.GetItem(out var li, (double)w.Count, "Washer", w.Diameter);
@@ -176,7 +157,7 @@ namespace JPMorrow.Excel
                     string washer_name = w.Type + " - " + w.Diameter + " Dia.";
                     InsertIntoRow(washer_name, li.Quantity, li.PerUnitLabor, li.LaborCodeLetter, li.TotalLaborValue);
                     gt += li.TotalLaborValue; code_one_gt += li.TotalLaborValue; NextRow(1);
-                }
+                } */
 
                 foreach (var lw in ht.LockWashers)
                 {
@@ -187,6 +168,7 @@ namespace JPMorrow.Excel
                     gt += li.TotalLaborValue; code_one_gt += li.TotalLaborValue; NextRow(1);
                 }
 
+                /* @TODO: washers removed from the page per elmore. Delete later 
                 foreach (var hn in ht.HexNuts)
                 {
                     var has_item = l.GetItem(out var li, (double)hn.Count, "Hex Nut", hn.Diameter);
@@ -194,7 +176,7 @@ namespace JPMorrow.Excel
                     string nut_name = hn.Type + " - " + hn.Diameter + " Dia.";
                     InsertIntoRow(nut_name, li.Quantity, li.PerUnitLabor, li.LaborCodeLetter, li.TotalLaborValue);
                     gt += li.TotalLaborValue; code_one_gt += li.TotalLaborValue; NextRow(1);
-                }
+                } */
 
                 /* foreach(var sn in ht.SpringNuts)
                 {

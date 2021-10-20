@@ -1,5 +1,6 @@
 
 using System;
+using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
 using System.Windows;
@@ -82,43 +83,83 @@ namespace JPMorrow.UI.ViewModels
                 #region BOM's
                 if (export_branch)
                 {
-                    debugger.show(err: "test");
-                    ExcelOutputSheet s1 = new ExcelOutputSheet(ExportStyle.WirePull);
-                    ExcelOutputSheet s2 = new ExcelOutputSheet(ExportStyle.WireTotal);
-                    ExcelOutputSheet s3 = new ExcelOutputSheet(ExportStyle.Labor);
+                    var sheets = new List<ExcelOutputSheet>();
+                    bool has_wire = ALS.AppData.GetSelectedConduitPackage().WireManager.HasWire;
 
+                    // If there is no wire. Don't generate wire pull and total sheet
+                    if (has_wire)
+                    {
+                        sheets.Add(new ExcelOutputSheet(ExportStyle.WirePull));
+                        sheets.Add(new ExcelOutputSheet(ExportStyle.WireTotal));
+                    }
 
-                    exporter.RegisterSheets("branch", s1, s2, s3);
+                    sheets.Add(new ExcelOutputSheet(ExportStyle.Labor));
+                    exporter.RegisterSheets("branch", sheets.ToArray());
 
-                    s1.GenerateWirePullSheet(ALS.Info, ALS.AppData, WireType.Branch);
-                    s2.GenerateWireTotalSheet(ALS.Info, ALS.AppData, WireType.Branch);
-                    s3.GenerateLaborSheet(ALS.Info, ALS.AppData, WireType.Branch);
+                    if (has_wire)
+                    {
+                        sheets[0].GenerateWirePullSheet(ALS.Info, ALS.AppData, WireType.Branch);
+                        sheets[1].GenerateWireTotalSheet(ALS.Info, ALS.AppData, WireType.Branch);
+                        sheets[2].GenerateLaborSheet(ALS.Info, ALS.AppData, WireType.Branch);
+                    }
+                    else
+                    {
+                        sheets[0].GenerateLaborSheet(ALS.Info, ALS.AppData, WireType.Branch);
+                    }
                 }
 
                 if (export_dist)
                 {
-                    ExcelOutputSheet s1 = new ExcelOutputSheet(ExportStyle.WirePull);
-                    ExcelOutputSheet s2 = new ExcelOutputSheet(ExportStyle.WireTotal);
-                    ExcelOutputSheet s3 = new ExcelOutputSheet(ExportStyle.Labor);
+                    var sheets = new List<ExcelOutputSheet>();
+                    bool has_wire = ALS.AppData.GetSelectedConduitPackage().WireManager.HasWire;
 
-                    exporter.RegisterSheets("distribution", s1, s2, s3);
+                    // If there is no wire. Don't generate wire pull and total sheet
+                    if (has_wire)
+                    {
+                        sheets.Add(new ExcelOutputSheet(ExportStyle.WirePull));
+                        sheets.Add(new ExcelOutputSheet(ExportStyle.WireTotal));
+                    }
 
-                    s1.GenerateWirePullSheet(ALS.Info, ALS.AppData, WireType.Distribution);
-                    s2.GenerateWireTotalSheet(ALS.Info, ALS.AppData, WireType.Distribution);
-                    s3.GenerateLaborSheet(ALS.Info, ALS.AppData, WireType.Distribution);
+                    sheets.Add(new ExcelOutputSheet(ExportStyle.Labor));
+                    exporter.RegisterSheets("distribution", sheets.ToArray());
+
+                    if (has_wire)
+                    {
+                        sheets[0].GenerateWirePullSheet(ALS.Info, ALS.AppData, WireType.Distribution);
+                        sheets[1].GenerateWireTotalSheet(ALS.Info, ALS.AppData, WireType.Distribution);
+                        sheets[2].GenerateLaborSheet(ALS.Info, ALS.AppData, WireType.Distribution);
+                    }
+                    else
+                    {
+                        sheets[0].GenerateLaborSheet(ALS.Info, ALS.AppData, WireType.Distribution);
+                    }
                 }
 
                 if (export_lowvoltage)
                 {
-                    ExcelOutputSheet s1 = new ExcelOutputSheet(ExportStyle.WirePull);
-                    ExcelOutputSheet s2 = new ExcelOutputSheet(ExportStyle.WireTotal);
-                    ExcelOutputSheet s3 = new ExcelOutputSheet(ExportStyle.Labor);
+                    var sheets = new List<ExcelOutputSheet>();
+                    bool has_wire = ALS.AppData.GetSelectedConduitPackage().WireManager.HasWire;
 
-                    exporter.RegisterSheets("low voltage", s1, s2, s3);
+                    // If there is no wire. Don't generate wire pull and total sheet
+                    if (has_wire)
+                    {
+                        sheets.Add(new ExcelOutputSheet(ExportStyle.WirePull));
+                        sheets.Add(new ExcelOutputSheet(ExportStyle.WireTotal));
+                    }
 
-                    s1.GenerateWirePullSheet(ALS.Info, ALS.AppData, WireType.LowVoltage);
-                    s2.GenerateWireTotalSheet(ALS.Info, ALS.AppData, WireType.LowVoltage);
-                    s3.GenerateLaborSheet(ALS.Info, ALS.AppData, WireType.LowVoltage);
+                    sheets.Add(new ExcelOutputSheet(ExportStyle.Labor));
+                    exporter.RegisterSheets("low voltage", sheets.ToArray());
+
+                    if (has_wire)
+                    {
+                        sheets[0].GenerateWirePullSheet(ALS.Info, ALS.AppData, WireType.LowVoltage);
+                        sheets[1].GenerateWireTotalSheet(ALS.Info, ALS.AppData, WireType.LowVoltage);
+                        sheets[2].GenerateLaborSheet(ALS.Info, ALS.AppData, WireType.LowVoltage);
+                    }
+                    else
+                    {
+                        sheets[0].GenerateLaborSheet(ALS.Info, ALS.AppData, WireType.LowVoltage);
+                    }
                 }
 
                 if (export_hanger_labor)
@@ -196,10 +237,13 @@ namespace JPMorrow.UI.ViewModels
 
                 exporter.Close();
 
-                // start pdf and excel
-                var pdf_filename = filename.Split('.').First() + ".pdf";
+                // make pdf file name
+                var pdf_name_split = filename.Split('.').ToList();
+                pdf_name_split.Remove(pdf_name_split.Last());
+                var pdf_filename = string.Join(".", pdf_name_split) + ".pdf";
                 bool pdf_created = exporter.ExportToPdf(pdf_filename);
 
+                // start pdf and excel
                 if (open_excel) exporter.OpenExcel();
                 if (open_pdf && pdf_created) exporter.OpenPDF(pdf_filename);
             }

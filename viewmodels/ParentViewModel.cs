@@ -198,6 +198,8 @@ namespace JPMorrow.UI.ViewModels
         public ICommand AddSingleHangersCmd => new RelayCommand<Window>(AddSingleHangers);
         public ICommand AddFixtureHangersCmd => new RelayCommand<Window>(AddFixtureHangers);
         public ICommand AddStrutHangersCmd => new RelayCommand<Window>(AddStrutHangers);
+        public ICommand AddQuickStrutHangersCmd => new RelayCommand<Window>(AddQuickStrutHangers);
+
         public ICommand RemoveSingleHangersCmd => new RelayCommand<Window>(RemoveSingleHangers);
         public ICommand RemoveStrutHangersCmd => new RelayCommand<Window>(RemoveStrutHangers);
         public ICommand RestoreHangersCmd => new RelayCommand<Window>(RestoreHangers);

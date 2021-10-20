@@ -194,14 +194,77 @@ namespace JPMorrow.UI.ViewModels
                 if (conduit_ids.Any())
                 {
                     var current_hangers = await StrutHanger.CreateStrutHangers(
-                        ALS.Info, ThisApplication.Hanger_View, conduit_ids, opts, StrutHangerRackType.Conduit);
+                        ALS.Info, ThisApplication.Hanger_View, conduit_ids, opts, StrutHangerRackType.Conduit, false);
                     if (current_hangers != null) hangers.AddRange(current_hangers);
                 }
 
                 if (tray_ids.Any())
                 {
                     var current_hangers = await StrutHanger.CreateStrutHangers(
-                        ALS.Info, ThisApplication.Hanger_View, tray_ids, opts, StrutHangerRackType.CableTray);
+                        ALS.Info, ThisApplication.Hanger_View, tray_ids, opts, StrutHangerRackType.CableTray, false);
+                    if (current_hangers != null) hangers.AddRange(current_hangers);
+                }
+
+                ALS.Info.SEL.SetElementIds(hangers.Select(x => new ElementId(x.HangerFamilyInstanceId)).ToArray());
+
+                ALS.AppData.GetSelectedHangerPackage().StrutHangers.AddRange(hangers);
+                var strut_cnt = ALS.AppData.GetSelectedHangerPackage().StrutHangers.Count;
+                RefreshDataGrids(BOMDataGrid.Hangers);
+                WriteToLog("Added " + strut_cnt + " strut hangers.");
+                UpdateTotalStrutLengthLabel();
+            }
+            catch (Exception ex)
+            {
+                debugger.show(header: "HangerCmds", err: ex.Message);
+            }
+        }
+
+        public async void AddQuickStrutHangers(Window window)
+        {
+            try
+            {
+                List<ElementId> ids = ALS.Info.SEL.GetElementIds().ToList();
+
+                if (!ids.Any())
+                {
+                    debugger.show(
+                        header: "Strut Hangers",
+                        err: "No Conduit was selected. Please select a conduit rack.");
+                    return;
+                }
+
+                List<ElementId> conduit_ids = new List<ElementId>();
+
+                foreach (var id in ids.ToArray())
+                {
+                    if (ALS.Info.DOC.GetElement(id).Category.Name.Equals("Conduits"))
+                        conduit_ids.Add(id);
+                }
+
+                var m_span = RMeasure.LengthDbl(ALS.Info.DOC, HO_Max_Span_Txt);
+                var irg = RMeasure.LengthDbl(ALS.Info.DOC, HO_IRGap_Txt);
+                var oesl = RMeasure.LengthDbl(ALS.Info.DOC, HO_OESLength_Txt);
+                var mrl = RMeasure.LengthDbl(ALS.Info.DOC, HO_Strut_Min_Rod_Len_Txt);
+                var nominal_spacing = RMeasure.LengthDbl(ALS.Info.DOC, Nominal_Hanger_Spacing_Txt);
+                var bend_spacing = RMeasure.LengthDbl(ALS.Info.DOC, Bend_Hanger_Spacing_Txt);
+                var rod_diameter = RMeasure.LengthDbl(ALS.Info.DOC, Rod_Diameter_Items[Sel_Strut_Rod_Diameter]);
+
+                HangerOptions opts = new HangerOptions();
+                opts.MaxStrutGapSpan = m_span;
+                opts.RodDiameter = rod_diameter;
+                opts.InsideRodGap = irg;
+                opts.OutsideRodExtraLength = oesl;
+                opts.MinRodLength = mrl;
+                opts.NominalSpacing = nominal_spacing;
+                opts.BendSpacing = bend_spacing;
+                opts.DrawSingleHangerModelGeometry = Draw_Single_Debug;
+                opts.DrawStrutHangerModelGeometry = Draw_Strut_Debug;
+
+                List<StrutHanger> hangers = new List<StrutHanger>();
+                if (conduit_ids.Any())
+                {
+                    var current_hangers = await StrutHanger.CreateStrutHangers(
+                        ALS.Info, ThisApplication.Hanger_View, conduit_ids, opts, StrutHangerRackType.Conduit, true);
                     if (current_hangers != null) hangers.AddRange(current_hangers);
                 }
 

@@ -625,16 +625,17 @@
     "Batwing" : {
         "K-12" : {
             "1/2\"" :       [ "C", 0.080 ],
-            "3/4\"" :       [ "C", 0.080 ]
-        },
-        "K-16" : {
-            "1\"" :         [ "C", 0.080 ],
-            "1 1/4\"" :     [ "C", 0.080 ]
+            "3/4\"" :       [ "C", 0.080 ],
+            "1\"" :         [ "C", 0.080 ]
         }
     },
-    "CaddyM4I Conduit Clip":  {
-        "1 1/4\"":          [ "C", 0.080 ],
-        "1 1/2\"":          [ "C", 0.080 ],
+    "Caddy 20M4I Conduit Clip":  {
+        "1 1/4\"":          [ "C", 0.080 ]
+    },
+    "Caddy 24M4I Conduit Clip":  {
+        "1 1/2\"":          [ "C", 0.080 ]
+    },
+    "Caddy 32M4I Conduit Clip":  {
         "2\"":              [ "C", 0.080 ]
     },
     "Mineralac" : {
@@ -1104,13 +1105,13 @@
         }
     },
     
-    "Ground Stinger #12 Copper" :            [ "C", 0.025 ],
-    "Ground Stinger" :            [ "C", 0.025 ],
-    "1/4\"x20 - 1/2\" Long Screw" :          [ "M", 0.078 ],
-    "Wafer Head Tek Screw" :                 [ "M", 0.030 ],
-    "Mounting Bracket" :                     [ "E", 0.078 ],
-    "Box Support" :                          [ "E", 0.078 ],
-    "Box Stabalizer" :                       [ "E", 0.078 ],
+    "Ground Stinger #12 Copper" :               [ "C", 0.025 ],
+    "Ground Stinger" :                          [ "C", 0.025 ],
+    "1/4\"x20 - 1/2\" Long Screw" :             [ "M", 0.078 ],
+    "Wafer Head Tek Screw" :                    [ "M", 0.030 ],
+    "Mounting Bracket" :                        [ "E", 0.078 ],
+    "Box Support" :                             [ "E", 0.078 ],
+    "Box Stabalizer" :                          [ "E", 0.078 ],
 
     "Metal Clad Conduit Clip Snap Close Flange Hanger Side Mount" : {
         "1/2\"" :                       [ "E", 0.082 ],

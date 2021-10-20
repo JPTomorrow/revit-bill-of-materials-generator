@@ -340,13 +340,17 @@ namespace JPMorrow.Revit.Hangers
 
             if (size_dbl >= batwing_cuttoff && size_dbl <= caddy_clip_cuttoff)
             {
-                final_type = "CaddyM4I Conduit Clip";
+                if (size.Equals("1 1/4\""))
+                    final_type = "Caddy 20M4I Conduit Clip";
+                else if (size.Equals("1 1/2\""))
+                    final_type = "Caddy 24M4I Conduit Clip";
+                else if (size.Equals("2\""))
+                    final_type = "Caddy 32M4I Conduit Clip";
             }
-            else
+            else if (size_dbl >= caddy_clip_cuttoff)
             {
                 final_type = "Mineralac";
             }
-
 
             int index = SingleAttachments
                 .FindIndex(ind => ind.Type.Equals(final_type) && ind.Size.Equals(size));

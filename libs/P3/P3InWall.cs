@@ -5,11 +5,9 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
-using System.Runtime.Serialization;
 using Autodesk.Revit.DB;
 using JPMorrow.Revit.Documents;
 using JPMorrow.Revit.Measurements;
-using JPMorrow.Revit.Text;
 using JPMorrow.Tools.Diagnostics;
 using MoreLinq;
 
@@ -313,8 +311,7 @@ namespace JPMorrow.P3
         /// Get Legacy device codes from file and return a collection 
         /// of parts to make up the box
         /// </summary>
-        public static IEnumerable<P3PartCollection> GetLegacyDevices(
-            ModelInfo info, IEnumerable<DeviceCodeQtyPair> code_pairs)
+        public static IEnumerable<P3PartCollection> GetLegacyDevices(ModelInfo info, IEnumerable<DeviceCodeQtyPair> code_pairs)
         {
             var codes = new List<P3Code>();
             foreach (var p in code_pairs)
@@ -330,8 +327,7 @@ namespace JPMorrow.P3
         /// get legacy device codes from fixtures in the revit model 
         /// and return a collection of parts to make up the box
         /// </summary>
-        public static IEnumerable<P3PartCollection> GetLegacyDevices(
-            ModelInfo info, IEnumerable<ElementId> fixture_ids)
+        public static IEnumerable<P3PartCollection> GetLegacyDevices(ModelInfo info, IEnumerable<ElementId> fixture_ids)
         {
             if (!fixture_ids.Any())
             {
@@ -362,8 +358,7 @@ namespace JPMorrow.P3
             return ParseLegacyDeviceCodes(info, device_codes);
         }
 
-        private static IEnumerable<P3PartCollection> ParseLegacyDeviceCodes(
-            ModelInfo info, IEnumerable<P3Code> codes)
+        private static IEnumerable<P3PartCollection> ParseLegacyDeviceCodes(ModelInfo info, IEnumerable<P3Code> codes)
         {
 
             List<ElementId> failed_devices = new List<ElementId>();

@@ -18,12 +18,12 @@ namespace JPMorrow.UI.ViewModels
         {
             try
             {
-                
-                debugger.show(err:"test");
+
+                throw new NotImplementedException("This is not implemented");
             }
-            catch(Exception ex)
+            catch (Exception ex)
             {
-                debugger.show(err:ex.ToString());
+                debugger.show(err: ex.ToString());
             }
         }
 
@@ -32,11 +32,11 @@ namespace JPMorrow.UI.ViewModels
         {
             try
             {
-                debugger.show(err:"test");
+                throw new NotImplementedException("This is not implemented");
             }
-            catch(Exception ex)
-            {   
-                debugger.show(err:ex.ToString());
+            catch (Exception ex)
+            {
+                debugger.show(err: ex.ToString());
             }
         }
 
@@ -45,11 +45,11 @@ namespace JPMorrow.UI.ViewModels
         {
             try
             {
-                debugger.show(err:"test");
+                throw new NotImplementedException("This is not implemented");
             }
-            catch(Exception ex)
+            catch (Exception ex)
             {
-                debugger.show(err:ex.ToString());
+                debugger.show(err: ex.ToString());
             }
         }
 
@@ -58,12 +58,12 @@ namespace JPMorrow.UI.ViewModels
             try
             {
 
-                debugger.show(err:"debug selected p3 fixture test");
+                debugger.show(err: "debug selected p3 fixture test");
             }
-            catch(Exception ex)
+            catch (Exception ex)
             {
-                debugger.show(err:ex.ToString());
+                debugger.show(err: ex.ToString());
             }
         }
-	}
+    }
 }

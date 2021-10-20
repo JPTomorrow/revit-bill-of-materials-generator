@@ -635,7 +635,8 @@ namespace JPMorrow.Revit.Hangers
         // Main Strut Hanger Creation Method
         public static async Task<IEnumerable<StrutHanger>> CreateStrutHangers(
             ModelInfo info, View3D view, IEnumerable<ElementId> ids,
-            HangerOptions opts, StrutHangerRackType rack_type)
+            HangerOptions opts, StrutHangerRackType rack_type,
+            bool auto_resolve_placement_pts)
         {
 
             List<StrutHanger> hangers = new List<StrutHanger>();
@@ -646,7 +647,7 @@ namespace JPMorrow.Revit.Hangers
                 if (rack_type == StrutHangerRackType.Conduit)
                 {
 
-                    var placement_data = GetConduitPlacementData(info, ids);
+                    var placement_data = GetConduitPlacementData(info, ids, auto_resolve_placement_pts);
                     var add_hangers = PlaceConduitHangers(info, view, ids, placement_data, opts);
 
                     // draw hangers in model
@@ -816,7 +817,7 @@ namespace JPMorrow.Revit.Hangers
 
         // Get hanger placement data for conduit 
         private static ConduitHangerPlacementData GetConduitPlacementData(
-            ModelInfo info, IEnumerable<ElementId> ids)
+            ModelInfo info, IEnumerable<ElementId> ids, bool auto_resolve_placement_pts)
         {
 
             debugger.show(
@@ -846,77 +847,107 @@ namespace JPMorrow.Revit.Hangers
             if (tier_ids.Count() > 4)
                 tier_ids = tier_ids.Take(4);
 
-            debugger.show(
-                header: "Hanger Conduit Rack Information",
-                err: "Pick points along the conduit rack that will" +
-                " be the placement locations for the hangers.");
+            List<XYZ> placement_pts = new List<XYZ>();
 
-            // Need to switch to a floorplan view to pick conduit points
-            // check open views first
-            FilteredElementCollector coll;
-            bool active_view_has_elements = false;
-            View view = null;
-            View prev_view = info.UIDOC.ActiveView;
-
-            foreach (var v in info.UIDOC.GetOpenUIViews())
+            if (auto_resolve_placement_pts)
             {
+                var longest = ids.MaxBy(x =>
+                    info.DOC.GetElement(x)
+                    .LookupParameter("Length")
+                    .AsDouble()).First();
 
-                if (v.ViewId == info.UIDOC.ActiveView.Id) continue;
+                // (length of longest run / hanger_spacing) + 2
+                var el = info.DOC.GetElement(longest);
+                var length = (int)Math.Ceiling(el.LookupParameter("Length").AsDouble());
+                var line = (el.Location as LocationCurve).Curve as Line;
+                var segments = length <= 8 ? 3 : ((length - 6) / 8) + 2;
+                var dummy_pt = RGeo.DerivePointsOnLine(line, 1.0).ToList().First();
 
-                coll = new FilteredElementCollector(info.DOC, v.ViewId);
-                var element_ids = coll.ToElementIds();
-                active_view_has_elements = !ids.Except(element_ids).Any();
+                for (var i = 0; i < segments; i++)
+                    placement_pts.Add(dummy_pt);
 
-                if (active_view_has_elements)
-                {
-                    view = info.DOC.GetElement(v.ViewId) as View;
-                    break;
-                }
+                debugger.show(
+                    header: "Quick Strut Hanger Creation",
+                    err: "The length of the longest pipe in rack: " +
+                        RMeasure.LengthFromDbl(info.DOC, length) + "\n" +
+                        "Number of hangers to be generated: " +
+                        placement_pts.Count().ToString());
             }
-
-            if (view == null)
-            {
-
-                coll = new FilteredElementCollector(info.DOC);
-                var filter = new ElementMulticlassFilter(new List<Type> { typeof(ViewPlan) });
-                var views = coll
-                    .WherePasses(filter)
-                    .Where(x => (x as View).ViewType == ViewType.FloorPlan)
-                    .ToList();
-
-                active_view_has_elements = false;
-                foreach (var v in views)
-                {
-
-                    coll = new FilteredElementCollector(info.DOC, (v as View).Id);
-                    var view_element_ids = coll.ToElementIds();
-                    active_view_has_elements = !ids.Except(view_element_ids).Any();
-                    if (active_view_has_elements)
-                    {
-                        view = v as View;
-                        break;
-                    }
-                }
-            }
-
-            if (view == null)
+            else
             {
 
                 debugger.show(
                     header: "Hanger Conduit Rack Information",
-                    err: "A floor plan view with the rack visible is required " +
-                    "in order to pick placement points for the hangers.");
+                    err: "Pick points along the conduit rack that will" +
+                    " be the placement locations for the hangers.");
 
-                throw new Exception("Exiting Hanger Placement");
+                // Need to switch to a floorplan view to pick conduit points
+                // check open views first
+                FilteredElementCollector coll;
+                bool active_view_has_elements = false;
+                View view = null;
+                View prev_view = info.UIDOC.ActiveView;
+
+                foreach (var v in info.UIDOC.GetOpenUIViews())
+                {
+
+                    if (v.ViewId == info.UIDOC.ActiveView.Id) continue;
+
+                    coll = new FilteredElementCollector(info.DOC, v.ViewId);
+                    var element_ids = coll.ToElementIds();
+                    active_view_has_elements = !ids.Except(element_ids).Any();
+
+                    if (active_view_has_elements)
+                    {
+                        view = info.DOC.GetElement(v.ViewId) as View;
+                        break;
+                    }
+                }
+
+                if (view == null)
+                {
+
+                    coll = new FilteredElementCollector(info.DOC);
+                    var filter = new ElementMulticlassFilter(new List<Type> { typeof(ViewPlan) });
+                    var views = coll
+                        .WherePasses(filter)
+                        .Where(x => (x as View).ViewType == ViewType.FloorPlan)
+                        .ToList();
+
+                    active_view_has_elements = false;
+                    foreach (var v in views)
+                    {
+
+                        coll = new FilteredElementCollector(info.DOC, (v as View).Id);
+                        var view_element_ids = coll.ToElementIds();
+                        active_view_has_elements = !ids.Except(view_element_ids).Any();
+                        if (active_view_has_elements)
+                        {
+                            view = v as View;
+                            break;
+                        }
+                    }
+                }
+
+                if (view == null)
+                {
+
+                    debugger.show(
+                        header: "Hanger Conduit Rack Information",
+                        err: "A floor plan view with the rack visible is required " +
+                        "in order to pick placement points for the hangers.");
+
+                    throw new Exception("Exiting Hanger Placement");
+                }
+
+                info.UIDOC.ActiveView = view;
+                info.UIDOC.RefreshActiveView();
+
+                placement_pts = RvtPicker.PickPoints(info, ObjectSnapTypes.Nearest).ToList();
+
+                info.UIDOC.ActiveView = prev_view;
+                info.UIDOC.RefreshActiveView();
             }
-
-            info.UIDOC.ActiveView = view;
-            info.UIDOC.RefreshActiveView();
-
-            var placement_pts = RvtPicker.PickPoints(info, ObjectSnapTypes.Nearest);
-
-            info.UIDOC.ActiveView = prev_view;
-            info.UIDOC.RefreshActiveView();
 
             return new ConduitHangerPlacementData(
                 info, placement_pts.ToArray(), left_id, right_id, tier_ids.ToArray());
@@ -1636,7 +1667,7 @@ namespace JPMorrow.Revit.Hangers
             public object Clone() => this;
 
             private readonly string[] TierSpacingParamPrefixes = new string[] { "Second", "Third", "Fourth" };
-            private readonly string TierSpacingParamSuffix = " Tier Offset";
+            // private readonly string TierSpacingParamSuffix = " Tier Offset";
 
             public void Execute(UIApplication app)
             {
@@ -1690,7 +1721,7 @@ namespace JPMorrow.Revit.Hangers
                     tx4.Start();
 
                     // rotate hanger
-                    double get_angle(Line line1, Line line2)
+                    /* double get_angle(Line line1, Line line2)
                     {
                         var x1 = line1.GetEndPoint(0).X;
                         var y1 = line1.GetEndPoint(0).Y;
@@ -1702,7 +1733,7 @@ namespace JPMorrow.Revit.Hangers
                         var x4 = line2.GetEndPoint(1).X;
                         var y4 = line2.GetEndPoint(1).Y;
                         return Math.Atan2(y2 - y1, x2 - x1) - Math.Atan2(y4 - y3, x4 - x3);
-                    }
+                    } */
 
                     /* var up_sec_pt = new XYZ(Hanger.OriginPt.X, Hanger.OriginPt.Y, Hanger.OriginPt.Z + 5.0);
 					var axis = Line.CreateBound(Hanger.OriginPt.RevitPoint(), up_sec_pt);

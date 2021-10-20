@@ -17,19 +17,19 @@ namespace JPMorrow.Revit.Labor
 	/// when you have a very specific labor setup
 	/// </summary>
 	public class LaborDefinition
-	{
-		public string EntryName { get; }
-		public double LaborUnit { get; }
-		public string LaborCode { get; }
-		public double ResolveLabor(int cnt) => cnt * LaborUnit;
+    {
+        public string EntryName { get; }
+        public double LaborUnit { get; }
+        public string LaborCode { get; }
+        public double ResolveLabor(int cnt) => cnt * LaborUnit;
 
-		public LaborDefinition(string name, double unit, string code)
-		{
-			EntryName = name;
-			LaborUnit = unit;
-			LaborCode = code;
-		}
-	}
+        public LaborDefinition(string name, double unit, string code)
+        {
+            EntryName = name;
+            LaborUnit = unit;
+            LaborCode = code;
+        }
+    }
 
     [DataContract]
     public class LaborItem
@@ -38,9 +38,9 @@ namespace JPMorrow.Revit.Labor
         public LaborEntry LaborEntry { get; private set; }
         [DataMember]
         public double Quantity { get; private set; }
-        
+
         public string DisplayQuantity { get => ((int)Math.Round(Quantity)).ToString(); }
-        public double TotalLaborValue { get =>  LaborEntry.LaborData.PerUnitLabor * Quantity; }
+        public double TotalLaborValue { get => LaborEntry.LaborData.PerUnitLabor * Quantity; }
         public double PerUnitLabor { get => LaborEntry.LaborData.PerUnitLabor; }
         public string LaborCodeLetter { get => LaborEntry.LaborData.LaborCodePair.Letter; }
         public string EntryName { get => LaborEntry.EntryName; }
@@ -49,7 +49,7 @@ namespace JPMorrow.Revit.Labor
         {
             LaborEntry = entry;
             Quantity = qty;
-        }   
+        }
 
         public string MakeEntryName(string prefix = "", string postfix = "")
         {
@@ -65,9 +65,9 @@ namespace JPMorrow.Revit.Labor
     }
 
     // single named entry for labor
-	[DataContract]
-	public class LaborEntry
-	{
+    [DataContract]
+    public class LaborEntry
+    {
         [DataMember]
         public string EntryName { get; private set; }
         [DataMember]
@@ -85,10 +85,10 @@ namespace JPMorrow.Revit.Labor
         {
             string o = "";
 
-            foreach(var e in entries)
+            foreach (var e in entries)
             {
-                o += e.EntryName + "\t{ " + 
-                    e.LaborData.LaborCodePair.Letter + ", " + 
+                o += e.EntryName + "\t{ " +
+                    e.LaborData.LaborCodePair.Letter + ", " +
                     e.LaborData.PerUnitLabor + " },\n";
             }
 
@@ -119,7 +119,7 @@ namespace JPMorrow.Revit.Labor
         public string Letter { get; private set; }
         [DataMember]
         public LaborCode Code { get; private set; }
-        
+
         public int Qty { get => (int)Code; }
 
         public LetterCodePair(string letter, LaborCode code)
@@ -151,36 +151,36 @@ namespace JPMorrow.Revit.Labor
         public LetterCodePair GetByLetter(char letter)
         {
             var idx = _pairs.FindIndex(x => x.Letter.Contains(letter));
-            
-            if(idx == -1)
+
+            if (idx == -1)
                 throw new Exception("The specified letter does not exist in the collection");
 
             return _pairs[idx];
         }
     }
 
-	public enum LaborCode
-	{
-		Each = 1,
-		Per_Hundred = 100,
-		Per_Thousand = 1000
-	}
+    public enum LaborCode
+    {
+        Each = 1,
+        Per_Hundred = 100,
+        Per_Thousand = 1000
+    }
 
-	public class LaborExchange
-	{
+    public class LaborExchange
+    {
         public static LetterCodeCollection LetterCodes { get; } = new LetterCodeCollection();
         public static string DefaultLaborFilePath { get; private set; } = string.Empty;
         private List<LaborEntry> CheckEntries { get; set; }
-        
+
         private List<LaborItem> _items { get; set; }
         public IList<LaborItem> Items { get => _items; }
 
         public LaborExchange(string settings_base_path, IEnumerable<LaborEntry> entries = null)
         {
-            if(entries == null)
+            if (entries == null)
                 entries = new List<LaborEntry>();
 
-            if(DefaultLaborFilePath.Equals(string.Empty))
+            if (DefaultLaborFilePath.Equals(string.Empty))
                 DefaultLaborFilePath = settings_base_path + @"labor\default_labor_dictionary.json";
 
             CheckEntries = entries.ToList();
@@ -192,7 +192,7 @@ namespace JPMorrow.Revit.Labor
             var part_name = string.Join(" - ", part_segment_names);
             int idx = CheckEntries.FindIndex(x => x.EntryName.Equals(part_name));
 
-            if(idx == -1) return false;
+            if (idx == -1) return false;
             else
             {
                 LaborEntry found_entry = CheckEntries[idx];
@@ -206,20 +206,20 @@ namespace JPMorrow.Revit.Labor
         {
             item = null;
             bool s = GetEntry(out var entry, part_segment_names);
-            if(!s) return false;
+            if (!s) return false;
             item = new LaborItem(entry, qty);
             return true;
         }
 
-		public static LaborEntry MakeLaborEntry(string name, LaborCode code, double per_unit)
-		{
-			LaborEntry entry = new LaborEntry(name, new LaborData(LetterCodes.GetByLaborCode(code), per_unit));
-			return entry;
-		}
+        public static LaborEntry MakeLaborEntry(string name, LaborCode code, double per_unit)
+        {
+            LaborEntry entry = new LaborEntry(name, new LaborData(LetterCodes.GetByLaborCode(code), per_unit));
+            return entry;
+        }
 
         public static IEnumerable<LaborEntry> LoadLaborFromFile(string file_path)
-		{
-			List<LaborEntry> ret_entries = new List<LaborEntry>();
+        {
+            List<LaborEntry> ret_entries = new List<LaborEntry>();
             using StreamReader r = new StreamReader(file_path);
             string json = r.ReadToEnd();
             var con = (JContainer)JToken.Parse(json);
@@ -227,7 +227,7 @@ namespace JPMorrow.Revit.Labor
 
             var query = (con as JContainer).DescendantsAndSelf().OfType<JArray>();
 
-            foreach(var q in query)
+            foreach (var q in query)
             {
                 //if(!(q as JContainer).Path.ToLower().Contains("4 11/16\" square plaster ring")) continue;
 
@@ -237,7 +237,7 @@ namespace JPMorrow.Revit.Labor
                 double labor_per_unit;
                 //debugger.debug_show(err:path);
 
-                if(q.Count == 1)
+                if (q.Count == 1)
                 {
                     path = path.Replace("['", "");
                     path = path.Replace("']", "");
@@ -283,10 +283,10 @@ namespace JPMorrow.Revit.Labor
 
                     //debugger.debug_show(err:"after period: " + path);
 
-                    if(path.StartsWith("['"))
+                    if (path.StartsWith("['"))
                         path = path.Remove(0, 2);
 
-                    if(path.EndsWith("']"))
+                    if (path.EndsWith("']"))
                         path = path.Remove(path.Length - 2, 2);
 
                     //debugger.debug_show(err:"after first brackets: " + path);
@@ -294,20 +294,20 @@ namespace JPMorrow.Revit.Labor
                     path = path.Replace("']['", " - ");
                     path = path.Replace("'].", " - ");
                     path = path.Replace(".['", " - ");
-                    
+
                     foreach (var i in path.Where(x => x == '.').Select(x => path.IndexOf(x)))
                     {
                         //debugger.debug_show(err:i.ToString());
                         var idx1 = i - 1;
                         var idx2 = i + 1;
-                        if(idx1 <= 0 || path[idx1] == ' ') continue;
-                        if(idx2 > path.Length || path[idx2] == ' ') continue;
+                        if (idx1 <= 0 || path[idx1] == ' ') continue;
+                        if (idx2 > path.Length || path[idx2] == ' ') continue;
                         StringBuilder ss = new StringBuilder(path);
                         ss.Remove(i, 1);
                         ss.Insert(i, " - ", 1);
                         path = ss.ToString();
                     }
-                    
+
                     path = path.Replace("']", " - ");
                     path = path.Replace("['", " - ");
 
@@ -317,17 +317,17 @@ namespace JPMorrow.Revit.Labor
                     labor_per_unit = (double)q[1];
                 }
                 //debugger.debug_show(err:"finished: " + path);
-                
+
                 var entry = new LaborEntry(path, new LaborData(LetterCodes.GetByLetter(code_char), labor_per_unit));
                 ret_entries.Add(entry);
             }
 
             return ret_entries;
-		}
+        }
 
         public void GenTwentyTestCases()
-		{
-            List<object[]> parts = new List<object[]>() { 
+        {
+            List<object[]> parts = new List<object[]>() {
                 new object[] { "Screw", "Big", "Many", new LaborData(LetterCodes.GetByLaborCode(LaborCode.Each), 0.001  ) },
                 new object[] { "Steve", "John", "Doe", new LaborData(LetterCodes.GetByLaborCode(LaborCode.Each), 0.05   ) },
                 new object[] { "Larry", "Cable", "Guy", new LaborData(LetterCodes.GetByLaborCode(LaborCode.Each), 0.5    ) },
@@ -353,7 +353,7 @@ namespace JPMorrow.Revit.Labor
                 new object[] { "Raise", "Hail", "Dale", new LaborData(LetterCodes.GetByLaborCode(LaborCode.Each), 0.005) }
             };
 
-            foreach(var p in parts)
+            foreach (var p in parts)
             {
                 var pname = string.Join(" - ", p[0], p[1], p[2]);
                 var data = p[3] as LaborData;
@@ -361,7 +361,7 @@ namespace JPMorrow.Revit.Labor
                 CheckEntries.Add(entry);
             }
         }
-	}
+    }
 }
 
 namespace JPMorrow.Test

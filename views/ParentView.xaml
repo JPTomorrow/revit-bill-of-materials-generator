@@ -457,7 +457,7 @@
           </TabControl>
         </ItemsControl>
       </TabItem>
-      <!-- P3 -->
+      <!-- P3
       <TabItem Header="P3 Lighting" Style="{StaticResource MainTabItemStyle}">
         <Grid>
           <Grid.ColumnDefinitions>
@@ -534,6 +534,7 @@
           <Button Name="SelectNetworkButton" Command="{Binding SelectNetworkCmd}" CommandParameter="{Binding ElementName = WindowBase}" Style="{StaticResource MarathonRed}" Content="Select Network" Margin="2,2,0,2" Background="Transparent" Foreground="White" BorderThickness="1" Width="auto" Height="auto" Grid.Column="2" Grid.Row="2"/>
         </Grid>
       </TabItem>
+      -->
       <!-- Wire -->
       <TabItem Header="Wire" Style="{StaticResource MainTabItemStyle}">
         <Grid>
@@ -1080,6 +1081,7 @@
               </DataGrid>
               <TextBlock Text="{Binding Path=Total_Unistrut_Hanger_Length_Txt, Mode=TwoWay}" Margin="10,0,0,0" FontSize="18" TextDecorations="Underline" Foreground="White" Grid.Column="0" Grid.Row="2" Grid.ColumnSpan="3" VerticalAlignment="center"/>
 
+              <Button Name="AddQuickStrutHangersButton" Command="{Binding AddQuickStrutHangersCmd}" CommandParameter="{Binding ElementName = WindowBase}" Style="{StaticResource MarathonRed}" Content="Add Quick Strut" Margin="2,2,0,2" Background="Transparent" Foreground="White" BorderThickness="1" Width="auto" Height="auto" Grid.Column="2" Grid.Row="2"/>
               <Button Name="AddStrutHangersButton" Command="{Binding AddStrutHangersCmd}" CommandParameter="{Binding ElementName = WindowBase}" Style="{StaticResource MarathonRed}" Content="Add Strut" Margin="2,2,0,2" Background="Transparent" Foreground="White" BorderThickness="1" Width="auto" Height="auto" Grid.Column="3" Grid.Row="2"/>
               <Button Name="RemoveStrutHangersButton" Command="{Binding RemoveStrutHangersCmd}" CommandParameter="{Binding ElementName = WindowBase}" Style="{StaticResource MarathonRed}" Content="Remove" Margin="2,2,0,2" Background="Transparent" Foreground="White" BorderThickness="1" Width="auto" Height="auto" Grid.Column="4" Grid.Row="2"/>
 
