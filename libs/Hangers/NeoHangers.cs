@@ -638,7 +638,6 @@ namespace JPMorrow.Revit.Hangers
             HangerOptions opts, StrutHangerRackType rack_type,
             bool auto_resolve_placement_pts)
         {
-
             List<StrutHanger> hangers = new List<StrutHanger>();
 
             // create and get placement data for hangers
@@ -664,7 +663,6 @@ namespace JPMorrow.Revit.Hangers
                 }
                 else if (rack_type == StrutHangerRackType.CableTray)
                 {
-
                     var placement_data = new List<CableTrayHangerPlacementData>();
                     ids.ToList().ForEach(x => placement_data.Add(GetCableTrayPlacementData(info, x, view, opts)));
 

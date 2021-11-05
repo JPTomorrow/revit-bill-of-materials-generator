@@ -46,7 +46,7 @@ namespace JPMorrow.P3
         };
 
         private static List<char> DeviceCheckChars = new List<char>() {
-            'S', 'X', 'F', 'P', 'N', 'M', 'C', '\u00B2', 'R', 'E', 'B'
+            'S', '3', 'X', 'F', 'P', 'N', 'M', 'C', '\u00B2', 'R', 'E', 'B'
         };
 
         private static Dictionary<string, string> DeviceCodeToPartName = new Dictionary<string, string>() {
@@ -75,6 +75,21 @@ namespace JPMorrow.P3
             { "XF|3/4", "4-11/16\" Red Life Saftey Square Box - 2-1/8\" Deep - 3/4\" & 1/2\" KO" },
             { "XF|1", "4-11/16\" Red Life Saftey Square Box - 2-1/8\" Deep - 1\" KO" },
             { "XF|M", "4-11/16\" Red Life Saftey Square Box - 2-1/8\" Deep - 3/4\" & 1/2\" KO" },
+
+            { "3N|1/2", "4-11/16\" Square Box - 3-1/4\" Deep - 3/4\" & 1/2\" KO" },
+            { "3N|3/4", "4-11/16\" Square Box - 3-1/4\" Deep - 3/4\" & 1/2\" KO" },
+            { "3N|1", "4-11/16\" Square Box - 3-1/4\" Deep - 1\" KO" },
+            { "3N|M", "4-11/16\" Square Box - 3-1/4\" Deep - 3/4\" & 1/2\" KO" },
+
+            { "3P|1/2", "4-11/16\" Square Box - 3-1/4\" Deep - 3/4\" & 1/2\" KO" },
+            { "3P|3/4", "4-11/16\" Square Box - 3-1/4\" Deep - 3/4\" & 1/2\" KO" },
+            { "3P|1", "4-11/16\" Square Box - 3-1/4\" Deep - 1\" KO" },
+            { "3P|M", "4-11/16\" Square Box - 3-1/4\" Deep - 3/4\" & 1/2\" KO" },
+
+            { "3F|1/2", "4-11/16\" Red Life Saftey Square Box - 3-1/4\" Deep - 3/4\" & 1/2\" KO" },
+            { "3F|3/4", "4-11/16\" Red Life Saftey Square Box - 3-1/4\" Deep - 3/4\" & 1/2\" KO" },
+            { "3F|1", "4-11/16\" Red Life Saftey Square Box - 3-1/4\" Deep - 1\" KO" },
+            { "3F|M", "4-11/16\" Red Life Saftey Square Box - 3-1/4\" Deep - 3/4\" & 1/2\" KO" },
 
             { "F|1/2", "4\" Red Life Saftey Square Box - 3-1/2\" Deep - 3/4\" & 1/2\" KO" },
             { "F|3/4", "4\" Red Life Saftey Square Box - 3-1/2\" Deep - 3/4\" & 1/2\" KO" },
@@ -721,13 +736,18 @@ namespace JPMorrow.P3
 
                 if (!has_box_part) return;
 
+                /* if (RawDeviceCode.First().Equals('3'))
+                    debugger.debug_show(err: "box part: " + box_part + "\n" +
+                    "box size code: " + BoxSizeCode + "\n" +
+                    "raw code: " + RawDeviceCode); */
+
                 if (RawDeviceCode.Contains("\u00B2"))
                 {
                     GangCode = "4|" + GangCode;
                 }
                 else
                 {
-                    GangCode = box_part.Contains("4\"") ? "4|" + GangCode : "4 11/16|" + GangCode;
+                    GangCode = box_part.Contains("4-11/16") ? "4 11/16|" + GangCode : "4|" + GangCode;
                 }
 
                 GangCode = CorrectGang(GangCode, last_parts);

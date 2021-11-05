@@ -10,7 +10,6 @@ using JPMorrow.Revit.Hangers;
 using JPMorrow.Revit.WirePackage;
 using JPMorrow.Revit.Labor;
 using JPMorrow.Revit.Hardware;
-using JPMorrow.Revit.ElectricalRoom;
 using JPMorrow.Revit.Custom.WallInspection;
 using JPMorrow.Revit.Custom.GroundBar;
 using JPMorrow.Views.RelayCmd;
@@ -18,7 +17,6 @@ using om = System.Collections.ObjectModel;
 using JPMorrow.Revit.ConduitRuns;
 using JPMorrow.Revit.Measurements;
 using JPMorrow.Data.Globals;
-using JPMorrow.Tools.Diagnostics;
 
 namespace JPMorrow.UI.ViewModels
 {
@@ -264,6 +262,7 @@ namespace JPMorrow.UI.ViewModels
         public ICommand AddNewHardwareSubPackageCmd => new RelayCommand<ComboBox>(AddNewHardwareSubPackage);
         public ICommand RemoveHardwareSubPackageCmd => new RelayCommand<Window>(RemoveHardwareSubPackage);
         public ICommand AddPullBoxHardwareCmd => new RelayCommand<Window>(AddPullBoxHardware);
+        public ICommand AddSelectedPullBoxHardwareCmd => new RelayCommand<Window>(AddSelectedPullBoxHardware);
         public ICommand HardwareSubPackageSelectionChangedCmd => new RelayCommand<Window>(HardwareSubPackageSelectionChanged);
 
         public ICommand AddNewGlobalSettingsSubPackageCmd => new RelayCommand<ComboBox>(AddNewGlobalSettingsSubPackage);

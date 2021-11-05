@@ -1,3 +1,5 @@
+using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Windows;
 using Autodesk.Revit.DB;
@@ -39,16 +41,41 @@ namespace JPMorrow.UI.ViewModels
 
         public void AddPullBoxHardware(Window window)
         {
-            // collect pull boxes
-            FilteredElementCollector fec = new FilteredElementCollector(ALS.Info.DOC, ALS.Info.UIDOC.ActiveView.Id);
+            try
+            {
+                // collect pull boxes
+                FilteredElementCollector fec = new FilteredElementCollector(ALS.Info.DOC, ALS.Info.UIDOC.ActiveView.Id);
+                GeneratePullBoxHardware(fec.OfCategory(BuiltInCategory.OST_ElectricalEquipment).ToList());
+            }
+            catch (Exception ex)
+            {
+                debugger.show(err: ex.ToString());
+            }
+        }
 
+        public void AddSelectedPullBoxHardware(Window window)
+        {
+            try
+            {
+                // collect pull boxes
+                var selected_els = ALS.Info.SEL.GetElementIds().Select(x => ALS.Info.DOC.GetElement(x));
+                GeneratePullBoxHardware(selected_els);
+            }
+            catch (Exception ex)
+            {
+                debugger.show(err: ex.ToString());
+            }
+        }
+
+        private void GeneratePullBoxHardware(IEnumerable<Element> passed_els)
+        {
             Parameter p(Element el, string name) => el.LookupParameter(name);
             string w = "Width";
             string h = "Height";
             string d = "Depth";
 
-            var els = fec
-                .OfCategory(BuiltInCategory.OST_ElectricalEquipment)
+            var els = passed_els
+                .Where(x => x.Category.Name.Equals("Electrical Equipment"))
                 .Where(x => x.Name.ToLower().Contains("generic box"))
                 .Where(x => p(x, w) != null && p(x, h) != null && p(x, d) != null);
 

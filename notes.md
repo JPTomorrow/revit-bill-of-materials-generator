@@ -19,7 +19,6 @@ img {
 <br/><br/>
 
 # Todo
-- Fix Labor Hours file not loading on new project
 - Allow user to set default location for saving Excel and PDF BOM's
 
 # Completed
@@ -37,6 +36,7 @@ img {
 - Mineralac hangers should only apply to single conduit above 2"
 - Fix PDF BOM export name
 - Fix Wire and Labor BOM's spitting out Wire Pull and Wire Total sheets even when there is no wire to export
+- Fix Labor Hours file not loading on new project
 
 ## The pdf document that these chagnes came from (provided by elmor):
 ### OLD AS OF 10/18/2021

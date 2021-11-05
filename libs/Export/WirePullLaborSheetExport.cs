@@ -85,7 +85,8 @@ namespace JPMorrow.Excel
                 var run_len = (int)Math.Round(t.Length);
 
                 // subtract 10' elec room conduit will be added separately
-                run_len -= ConduitRunInfo.ElecRoomTakeoffLength;
+                if (run_len >= 15.0)
+                    run_len -= ConduitRunInfo.ElecRoomTakeoffLength;
 
                 bool has_item = l.GetItem(out var li, run_len, "Conduit", type, t.Diameter);
                 if (!has_item) throw new Exception("no conduit labor item found: " + "Conduit " + type + " " + t.Diameter);

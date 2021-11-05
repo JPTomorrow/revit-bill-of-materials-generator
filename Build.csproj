@@ -1,12 +1,14 @@
 <Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup Condition="$(Configuration.Equals('Release'))">
-    <PrefixAssembly>WireBOMLite</PrefixAssembly> <!-- Assembly name prefix (should be the name of the program) -->
+    <!-- Assembly name prefix (should be the name of the program) -->
+    <PrefixAssembly>WireBOMLite</PrefixAssembly>
     <Configurations>Release</Configurations>
     <OutputPath>./build/Release</OutputPath>
   </PropertyGroup>
 
   <PropertyGroup Condition="$(Configuration.Equals('Debug'))">
-    <PrefixAssembly>WireBOMLite_Debug</PrefixAssembly> <!-- Assembly name prefix (should be the name of the program) -->
+    <!-- Assembly name prefix (should be the name of the program) -->
+    <PrefixAssembly>WireBOMLite_Debug</PrefixAssembly>
     <Configurations>Debug</Configurations>
     <OutputPath>./build/Debug</OutputPath>
   </PropertyGroup>
@@ -102,16 +104,6 @@
     <Compile Include="./libs/*/*.cs"/>
   </ItemGroup>
 
-  
-  <!-- Different framework refs. not needed. DELETE later
-  <ItemGroup Condition=" '$(TargetFramework)' == 'net452' ">
-    <Reference Include="System.ValueTuple">
-      <HintPath>./packages/System.ValueTuple.4.4.0/lib/net461/System.ValueTuple.dll</HintPath>
-    </Reference>
-  </ItemGroup>
-  -->
-  
-
   <ItemGroup>
     <Resource Include="./views/res/*.png"/>
     <Resource Include="./views/res/help/*.png"/>
@@ -182,11 +174,8 @@
   </ItemGroup>
 
   <Target Name="ILRepack" AfterTargets="Build">
-
-    <!-- Outputs="$(IntermediateOutputPath)$(TargetFileName)" -->
-    <!-- Outputs="$(TargetPath)" -->
     <Message Importance="high" Text="Compacting DLLs with ILRepack"  />
-    <!-- in this CreateItem stanza, we collect all the DLLs for the referenced projects -->
+
     <ItemGroup>
       <_MergeItem Include="build/$(Configuration)/$(TargetFramework)\MoreLinq.dll" />
       <_MergeItem Include="build/$(Configuration)/$(TargetFramework)\Newtonsoft.Json.dll" />
@@ -222,10 +211,7 @@
 
 
   <!-- Copy files post build target -->
-  
   <Target Name="CopyFilesAfterBuild" AfterTargets="ILRepack">
-    <!-- for some reason the XML doc file does not get copied automatically from obj\Debug to bin\Debug. -->
-    <!-- we do it here explicitly. -->
     <ItemGroup>
       <_CopyItems Include="build\$(Configuration)\$(TargetFramework)\merge\*.*" />
       <_CopyItems Include="build\$(Configuration)\$(TargetFramework)\RevitAPI*.*" />

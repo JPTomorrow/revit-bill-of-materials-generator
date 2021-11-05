@@ -13,12 +13,11 @@ using System.Diagnostics;
 using JPMorrow.Revit.Hangers.Internal;
 using JPMorrow.Revit.Measurements;
 using JPMorrow.Data.Globals;
-using om = System.Collections.ObjectModel;
 
 namespace JPMorrow.UI.ViewModels
 {
     public partial class ParentViewModel
-    {   
+    {
         public void AddAllRuns(Window window)
         {
             try
@@ -31,32 +30,37 @@ namespace JPMorrow.UI.ViewModels
 
                 collected_els.AddRange(coll.OfClass(typeof(FlexPipe)).ToElementIds().ToList());
 
-                if(!collected_els.Any()) {
+                if (!collected_els.Any())
+                {
                     debugger.show(err: "No conduit in view to process.");
                     return;
                 }
 
-				ConduitRunInfo.ProcessCRIFromConduitId(
+                ConduitRunInfo.ProcessCRIFromConduitId(
                     ALS.Info, collected_els, ALS.AppData.GetSelectedConduitPackage().Cris);
-                
+
                 // add low voltage wire automatically if devices are recognized in to parameter
-                if(Automate_Wire)
+                if (Automate_Wire)
+                {
                     LowVoltageDeviceAutomation.AddLowVoltageDeviceWire(
-                        ALS.AppData.GetSelectedConduitPackage().Cris, 
-                        ALS.AppData.GetSelectedConduitPackage().WireManager, 
-                        ALS.AppData.LowVoltageDevicePairings, 
+                        ALS.AppData.GetSelectedConduitPackage().Cris,
+                        ALS.AppData.GetSelectedConduitPackage().WireManager,
+                        ALS.AppData.LowVoltageDevicePairings,
                         ALS.AppData.LowVoltageWirePairings);
+                }
+
 
                 WriteToLog("Runs Processed: " + ALS.AppData.GetSelectedConduitPackage().Cris.Count().ToString());
                 RefreshDataGrids(BOMDataGrid.All);
             }
-            catch(Exception ex)
+            catch (Exception ex)
             {
                 debugger.show(err: ex.ToString());
             }
         }
 
-        public void AddAllRunsByWorksetAndLevel(Window window) {
+        public void AddAllRunsByWorksetAndLevel(Window window)
+        {
 
             try
             {
@@ -64,37 +68,38 @@ namespace JPMorrow.UI.ViewModels
                 IntPtr main_rvt_wind = Process.GetCurrentProcess().MainWindowHandle;
                 AddConduitView acv = new AddConduitView(main_rvt_wind, ALS.Info);
                 acv.ShowDialog();
-                
+
                 List<ElementId> collected_els = ElementCollector.CollectElementsByFloorAndWorkset(
-                    ALS.Info, BuiltInCategory.OST_Conduit, new string[] {}, new string[] {}).Element_Ids.ToList();
+                    ALS.Info, BuiltInCategory.OST_Conduit, new string[] { }, new string[] { }).Element_Ids.ToList();
 
                 FilteredElementCollector coll = new FilteredElementCollector(
                     ALS.Info.DOC, ALS.Info.DOC.ActiveView.Id);
 
                 collected_els.AddRange(coll.OfClass(typeof(FlexPipe)).ToElementIds().ToList());
 
-                if(!collected_els.Any()) {
+                if (!collected_els.Any())
+                {
                     debugger.show(err: "No conduit in view to process.");
                     return;
                 }
 
                 var old_cris = new List<ConduitRunInfo>(ALS.AppData.GetSelectedConduitPackage().Cris);
 
-				ConduitRunInfo.ProcessCRIFromConduitId(
+                ConduitRunInfo.ProcessCRIFromConduitId(
                     ALS.Info, collected_els, ALS.AppData.GetSelectedConduitPackage().Cris);
-                
+
                 // add low voltage wire automatically if devices are recognized in to parameter
-                if(Automate_Wire)
+                if (Automate_Wire)
                     LowVoltageDeviceAutomation.AddLowVoltageDeviceWire(
-                        ALS.AppData.GetSelectedConduitPackage().Cris, 
-                        ALS.AppData.GetSelectedConduitPackage().WireManager, 
-                        ALS.AppData.LowVoltageDevicePairings, 
+                        ALS.AppData.GetSelectedConduitPackage().Cris,
+                        ALS.AppData.GetSelectedConduitPackage().WireManager,
+                        ALS.AppData.LowVoltageDevicePairings,
                         ALS.AppData.LowVoltageWirePairings);
 
                 WriteToLog("Runs Processed: " + ALS.AppData.GetSelectedConduitPackage().Cris.Count().ToString());
                 RefreshDataGrids(BOMDataGrid.All);
             }
-            catch(Exception ex)
+            catch (Exception ex)
             {
                 debugger.show(err: ex.ToString());
             }
@@ -108,25 +113,26 @@ namespace JPMorrow.UI.ViewModels
                 var ids = ALS.Info.SEL.GetElementIds();
                 ids = ids.ToList().FindAll(x => ALS.Info.DOC.GetElement(x).Category.Name.Equals("Conduits"));
 
-                if(!ids.Any()) {
+                if (!ids.Any())
+                {
                     WriteToLog("No conduit is selected");
                 }
 
                 ConduitRunInfo.ProcessCRIFromConduitId(
                     ALS.Info, ids, ALS.AppData.GetSelectedConduitPackage().Cris);
-                
+
                 // add low voltage wire automatically if devices are recognized in to parameter
-                if(Automate_Wire)
+                if (Automate_Wire)
                     LowVoltageDeviceAutomation.AddLowVoltageDeviceWire(
-                        ALS.AppData.GetSelectedConduitPackage().Cris, 
-                        ALS.AppData.GetSelectedConduitPackage().WireManager, 
-                        ALS.AppData.LowVoltageDevicePairings, 
+                        ALS.AppData.GetSelectedConduitPackage().Cris,
+                        ALS.AppData.GetSelectedConduitPackage().WireManager,
+                        ALS.AppData.LowVoltageDevicePairings,
                         ALS.AppData.LowVoltageWirePairings);
-                
+
                 WriteToLog("Runs Processed: " + ALS.AppData.GetSelectedConduitPackage().Cris.Count().ToString());
                 RefreshDataGrids(BOMDataGrid.All);
             }
-            catch(Exception ex)
+            catch (Exception ex)
             {
                 debugger.show(err: ex.ToString());
             }
@@ -135,9 +141,10 @@ namespace JPMorrow.UI.ViewModels
         /// <summary>
         /// Update all the currently added runs
         /// </summary>
-        public void UpdateRuns(Window window) {
+        public void UpdateRuns(Window window)
+        {
 
-            if(!ALS.AppData.GetSelectedConduitPackage().Cris.Any()) return;
+            if (!ALS.AppData.GetSelectedConduitPackage().Cris.Any()) return;
 
             var gen_ids = ALS.AppData.GetSelectedConduitPackage().Cris
                 .Select(x => new ElementId(x.ConduitIds.First())).ToList();
@@ -158,7 +165,7 @@ namespace JPMorrow.UI.ViewModels
             Selected_Run_Items.Clear();
             Update("Selected_Run_Items");
 
-            if(!presenters.Any()) return;
+            if (!presenters.Any()) return;
 
             presenters.ForEach(x => Run_Items.Remove(x));
             var runs = presenters.Select(x => x.Value).ToList();
@@ -171,7 +178,8 @@ namespace JPMorrow.UI.ViewModels
             WriteToLog(presenters.Count().ToString() + " selected runs were removed");
         }
 
-        public void ClearRuns(Window window) {
+        public void ClearRuns(Window window)
+        {
 
             var cri_cnt = ALS.AppData.GetSelectedConduitPackage().Cris.Count();
 
@@ -205,7 +213,7 @@ namespace JPMorrow.UI.ViewModels
                 .ToList().ForEach(z => selected_runs
                 .Add(new ElementId(z))));
 
-            if(!selected_runs.Any()) return;
+            if (!selected_runs.Any()) return;
             ALS.Info.SEL.SetElementIds(selected_runs);
 
             List<Wire> wires = new List<Wire>();
@@ -218,27 +226,28 @@ namespace JPMorrow.UI.ViewModels
             RefreshDataGrids(BOMDataGrid.Wire);
         }
 
-        public void ChangeConduitMaterialType(Window window) {
+        public void ChangeConduitMaterialType(Window window)
+        {
 
             var runs = Run_Items.Where(x => x.IsSelected).Select(x => x.Value).ToList();
 
-            if(!runs.Any()) return;
+            if (!runs.Any()) return;
 
             var change_mat = Conduit_Material_Items[Sel_Conduit_Material];
             runs.ForEach(x => x.OverrideMaterialType(change_mat));
 
             RefreshDataGrids(BOMDataGrid.Runs, BOMDataGrid.SelectedRuns, BOMDataGrid.Wire);
         }
-        
+
         public void CombineLikeRuns(Window window)
         {
             try
             {
                 var presenters = Run_Items.Where(x => x.IsSelected).ToList();
 
-                if(!presenters.Any())
+                if (!presenters.Any())
                 {
-                    debugger.show(header:"Combine Like Runs", err:"Please select runs to combine");
+                    debugger.show(header: "Combine Like Runs", err: "Please select runs to combine");
                 }
 
                 Selected_Run_Items.Clear();
@@ -251,10 +260,10 @@ namespace JPMorrow.UI.ViewModels
                 // clear wire
                 runs.ForEach(x => ALS.AppData.WireManager.RemoveWires(x.WireIds)); */
 
-                foreach(var p in presenters)
+                foreach (var p in presenters)
                 {
                     var new_cri = ConduitRunInfo.CombineRuns(ALS.Info, p.Value, ALS.AppData.GetSelectedConduitPackage().Cris, out var old_cris);
-                    if(new_cri == null) continue;
+                    if (new_cri == null) continue;
 
                     // remove old presenters
                     var rem_presenters = Run_Items.Where(x => old_cris.Any(y => y.DeepEquals(x.Value))).ToList();
@@ -269,7 +278,7 @@ namespace JPMorrow.UI.ViewModels
                 WriteToLog("Combined runs");
                 RefreshDataGrids(BOMDataGrid.All);
             }
-            catch(Exception ex)
+            catch (Exception ex)
             {
                 debugger.show(err: ex.ToString());
             }
@@ -287,7 +296,7 @@ namespace JPMorrow.UI.ViewModels
                 .ToList().ForEach(z => selected_runs
                 .Add(new ElementId(z))));
 
-            if(!selected_runs.Any()) return;
+            if (!selected_runs.Any()) return;
             ALS.Info.SEL.SetElementIds(selected_runs);
         }
 
@@ -296,7 +305,7 @@ namespace JPMorrow.UI.ViewModels
             try
             {
                 List<ConduitRunInfo> cris = Selected_Run_Items.Select(x => x.Value).ToList();
-                if(!cris.Any()) return;
+                if (!cris.Any()) return;
 
                 /* 
                     // get strut line from user selection
@@ -308,13 +317,13 @@ namespace JPMorrow.UI.ViewModels
 
                 var calc = ConduitLoadCalc.CalcSupportLoad(
                     ALS.Info.DOC, cris, ALS.AppData.GetSelectedConduitPackage().WireManager, length);
-                    
-                if(calc.HasFailedEntries) debugger.show(header:"Failed Load Calcs", err:calc.PrintFailedEntries(ALS.Info.DOC));
-                debugger.show(header:"Conduit Load Calc", err:calc.PrintCalcs(ALS.Info.DOC));
+
+                if (calc.HasFailedEntries) debugger.show(header: "Failed Load Calcs", err: calc.PrintFailedEntries(ALS.Info.DOC));
+                debugger.show(header: "Conduit Load Calc", err: calc.PrintCalcs(ALS.Info.DOC));
             }
-            catch(Exception ex)
+            catch (Exception ex)
             {
-                debugger.show(err:ex.ToString());
+                debugger.show(err: ex.ToString());
             }
         }
 
@@ -323,13 +332,13 @@ namespace JPMorrow.UI.ViewModels
             try
             {
                 var ids = ALS.Info.SEL.GetElementIds().ToArray();
-                if(!ids.Any()) return;
+                if (!ids.Any()) return;
                 double[] strut_lens = HangerUtil.GetStandardizedStrutLengthFromSelected(ALS.Info.DOC, ids);
-                debugger.show(err:strut_lens[0].ToString() + " | " + strut_lens[1].ToString());
+                debugger.show(err: strut_lens[0].ToString() + " | " + strut_lens[1].ToString());
             }
-            catch(Exception ex)
+            catch (Exception ex)
             {
-                debugger.show(err:ex.ToString());
+                debugger.show(err: ex.ToString());
             }
         }
 
@@ -344,11 +353,11 @@ namespace JPMorrow.UI.ViewModels
                 //ClearRuns(null);
                 //AddAllRuns(null);
             }
-            catch(Exception ex)
+            catch (Exception ex)
             {
-                debugger.show(err:ex.ToString());
+                debugger.show(err: ex.ToString());
             }
         }
-	}
+    }
 }
 
