@@ -45,7 +45,7 @@ namespace JPMorrow.UI.ViewModels
     {
         // observable collections
         public ObsStr Labor_Code_Items { get; set; } = new ObsStr();
-        public ObsStr Dist_Wire_Size_Items { get; set; } = new ObsStr();
+        public ObsStr Wire_Size_Items { get; set; } = new ObsStr();
         public ObsStr Low_Voltage_Wire_Size_Items { get; set; } = new ObsStr();
         public ObsStr Panel_Voltage_Items { get; set; } = new ObsStr();
         public ObsStr Dist_Wire_Color_Items { get; set; } = new ObsStr();
@@ -100,7 +100,8 @@ namespace JPMorrow.UI.ViewModels
         public int Sel_Grd_Lug_Size { get; set; }
         public int Sel_Masonry_Anchor_Size { get; set; }
         public int Sel_Voltage_Drop_Voltage { get; set; }
-        public int Sel_Voltage_Drop_Wire_Size { get; set; }
+        public int Sel_Voltage_Drop_From_Wire_Size { get; set; }
+        public int Sel_Voltage_Drop_To_Wire_Size { get; set; }
         public int Sel_Conduit_Material { get; set; }
         public int Sel_Branch_Wire_Material { get; set; }
         public int Sel_Dist_Wire_Material { get; set; }
@@ -142,15 +143,12 @@ namespace JPMorrow.UI.ViewModels
         public string Elec_Room_Conduit_Txt { get; set; }
         public string Nominal_Hanger_Spacing_Txt { get; set; }
         public string Bend_Hanger_Spacing_Txt { get; set; }
-        public string Voltage_Drop_Min_Distance_Txt { get; set; }
-        public string Voltage_Drop_Max_Distance_Txt { get; set; }
+        public string Voltage_Drop_Distance_Txt { get; set; }
         public string Wire_Makeup_Length_Txt { get; set; }
-        public string Branch_Export_Sheet_Name_Txt { get; set; }
-        public string Distribution_Export_Sheet_Name_Txt { get; set; }
-        public string Low_Voltage_Export_Sheet_Name_Txt { get; set; }
-        public string Hangers_Export_Sheet_Name_Txt { get; set; }
+        public string Export_Title_Txt { get; set; }
         public string Load_Length_Txt { get; set; }
         public string Total_Unistrut_Hanger_Length_Txt { get; set; }
+        public string Export_Root_Directory_Txt { get; set; }
 
         public ICommand MasterCloseCmd => new RelayCommand<Window>(MasterClose);
         public ICommand TestCmd => new RelayCommand<Window>(Test);
@@ -172,6 +170,7 @@ namespace JPMorrow.UI.ViewModels
         public ICommand CombineLikeRunsCmd => new RelayCommand<Window>(CombineLikeRuns);
         public ICommand SelectAllRunsCmd => new RelayCommand<Window>(SelectAllRuns);
         public ICommand FixToFromCmd => new RelayCommand<Window>(FixToFrom);
+
 
         public ICommand SelectP3LightingNetworkCmd => new RelayCommand<Window>(SelectP3LightingNetwork);
         public ICommand P3LightingFixtureSelChangedCmd => new RelayCommand<Window>(P3LightingFixtureSelChanged);
@@ -232,6 +231,7 @@ namespace JPMorrow.UI.ViewModels
 
         public ICommand GetConduitLoadCmd => new RelayCommand<Window>(GetConduitLoad);
         public ICommand GetStrutLengthFromSelectedCmd => new RelayCommand<Window>(GetStrutLengthFromSelected);
+        public ICommand BrowseRootPathCmd => new RelayCommand<Window>(BrowseRootPath);
 
         /// <summary>
         /// Package Selection UI
@@ -243,7 +243,6 @@ namespace JPMorrow.UI.ViewModels
         public ObsStr HardwarePackageNameItems { get; set; } = new ObsStr();
         public ObsStr ElecRoomPackageNameItems { get; set; } = new ObsStr();
         public ObsStr GlobalSettingsPackageNameItems { get; set; } = new ObsStr();
-
         public int SelConduitPackage { get; set; }
         public int SelHangerPackage { get; set; }
         public int SelP3Package { get; set; }
@@ -251,23 +250,26 @@ namespace JPMorrow.UI.ViewModels
         public int SelElecRoomPackage { get; set; }
         public int SelGlobalSettingsPackage { get; set; }
 
-        public ICommand AddNewConduitSubPackageCmd => new RelayCommand<ComboBox>(AddNewConduitSubPackage);
+        public ICommand AddNewConduitSubPackageCmd => new RelayCommand<ComboBox>(AddNewSubPackage);
         public ICommand RemoveConduitSubPackageCmd => new RelayCommand<Window>(RemoveConduitSubPackage);
         public ICommand ConduitSubPackageSelectionChangedCmd => new RelayCommand<Window>(ConduitSubPackageSelectionChanged);
 
-        public ICommand AddNewHangerSubPackageCmd => new RelayCommand<ComboBox>(AddNewHangerSubPackage);
+        public ICommand AddNewHangerSubPackageCmd => new RelayCommand<ComboBox>(AddNewSubPackage);
         public ICommand RemoveHangerSubPackageCmd => new RelayCommand<Window>(RemoveHangerSubPackage);
         public ICommand HangerSubPackageSelectionChangedCmd => new RelayCommand<Window>(HangerSubPackageSelectionChanged);
 
-        public ICommand AddNewHardwareSubPackageCmd => new RelayCommand<ComboBox>(AddNewHardwareSubPackage);
+        public ICommand AddNewHardwareSubPackageCmd => new RelayCommand<ComboBox>(AddNewSubPackage);
         public ICommand RemoveHardwareSubPackageCmd => new RelayCommand<Window>(RemoveHardwareSubPackage);
         public ICommand AddPullBoxHardwareCmd => new RelayCommand<Window>(AddPullBoxHardware);
         public ICommand AddSelectedPullBoxHardwareCmd => new RelayCommand<Window>(AddSelectedPullBoxHardware);
         public ICommand HardwareSubPackageSelectionChangedCmd => new RelayCommand<Window>(HardwareSubPackageSelectionChanged);
 
-        public ICommand AddNewGlobalSettingsSubPackageCmd => new RelayCommand<ComboBox>(AddNewGlobalSettingsSubPackage);
+        public ICommand AddNewGlobalSettingsSubPackageCmd => new RelayCommand<ComboBox>(AddNewSubPackage);
         public ICommand RemoveGlobalSettingsSubPackageCmd => new RelayCommand<Window>(RemoveGlobalSettingsSubPackage);
         public ICommand GlobalSettingsSubPackageSelectionChangedCmd => new RelayCommand<Window>(GlobalSettingsSubPackageSelectionChanged);
+
+        public ICommand TransferSelectedConduitCmd => new RelayCommand<Window>(TransferSelectedConduitToNewSubPackage);
+
 
         //Action Log Text
         public string Action_Log { get; set; }
@@ -355,13 +357,13 @@ namespace JPMorrow.UI.ViewModels
             SelElecRoomPackage = ALS.AppData.SelectedElecRoomPackageIdx;
             SelGlobalSettingsPackage = ALS.AppData.SelectedGlobalSettingsPackageIdx;
 
-            Branch_Export_Sheet_Name_Txt = ALS.AppData.GetSelectedGlobalSettingsPackage().BranchExportSheetName;
-            Distribution_Export_Sheet_Name_Txt = ALS.AppData.GetSelectedGlobalSettingsPackage().DistributionExportSheetName;
-            Low_Voltage_Export_Sheet_Name_Txt = ALS.AppData.GetSelectedGlobalSettingsPackage().LowVoltageExportSheetName;
-            Hangers_Export_Sheet_Name_Txt = ALS.AppData.GetSelectedGlobalSettingsPackage().HangerExportSheetName;
+            Export_Title_Txt = ALS.AppData.GetSelectedGlobalSettingsPackage().ExportTitle;
 
             // set makeup length from ALS.AppData
             Wire_Makeup_Length_Txt = RMeasure.LengthFromDbl(ALS.Info.DOC, ALS.AppData.GetSelectedGlobalSettingsPackage().WireMakeupLength);
+
+            // set the directory to which exports are saved
+            ResolveStartupExportDirectory(packagePath);
 
             Update("SelConduitPackage");
             Update("SelHangerPackage");
@@ -377,11 +379,29 @@ namespace JPMorrow.UI.ViewModels
             Update("ElecRoomPackageNameItems");
             Update("GlobalSettingsPackageNameItems");
 
-            Update("Branch_Export_Sheet_Name_Txt");
-            Update("Distribution_Export_Sheet_Name_Txt");
-            Update("Low_Voltage_Export_Sheet_Name_Txt");
-            Update("Hangers_Export_Sheet_Name_Txt");
+            Update("Export_Title_Txt");
             Update("Wire_Makeup_Length_Txt");
+        }
+
+        private void ResolveStartupExportDirectory(string package_path)
+        {
+            if (string.IsNullOrWhiteSpace(ALS.AppData.ExportRootDirectory))
+            {
+                var temp = Path.GetDirectoryName(package_path).Split('\\').ToList();
+                temp.RemoveAt(temp.Count - 1);
+                string one_up_folder = string.Join("\\", temp);
+
+                if (!Directory.Exists(one_up_folder)) Export_Root_Directory_Txt = package_path;
+                else Export_Root_Directory_Txt = one_up_folder;
+
+                ALS.AppData.ExportRootDirectory = Export_Root_Directory_Txt;
+                Update("Export_Root_Directory_Txt");
+            }
+            else
+            {
+                Export_Root_Directory_Txt = ALS.AppData.ExportRootDirectory;
+                Update("Export_Root_Directory_Txt");
+            }
         }
 
         public ParentViewModel(ModelInfo info)
@@ -413,8 +433,7 @@ namespace JPMorrow.UI.ViewModels
             Elec_Room_Conduit_Txt = "Buildout Conduit Runs: 0";
             Nominal_Hanger_Spacing_Txt = "8'";
             Bend_Hanger_Spacing_Txt = "3'";
-            Voltage_Drop_Min_Distance_Txt = "0'";
-            Voltage_Drop_Max_Distance_Txt = "100'";
+            Voltage_Drop_Distance_Txt = "0'";
             Load_Length_Txt = "0' 1\"";
 
             UpdateTotalStrutLengthLabel();
@@ -447,7 +466,7 @@ namespace JPMorrow.UI.ViewModels
             Branch_Wire_Material_Items = new ObsStr(Wire.WireMaterialTypes);
             Dist_Wire_Material_Items = new ObsStr(Wire.WireMaterialTypes);
             VD_Cutoff_Items = new ObsStr(VDrop.VDropIdxToWireSize.Values);
-            Dist_Wire_Size_Items = new ObsStr(Wire.WireSizes);
+            Wire_Size_Items = new ObsStr(Wire.WireSizes);
             Low_Voltage_Wire_Size_Items = new ObsStr(Wire.LowVoltageWireNames);
             Panel_Voltage_Items = new ObsStr(Wire.PanelVoltages);
             Dist_Wire_Color_Items = new ObsStr(WireColor.All_Colors);
@@ -470,7 +489,7 @@ namespace JPMorrow.UI.ViewModels
             Update("Load_Panel_Voltage_Items");
             Update("Copper_Alum_Items");
             Update("VD_Cutoff_Items");
-            Update("Dist_Wire_Size_Items");
+            Update("Wire_Size_Items");
             Update("Low_Voltage_Wire_Size_Items");
             Update("Panel_Voltage_Items");
             Update("Dist_Wire_Color_Items");
