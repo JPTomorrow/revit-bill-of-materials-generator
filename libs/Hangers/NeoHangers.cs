@@ -107,10 +107,9 @@ namespace JPMorrow.Revit.Hangers
         }
 
         // Create single hangers in revit and link them to this program
-        public static async Task<IEnumerable<SingleHanger>> CreateSingleHangers(
+        public static IEnumerable<SingleHanger> CreateSingleHangers(
             ModelInfo info, View3D view, IEnumerable<ElementId> ids, HangerOptions opts)
         {
-
             List<SingleHanger> hangers = new List<SingleHanger>();
 
             var placement_data = SingleHangerConduitPlacementData
@@ -121,6 +120,7 @@ namespace JPMorrow.Revit.Hangers
                 var add_hangers = PlaceConduitSingleHangers(info, view, opts, data);
 
                 // draw hangers in model
+                /*
                 if (opts.DrawSingleHangerModelGeometry)
                 {
                     foreach (var hanger in add_hangers)
@@ -129,6 +129,7 @@ namespace JPMorrow.Revit.Hangers
                         hanger.SetFamilyInstanceId(fam.Id);
                     }
                 }
+                */
                 hangers.AddRange(add_hangers);
             }
 

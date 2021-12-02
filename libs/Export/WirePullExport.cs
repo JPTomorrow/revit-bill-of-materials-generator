@@ -6,6 +6,7 @@ using JPMorrow.Revit.Documents;
 using JPMorrow.Revit.Measurements;
 using JPMorrow.Revit.VoltageDrop;
 using JPMorrow.Revit.Wires;
+using JPMorrow.Tools.Diagnostics;
 using OfficeOpenXml.Style;
 using Draw = System.Drawing;
 
@@ -25,21 +26,10 @@ namespace JPMorrow.Excel
             var project_title = info.DOC.ProjectInformation.Name;
             string title = "M.P.A.C.T. - " + project_title;
 
-            if (pull_type == WireType.Branch)
-            {
-                InsertHeader(title, "Per-Panel Breakdown", data_package.GetSelectedGlobalSettingsPackage().BranchExportSheetName);
-            }
-            else if (pull_type == WireType.Distribution)
-            {
-                InsertHeader(title, "Per-Panel Breakdown", data_package.GetSelectedGlobalSettingsPackage().DistributionExportSheetName);
-            }
-            else if (pull_type == WireType.LowVoltage)
-            {
-                InsertHeader(title, "Per-Panel Breakdown", data_package.GetSelectedGlobalSettingsPackage().LowVoltageExportSheetName);
-            }
+            InsertHeader(title, "Per-Panel Breakdown", data_package.GetSelectedGlobalSettingsPackage().ExportTitle);
 
             // voltage drop
-            package = VoltageDrop.AllWireDropVoltage(package);
+            package = VoltageDrop.AllWireDropVoltage(package, out string changed_wires);
 
             var cris = package.GetSelectedConduitPackage().Cris.OrderBy(x => x.From).ToList();
 

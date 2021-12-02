@@ -4,6 +4,10 @@
     <PrefixAssembly>WireBOMLite</PrefixAssembly>
     <Configurations>Release</Configurations>
     <OutputPath>./build/Release</OutputPath>
+    <DefineConstants>$(DefineConstants);RELEASE;TRACE</DefineConstants>
+    <DebugSymbols>false</DebugSymbols>
+    <DebugType>portable</DebugType>
+    <Optimize>true</Optimize>
   </PropertyGroup>
 
   <PropertyGroup Condition="$(Configuration.Equals('Debug'))">
@@ -11,12 +15,12 @@
     <PrefixAssembly>WireBOMLite_Debug</PrefixAssembly>
     <Configurations>Debug</Configurations>
     <OutputPath>./build/Debug</OutputPath>
+    <DebugType>portable</DebugType>
   </PropertyGroup>
 
   <PropertyGroup>
     <MSBuildWarningsAsMessages>$(MSBuildWarningsAsMessages);MSB3277</MSBuildWarningsAsMessages>
     <PlatformTarget>x64</PlatformTarget>
-    <DebugType>portable</DebugType>
     <EnableDefaultCompileItems>false</EnableDefaultCompileItems>
     <EnableDefaultItems>false</EnableDefaultItems>
 	  <OutputType>Library</OutputType>

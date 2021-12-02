@@ -13,19 +13,28 @@ using JPMorrow.UI.Views;
 
 namespace JPMorrow.UI.ViewModels
 {
-	public partial class ParentViewModel
+    public partial class ParentViewModel
     {
-		// save global settings
+        public void BrowseRootPath(Window window)
+        {
+            try
+            {
+                throw new NotImplementedException();
+            }
+            catch (Exception ex)
+            {
+                debugger.show(header: "Browse Root Path", err: ex.Message);
+            }
+        }
+
+        // save global settings
         public void SaveGlobalSettings(Window window)
         {
             ALS.WirePackSettings.CouplingType = Coupling_Mat_Items[Sel_Coupling_Mat_Type];
 
             var makeup = RMeasure.LengthDbl(ALS.Info.DOC, Wire_Makeup_Length_Txt);
             ALS.AppData.GetSelectedGlobalSettingsPackage().WireMakeupLength = makeup;
-            ALS.AppData.GetSelectedGlobalSettingsPackage().BranchExportSheetName = Branch_Export_Sheet_Name_Txt;
-            ALS.AppData.GetSelectedGlobalSettingsPackage().DistributionExportSheetName = Distribution_Export_Sheet_Name_Txt;
-            ALS.AppData.GetSelectedGlobalSettingsPackage().LowVoltageExportSheetName = Low_Voltage_Export_Sheet_Name_Txt;
-            ALS.AppData.GetSelectedGlobalSettingsPackage().HangerExportSheetName = Hangers_Export_Sheet_Name_Txt;
+            ALS.AppData.GetSelectedGlobalSettingsPackage().ExportTitle = Export_Title_Txt;
 
             WirePackageSettings.Save(ALS.WirePackSettings);
         }
@@ -44,7 +53,8 @@ namespace JPMorrow.UI.ViewModels
             bool ResetPackageSettings = false;
 
 
-            try {
+            try
+            {
                 IntPtr main_rvt_wind = Process.GetCurrentProcess().MainWindowHandle;
                 ResetFileView rfv = new ResetFileView(main_rvt_wind);
                 rfv.ShowDialog();
@@ -59,15 +69,17 @@ namespace JPMorrow.UI.ViewModels
                 ResetAutomaticWire = rfv.ResetAutoWireBox.IsChecked ?? false;
                 ResetPackageSettings = rfv.ResetPackageSettingsBox.IsChecked ?? false;
             }
-            catch(Exception ex) {
-                debugger.show(err:ex.ToString());
+            catch (Exception ex)
+            {
+                debugger.show(err: ex.ToString());
             }
 
-            if(!ResetRuns && !ResetWire && !ResetHangers &&
+            if (!ResetRuns && !ResetWire && !ResetHangers &&
             !ResetLabor && !ResetHardware && !ResetElecRoom &&
             !ResetP3InWall && !ResetPackageSettings && !ResetAutomaticWire) return;
 
-            if(ResetRuns) {
+            if (ResetRuns)
+            {
                 ALS.AppData.GetSelectedConduitPackage().WireManager.Clear();
                 Wire_Items.Clear();
                 ALS.AppData.GetSelectedConduitPackage().Cris.Clear();
@@ -76,7 +88,7 @@ namespace JPMorrow.UI.ViewModels
                 RefreshDataGrids(BOMDataGrid.Runs, BOMDataGrid.SelectedRuns, BOMDataGrid.Wire);
             }
 
-            if(ResetWire)
+            if (ResetWire)
             {
                 ALS.AppData.GetSelectedConduitPackage().WireManager.Clear();
                 Wire_Items.Clear();
@@ -84,7 +96,7 @@ namespace JPMorrow.UI.ViewModels
                 RefreshDataGrids(BOMDataGrid.SelectedRuns, BOMDataGrid.Wire);
             }
 
-            if(ResetHangers)
+            if (ResetHangers)
             {
                 ALS.AppData.GetSelectedHangerPackage().SingleHangers.Clear();
                 Single_Hanger_Items.Clear();
@@ -96,7 +108,7 @@ namespace JPMorrow.UI.ViewModels
                 RefreshDataGrids(BOMDataGrid.Hangers);
             }
 
-            if(ResetLabor)
+            if (ResetLabor)
             {
                 ALS.AppData.LaborHourEntries.Clear();
                 Labor_Items.Clear();
@@ -104,7 +116,7 @@ namespace JPMorrow.UI.ViewModels
                 RefreshDataGrids(BOMDataGrid.Labor);
             }
 
-            if(ResetHardware)
+            if (ResetHardware)
             {
                 ALS.AppData.GetSelectedHardwarePackage().MiscHardwareEntries.Clear();
                 Hardware_Items.Clear();
@@ -112,7 +124,8 @@ namespace JPMorrow.UI.ViewModels
                 RefreshDataGrids(BOMDataGrid.Hardware);
             }
 
-            if(ResetElecRoom) {
+            if (ResetElecRoom)
+            {
                 ALS.AppData.GetSelectedElecRoomPackage().ElectricalRoomPack.Rooms.Clear();
                 ALS.ElecRoom = new ElecRoom();
                 Elec_Room_Title_Txt = "";
@@ -121,27 +134,19 @@ namespace JPMorrow.UI.ViewModels
                 RefreshDataGrids(BOMDataGrid.ElecRoom);
             }
 
-            if(ResetAutomaticWire) {
+            if (ResetAutomaticWire)
+            {
                 ALS.AppData.LowVoltageDevicePairings.Clear();
                 ALS.AppData.LowVoltageWirePairings.Clear();
                 RefreshDataGrids(BOMDataGrid.DeviceWirePairings);
             }
 
-            if (ResetPackageSettings) {
-                Branch_Export_Sheet_Name_Txt = "";
-                Distribution_Export_Sheet_Name_Txt = "";
-                Low_Voltage_Export_Sheet_Name_Txt = "";
-                Hangers_Export_Sheet_Name_Txt = "";
+            if (ResetPackageSettings)
+            {
+                Export_Title_Txt = "";
+                Update("Export_Title_Txt");
 
-                Update("Branch_Export_Sheet_Name_Txt");
-                Update("Distribution_Export_Sheet_Name_Txt");
-                Update("Low_Voltage_Export_Sheet_Name_Txt");
-                Update(Hangers_Export_Sheet_Name_Txt);
-
-                ALS.AppData.GetSelectedGlobalSettingsPackage().BranchExportSheetName = "";
-                ALS.AppData.GetSelectedGlobalSettingsPackage().LowVoltageExportSheetName = "";
-                ALS.AppData.GetSelectedGlobalSettingsPackage().DistributionExportSheetName = "";
-                ALS.AppData.GetSelectedGlobalSettingsPackage().HangerExportSheetName = "";
+                ALS.AppData.GetSelectedGlobalSettingsPackage().ExportTitle = "";
             }
 
             var o = "Reset Project: { ";
@@ -151,11 +156,11 @@ namespace JPMorrow.UI.ViewModels
             o += ResetLabor ? " Labor" : "";
             o += ResetHardware ? " Hardware " : "";
             o += ResetElecRoom ? " Elec Room" : "";
-            o += ResetP3InWall  ? " P3 In Wall" : "";
+            o += ResetP3InWall ? " P3 In Wall" : "";
             o += ResetAutomaticWire ? "Wire Automation" : "";
             o += ResetPackageSettings ? "Package Settings" : "";
             o += " }";
             WriteToLog(o);
         }
-	}
+    }
 }

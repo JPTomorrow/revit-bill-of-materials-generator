@@ -388,6 +388,7 @@
                     <RowDefinition Height="40"/>
                     <RowDefinition Height="40"/>
                     <RowDefinition Height="40"/>
+                    <RowDefinition Height="40"/>
                   </Grid.RowDefinitions>
                   
                   <ComboBox SelectedIndex="{Binding Path=Sel_Conduit_Material, Mode=TwoWay}" ItemsSource="{Binding Conduit_Material_Items}" Margin="10,5,5,5" Grid.Column="0" Grid.Row="0"/>
@@ -396,6 +397,7 @@
                   <Button Name="MarkNoWireExportButton" Command="{Binding MarkConduitNoWireExportCmd}" CommandParameter="{Binding ElementName = WindowBase}" Style="{StaticResource MarathonRed}" Content="Mark Conduit For No Wire Export" Margin="10,2,2,2" Background="Transparent" Foreground="White" BorderThickness="1" Width="auto" Height="auto" Grid.Column="1" Grid.Row="1" Grid.ColumnSpan="1"/>
                   <Button Name="CombineLikeRunsButton" Command="{Binding CombineLikeRunsCmd}" CommandParameter="{Binding ElementName = WindowBase}" Style="{StaticResource MarathonRed}" Content="Combine Like Runs" Margin="10,2,2,2" Background="Transparent" Foreground="White" BorderThickness="1" Width="auto" Height="auto" Grid.Column="1" Grid.Row="2" Grid.ColumnSpan="1"/>
                   <Button Name="FixToFromButton" Command="{Binding FixToFromCmd}" CommandParameter="{Binding ElementName = WindowBase}" Style="{StaticResource MarathonRed}" Content="Fix Selected To/From" Margin="10,2,2,2" Background="Transparent" Foreground="White" BorderThickness="1" Width="auto" Height="auto" Grid.Column="0" Grid.Row="2" Grid.ColumnSpan="1"/>
+                  <Button Name="TransferSelectedConduitButton" Command="{Binding TransferSelectedConduitCmd}" CommandParameter="{Binding ElementName = WindowBase}" Style="{StaticResource MarathonRed}" Content="Transfer Selected Conduit" Margin="10,2,2,2" Background="Transparent" Foreground="White" BorderThickness="1" Width="auto" Height="auto" Grid.Column="0" Grid.Row="3" Grid.ColumnSpan="2"/>
               </Grid>
             </TabItem>
             <TabItem Header="Information">
@@ -902,21 +904,22 @@
               ItemsSource="{Binding Panel_Voltage_Items}" VerticalContentAlignment="Center"
               Margin="3" Grid.Column="5" Grid.Row="2" Grid.ColumnSpan="1"/>
 
-          <TextBlock Text="Wire Size:" Margin="10,0,0,0" FontSize="14" Foreground="White"
+          <TextBlock Text="From Wire Size:" Margin="10,0,0,0" FontSize="14" Foreground="White"
               Grid.Column="4" Grid.Row="3" Grid.ColumnSpan="3"  VerticalAlignment="center"/>
-                <ComboBox SelectedIndex="{Binding Path=Sel_Voltage_Drop_Wire_Size, Mode=TwoWay}"
+                <ComboBox SelectedIndex="{Binding Path=Sel_Voltage_Drop_From_Wire_Size, Mode=TwoWay}"
               ItemsSource="{Binding Wire_Size_Items}" VerticalContentAlignment="Center" Margin="3"
               Grid.Column="5" Grid.Row="3" Grid.ColumnSpan="1"/>
 
-          <TextBlock Text="Min Distance:" Margin="10,0,0,0" FontSize="14" Foreground="White"
-              Grid.Column="6" Grid.Row="2" Grid.ColumnSpan="3" VerticalAlignment="center"/>
-                <TextBox Text="{Binding Path=Voltage_Drop_Min_Distance_Txt, Mode=TwoWay}" VerticalContentAlignment="Center"
-            Margin="3" Grid.Column="7" Grid.Row="2" Grid.ColumnSpan="1"/>
+          <TextBlock Text="To Wire Size:" Margin="10,0,0,0" FontSize="14" Foreground="White"
+              Grid.Column="6" Grid.Row="3" Grid.ColumnSpan="3"  VerticalAlignment="center"/>
+                <ComboBox SelectedIndex="{Binding Path=Sel_Voltage_Drop_To_Wire_Size, Mode=TwoWay}"
+              ItemsSource="{Binding Wire_Size_Items}" VerticalContentAlignment="Center" Margin="3"
+              Grid.Column="7" Grid.Row="3" Grid.ColumnSpan="1"/>
 
-          <TextBlock Text="Max Distance:" Margin="10,0,0,0" FontSize="14" Foreground="White" Grid.Column="6"
-              Grid.Row="3" Grid.ColumnSpan="1" VerticalAlignment="center"/>
-                <TextBox Text="{Binding Path=Voltage_Drop_Max_Distance_Txt, Mode=TwoWay}" VerticalContentAlignment="Center"
-            Margin="3" Grid.Column="7" Grid.Row="3" Grid.ColumnSpan="1"/>
+          <TextBlock Text="Longer Than Distance:" Margin="10,0,0,0" FontSize="14" Foreground="White"
+              Grid.Column="6" Grid.Row="2" Grid.ColumnSpan="3" VerticalAlignment="center"/>
+                <TextBox Text="{Binding Path=Voltage_Drop_Distance_Txt, Mode=TwoWay}" VerticalContentAlignment="Center"
+            Margin="3" Grid.Column="7" Grid.Row="2" Grid.ColumnSpan="1"/>
 
                 <Button Name="AddVDRuleButton" Command="{Binding AddVoltageDropRuleCmd}"
             CommandParameter="{Binding ElementName = WindowBase}" Style="{StaticResource MarathonRed}"
@@ -1342,6 +1345,8 @@
             <RowDefinition Height="40"/>
             <RowDefinition Height="40"/>
             <RowDefinition Height="40"/>
+            <RowDefinition Height="40"/>
+            <RowDefinition Height="40"/>
           </Grid.RowDefinitions>
 
           <ComboBox Name="GlobalSettingsSubPackageCB" SelectedIndex="{Binding Path=SelGlobalSettingsPackage, Mode=TwoWay}" VerticalContentAlignment="Center" ItemsSource="{Binding GlobalSettingsPackageNameItems}" Margin="3" Grid.Column="0" Grid.Row="0" Grid.ColumnSpan="1">
@@ -1356,28 +1361,23 @@
 
           <TextBlock Text="Package Settings" Margin="10,0,0,0" FontSize="18" Foreground="White" Grid.Column="0" Grid.Row="1" Grid.ColumnSpan="2" VerticalAlignment="center" TextDecorations="Underline"/>
 
-          <TextBlock Text="Branch Export Sheet Name:" Margin="10,0,0,0" FontSize="14" Foreground="White" Grid.Column="0" Grid.ColumnSpan="2" Grid.Row="2" VerticalAlignment="center"/>
-          <TextBox Text="{Binding Path=Branch_Export_Sheet_Name_Txt, Mode=TwoWay}" VerticalContentAlignment="Center" Margin="3" Grid.Column="2" Grid.Row="2" Grid.ColumnSpan="2"/>
+          <TextBlock Text="Export Title:" Margin="10,0,0,0" FontSize="14" Foreground="White" Grid.Column="0" Grid.ColumnSpan="2" Grid.Row="2" VerticalAlignment="center"/>
+          <TextBox Text="{Binding Path=Export_Title_Txt, Mode=TwoWay}" VerticalContentAlignment="Center" Margin="3" Grid.Column="2" Grid.Row="2" Grid.ColumnSpan="2"/>
 
-          <TextBlock Text="Distribution Export Sheet Name:" Margin="10,0,0,0" FontSize="14" Foreground="White" Grid.Column="0" Grid.ColumnSpan="2" Grid.Row="3" VerticalAlignment="center"/>
-          <TextBox Text="{Binding Path=Distribution_Export_Sheet_Name_Txt, Mode=TwoWay}" VerticalContentAlignment="Center" Margin="3" Grid.Column="2" Grid.Row="3" Grid.ColumnSpan="2"/>
+          <TextBlock Text="Wire Makeup Length:" Margin="10,0,0,0" FontSize="14" Foreground="White" Grid.Column="0" Grid.ColumnSpan="2" Grid.Row="3" VerticalAlignment="center"/>
+          <TextBox Text="{Binding Path=Wire_Makeup_Length_Txt, Mode=TwoWay}" VerticalContentAlignment="Center" Margin="3" Grid.Column="2" Grid.Row="3" Grid.ColumnSpan="2"/>
 
-          <TextBlock Text="Low Voltage Export Sheet Name:" Margin="10,0,0,0" FontSize="14" Foreground="White" Grid.Column="0" Grid.ColumnSpan="2" Grid.Row="4" VerticalAlignment="center"/>
-          <TextBox Text="{Binding Path=Low_Voltage_Export_Sheet_Name_Txt, Mode=TwoWay}" VerticalContentAlignment="Center" Margin="3" Grid.Column="2" Grid.Row="4" Grid.ColumnSpan="2"/>
+          <TextBlock Text="Coupling Material Type:" Margin="10,0,0,0" FontSize="14" Foreground="White" Grid.Column="0" Grid.ColumnSpan="2" Grid.Row="4" VerticalAlignment="center"/>
+          <ComboBox SelectedIndex="{Binding Path=Sel_Coupling_Mat_Type, Mode=TwoWay}" VerticalContentAlignment="Center" ItemsSource="{Binding Coupling_Mat_Items}" Margin="3" Grid.Column="2" Grid.ColumnSpan="2" Grid.Row="4"/>
 
-          <TextBlock Text="Hangers Export Sheet Name:" Margin="10,0,0,0" FontSize="14" Foreground="White" Grid.Column="0" Grid.ColumnSpan="2" Grid.Row="5" VerticalAlignment="center"/>
-          <TextBox Text="{Binding Path=Hangers_Export_Sheet_Name_Txt, Mode=TwoWay}" VerticalContentAlignment="Center" Margin="3" Grid.Column="2" Grid.Row="5" Grid.ColumnSpan="2"/>
+          <Button Name="SaveSettingsButton" Command="{Binding SaveGlobalSettingsCmd}" CommandParameter="{Binding ElementName = WindowBase}" Style="{StaticResource MarathonRed}" Content="Save Settings" Margin="2,2,0,2" Background="Transparent" Foreground="White" BorderThickness="1" Width="auto" Height="auto" Grid.Column="3" Grid.Row="5"/>
 
-          <TextBlock Text="Wire Makeup Length:" Margin="10,0,0,0" FontSize="14" Foreground="White" Grid.Column="0" Grid.ColumnSpan="2" Grid.Row="6" VerticalAlignment="center"/>
-          <TextBox Text="{Binding Path=Wire_Makeup_Length_Txt, Mode=TwoWay}" VerticalContentAlignment="Center" Margin="3" Grid.Column="2" Grid.Row="6" Grid.ColumnSpan="2"/>
+          <TextBlock Text="Hanger Settings" Margin="10,0,0,0" FontSize="18" Foreground="White" Grid.Column="0" Grid.Row="6" Grid.ColumnSpan="2" VerticalAlignment="center" TextDecorations="Underline"/>
+          <Button Name="RestoreHangersButton" Command="{Binding RestoreHangersCmd}" CommandParameter="{Binding ElementName = WindowBase}" Style="{StaticResource MarathonRed}" Content="Restore Hangers" Margin="10,2,0,2" Background="Transparent" Foreground="White" BorderThickness="1" Width="auto" Height="auto" Grid.Column="0" Grid.Row="7"/>
 
-          <TextBlock Text="Coupling Material Type:" Margin="10,0,0,0" FontSize="14" Foreground="White" Grid.Column="0" Grid.ColumnSpan="2" Grid.Row="7" VerticalAlignment="center"/>
-          <ComboBox SelectedIndex="{Binding Path=Sel_Coupling_Mat_Type, Mode=TwoWay}" VerticalContentAlignment="Center" ItemsSource="{Binding Coupling_Mat_Items}" Margin="3" Grid.Column="2" Grid.ColumnSpan="2" Grid.Row="7"/>
-
-          <Button Name="SaveSettingsButton" Command="{Binding SaveGlobalSettingsCmd}" CommandParameter="{Binding ElementName = WindowBase}" Style="{StaticResource MarathonRed}" Content="Save Settings" Margin="2,2,0,2" Background="Transparent" Foreground="White" BorderThickness="1" Width="auto" Height="auto" Grid.Column="3" Grid.Row="8"/>
-
-          <TextBlock Text="Hanger Settings" Margin="10,0,0,0" FontSize="18" Foreground="White" Grid.Column="0" Grid.Row="8" Grid.ColumnSpan="2" VerticalAlignment="center" TextDecorations="Underline"/>
-          <Button Name="RestoreHangersButton" Command="{Binding RestoreHangersCmd}" CommandParameter="{Binding ElementName = WindowBase}" Style="{StaticResource MarathonRed}" Content="Restore Hangers" Margin="10,2,0,2" Background="Transparent" Foreground="White" BorderThickness="1" Width="auto" Height="auto" Grid.Column="0" Grid.Row="10"/>
+          <TextBlock Text="BOM Export Root Directory:" Margin="10,0,0,0" FontSize="14" Foreground="White" Grid.Column="0" Grid.ColumnSpan="1" Grid.Row="9" VerticalAlignment="center"/>
+          <TextBox Text="{Binding Path=Export_Root_Directory_Txt, Mode=TwoWay}" VerticalContentAlignment="Center" Margin="3" Grid.Column="0" Grid.Row="10" Grid.ColumnSpan="3"/>
+          <Button Name="BrowseRootPathButton" Command="{Binding BrowseRootPathCmd}" CommandParameter="{Binding ElementName = WindowBase}" Style="{StaticResource MarathonRed}" Content="Browse" Margin="2,2,0,2" Background="Transparent" Foreground="White" BorderThickness="1" Width="auto" Height="auto" Grid.Column="3" Grid.Row="10"/>
         </Grid>
       </TabItem>
       <!-- Help -->

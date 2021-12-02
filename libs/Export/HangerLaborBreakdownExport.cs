@@ -24,7 +24,7 @@ namespace JPMorrow.Excel
             var project_title = info.DOC.ProjectInformation.Name;
             string title = "M.P.A.C.T. - " + project_title;
 
-            InsertHeader(title, "Hanger Labor Breakdown", data_package.GetSelectedGlobalSettingsPackage().HangerExportSheetName);
+            InsertHeader(title, "Hanger Labor Breakdown", data_package.GetSelectedGlobalSettingsPackage().ExportTitle);
 
             double gt = 0.0; // Grand Total
             double code_one_gt = 0; // 01 EMPTY RACEWAY Grand Total

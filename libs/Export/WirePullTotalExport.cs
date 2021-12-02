@@ -23,22 +23,10 @@ namespace JPMorrow.Excel
             var project_title = info.DOC.ProjectInformation.Name;
             string title = "M.P.A.C.T. - " + project_title;
 
-            if (pull_type == WireType.Branch)
-            {
-                InsertHeader(title, "Wire Pull Totals", data_package.GetSelectedGlobalSettingsPackage().BranchExportSheetName);
-            }
-            else if (pull_type == WireType.Distribution)
-            {
-                InsertHeader(title, "Wire Pull Totals", data_package.GetSelectedGlobalSettingsPackage().DistributionExportSheetName);
-            }
-            else if (pull_type == WireType.LowVoltage)
-            {
-                InsertHeader(title, "Wire Pull Totals", data_package.GetSelectedGlobalSettingsPackage().LowVoltageExportSheetName);
-            }
-
+            InsertHeader(title, "Wire Pull Totals", data_package.GetSelectedGlobalSettingsPackage().ExportTitle);
 
             // voltage drop
-            package = VoltageDrop.AllWireDropVoltage(package);
+            package = VoltageDrop.AllWireDropVoltage(package, out string changed_wires);
 
             // total the wire into a flat list
             var wires = WireTotal.GetTotaledWire(package, pull_type).Wires;

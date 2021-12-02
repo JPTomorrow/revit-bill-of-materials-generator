@@ -59,17 +59,11 @@ namespace JPMorrow.UI.ViewModels
                     return;
                 }
 
-                // user selects save file
-                var result = SaveFileSelection.Prompt("Select an Excel File for Master BOM Export", "xlsx");
+                string export_title = string.IsNullOrWhiteSpace(ALS.AppData.GetSelectedGlobalSettingsPackage().ExportTitle) ? "bom-export" : ALS.AppData.GetSelectedGlobalSettingsPackage().ExportTitle;
+                string filename = ALS.AppData.GenerateExcelExportPath(export_title, PackageName());
+                var pdf_filename = ALS.AppData.GeneratePdfExportPath(filename, PackageName());
 
-                if (!result.IsResult(DialogResult.OK))
-                {
-                    debugger.show(header: "BOM Exports", err: "Could not resolve file path, cancelling");
-                    return;
-                }
-
-                string filename = result.Filename;
-                string clean_file_name = System.IO.Path.GetFileNameWithoutExtension(filename);
+                string clean_file_name = ALS.AppData.GetSelectedGlobalSettingsPackage().ExportTitle;
                 clean_file_name = clean_file_name.Replace("_", " ");
 
                 if (!ExcelEngine.PrepExportFile(filename))
@@ -237,13 +231,8 @@ namespace JPMorrow.UI.ViewModels
 
                 exporter.Close();
 
-                // make pdf file name
-                var pdf_name_split = filename.Split('.').ToList();
-                pdf_name_split.Remove(pdf_name_split.Last());
-                var pdf_filename = string.Join(".", pdf_name_split) + ".pdf";
-                bool pdf_created = exporter.ExportToPdf(pdf_filename);
-
                 // start pdf and excel
+                bool pdf_created = exporter.ExportToPdf(pdf_filename);
                 if (open_excel) exporter.OpenExcel();
                 if (open_pdf && pdf_created) exporter.OpenPDF(pdf_filename);
             }

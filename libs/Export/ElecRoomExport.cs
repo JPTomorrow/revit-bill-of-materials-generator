@@ -34,7 +34,7 @@ namespace JPMorrow.Excel
             InsertHeader(title, "Electrical Room Buildout", "Room Name: " + room.RoomName);
 
             // voltage drop
-            package = VoltageDrop.AllWireDropVoltage(package);
+            package = VoltageDrop.AllWireDropVoltage(package, out string changed_wires);
 
             double gt = 0.0; // Grand Total
             double code_one_gt = 0; // 01 EMPTY RACEWAY Grand Total

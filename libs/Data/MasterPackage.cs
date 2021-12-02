@@ -12,10 +12,11 @@ using JPMorrow.Revit.ElectricalRoom;
 using JPMorrow.Revit.ConduitRuns;
 using JPMorrow.Revit.VoltageDrop;
 using System.Linq;
+using System.IO;
 
 namespace JPMorrow.Revit.BOMPackage
 {
-	/// <summary>
+    /// <summary>
     /// A 
     /// </summary>
     [DataContract]
@@ -34,7 +35,7 @@ namespace JPMorrow.Revit.BOMPackage
         }
     }
 
-	/// <summary>
+    /// <summary>
     /// A 
     /// </summary>
     [DataContract]
@@ -55,7 +56,7 @@ namespace JPMorrow.Revit.BOMPackage
         }
     }
 
-	/// <summary>
+    /// <summary>
     /// A 
     /// </summary>
     [DataContract]
@@ -72,7 +73,7 @@ namespace JPMorrow.Revit.BOMPackage
         }
     }
 
-	/// <summary>
+    /// <summary>
     /// A 
     /// </summary>
     [DataContract]
@@ -89,7 +90,7 @@ namespace JPMorrow.Revit.BOMPackage
         }
     }
 
-	/// <summary>
+    /// <summary>
     /// A 
     /// </summary>
     [DataContract]
@@ -117,13 +118,7 @@ namespace JPMorrow.Revit.BOMPackage
         [DataMember]
         public double WireMakeupLength { get; set; } = 8.0;
         [DataMember]
-        public string BranchExportSheetName { get; set; } = "";
-        [DataMember]
-        public string DistributionExportSheetName { get; set; } = "";
-        [DataMember]
-        public string LowVoltageExportSheetName { get; set; } = "";
-        [DataMember]
-        public string HangerExportSheetName { get; set; } = "";
+        public string ExportTitle { get; set; } = "";
 
         public GlobalSettingsSubDataPackage(string package_name)
         {
@@ -140,6 +135,8 @@ namespace JPMorrow.Revit.BOMPackage
     [DataContract]
     public class MasterDataPackage
     {
+        [DataMember]
+        public string ExportRootDirectory { get; set; } = "";
         [DataMember]
         public List<ConduitSubDataPackage> ConduitPackages { get; set; } = new List<ConduitSubDataPackage>();
         [DataMember]
@@ -191,48 +188,66 @@ namespace JPMorrow.Revit.BOMPackage
                 SelectedElecRoomPackageIdx.ToString(), SelectedGlobalSettingsPackageIdx.ToString());
         }
 
+        public string GenerateExcelExportPath(string export_filename, string master_package_name)
+        {
+            var p = ExportRootDirectory + "\\excel\\" + master_package_name;
+            if (!Directory.Exists(p)) Directory.CreateDirectory(p);
+            p += "\\" + export_filename + ".xlsx";
+            return p;
+        }
+
+        public string GeneratePdfExportPath(string excel_export_filepath, string master_package_name)
+        {
+
+            var p = ExportRootDirectory + "\\pdf\\" + master_package_name;
+            if (!Directory.Exists(p)) Directory.CreateDirectory(p);
+            var filename_no_ext = Path.GetFileNameWithoutExtension(excel_export_filepath);
+            p += "\\" + filename_no_ext + ".pdf";
+            return p;
+        }
+
         /// <summary>
         /// Add Package
         /// </summary>
-        
+
         public bool AddNewConduitSubPackage(string package_name)
         {
-            if(ConduitPackages.Any(x => x.PackageName.Equals(package_name))) return false;
-            ConduitPackages.Add(new ConduitSubDataPackage(package_name)); 
+            if (ConduitPackages.Any(x => x.PackageName.Equals(package_name))) return false;
+            ConduitPackages.Add(new ConduitSubDataPackage(package_name));
             return true;
         }
 
         public bool AddNewHangerSubPackage(string package_name)
         {
-            if(HangerPackages.Any(x => x.PackageName.Equals(package_name))) return false;
+            if (HangerPackages.Any(x => x.PackageName.Equals(package_name))) return false;
             HangerPackages.Add(new HangerSubDataPackage(package_name));
             return true;
         }
 
         public bool AddNewP3SubPackage(string package_name)
         {
-            if(P3Packages.Any(x => x.PackageName.Equals(package_name))) return false;
+            if (P3Packages.Any(x => x.PackageName.Equals(package_name))) return false;
             P3Packages.Add(new P3SubDataPackage(package_name));
             return true;
         }
 
         public bool AddNewHardwareSubPackage(string package_name)
         {
-            if(HardwarePackages.Any(x => x.PackageName.Equals(package_name))) return false;
+            if (HardwarePackages.Any(x => x.PackageName.Equals(package_name))) return false;
             HardwarePackages.Add(new HardwareSubDataPackage(package_name));
             return true;
         }
 
         public bool AddNewElecRoomSubPackage(string package_name)
         {
-            if(ElecRoomPackages.Any(x => x.PackageName.Equals(package_name))) return false;
+            if (ElecRoomPackages.Any(x => x.PackageName.Equals(package_name))) return false;
             ElecRoomPackages.Add(new ElectricalRoomSubDataPackage(package_name));
             return true;
         }
 
         public bool AddNewGlobalSettingsSubPackage(string package_name)
         {
-            if(GlobalSettingsPackages.Any(x => x.PackageName.Equals(package_name))) return false;
+            if (GlobalSettingsPackages.Any(x => x.PackageName.Equals(package_name))) return false;
             GlobalSettingsPackages.Add(new GlobalSettingsSubDataPackage(package_name));
             return true;
         }
@@ -245,7 +260,7 @@ namespace JPMorrow.Revit.BOMPackage
         {
             package = null;
             var idx = ConduitPackages.FindIndex(x => x.PackageName.Equals(package_name));
-            if(idx == -1) return false;
+            if (idx == -1) return false;
             package = ConduitPackages[idx];
             selectedConduitPackageIdx = idx;
             return true;
@@ -255,7 +270,7 @@ namespace JPMorrow.Revit.BOMPackage
         {
             package = null;
             var idx = HangerPackages.FindIndex(x => x.PackageName.Equals(package_name));
-            if(idx == -1) return false;
+            if (idx == -1) return false;
             package = HangerPackages[idx];
             selectedHangerPackageIdx = idx;
             return true;
@@ -265,7 +280,7 @@ namespace JPMorrow.Revit.BOMPackage
         {
             package = null;
             var idx = P3Packages.FindIndex(x => x.PackageName.Equals(package_name));
-            if(idx == -1) return false;
+            if (idx == -1) return false;
             package = P3Packages[idx];
             selectedP3PackageIdx = idx;
             return true;
@@ -275,7 +290,7 @@ namespace JPMorrow.Revit.BOMPackage
         {
             package = null;
             var idx = HardwarePackages.FindIndex(x => x.PackageName.Equals(package_name));
-            if(idx == -1) return false;
+            if (idx == -1) return false;
             package = HardwarePackages[idx];
             selectedHardwarePackageIdx = idx;
             return true;
@@ -285,17 +300,17 @@ namespace JPMorrow.Revit.BOMPackage
         {
             package = null;
             var idx = ElecRoomPackages.FindIndex(x => x.PackageName.Equals(package_name));
-            if(idx == -1) return false;
+            if (idx == -1) return false;
             package = ElecRoomPackages[idx];
             selectedElecRoomPackageIdx = idx;
             return true;
         }
-        
+
         public bool SelectGlobalSettingsPackage(string package_name, out GlobalSettingsSubDataPackage package)
         {
             package = null;
             var idx = GlobalSettingsPackages.FindIndex(x => x.PackageName.Equals(package_name));
-            if(idx == -1) return false;
+            if (idx == -1) return false;
             package = GlobalSettingsPackages[idx];
             selectedGlobalSettingsPackageIdx = idx;
             return true;
@@ -331,19 +346,19 @@ namespace JPMorrow.Revit.BOMPackage
             return GlobalSettingsPackages[selectedGlobalSettingsPackageIdx];
         }
 
-        private void AssimilatePackage(MasterDataPackage other) 
+        private void AssimilatePackage(MasterDataPackage other)
         {
-            if(other.ConduitPackages != null) ConduitPackages = other.ConduitPackages;
-            if(other.P3Packages != null) P3Packages = other.P3Packages;
-            if(other.HangerPackages != null) HangerPackages = other.HangerPackages;
-            if(other.HardwarePackages != null) HardwarePackages = other.HardwarePackages;
-            if(other.ElecRoomPackages != null) ElecRoomPackages = other.ElecRoomPackages;
-            if(other.ConduitPackages != null) GlobalSettingsPackages = other.GlobalSettingsPackages;
+            if (other.ConduitPackages != null) ConduitPackages = other.ConduitPackages;
+            if (other.P3Packages != null) P3Packages = other.P3Packages;
+            if (other.HangerPackages != null) HangerPackages = other.HangerPackages;
+            if (other.HardwarePackages != null) HardwarePackages = other.HardwarePackages;
+            if (other.ElecRoomPackages != null) ElecRoomPackages = other.ElecRoomPackages;
+            if (other.ConduitPackages != null) GlobalSettingsPackages = other.GlobalSettingsPackages;
 
-            if(other.LaborHourEntries != null) LaborHourEntries = other.LaborHourEntries;
-            if(other.VoltageDropRules != null) VoltageDropRules = other.VoltageDropRules;
-			if(other.LowVoltageDevicePairings != null) LowVoltageDevicePairings = other.LowVoltageDevicePairings;
-			if(other.LowVoltageWirePairings != null) LowVoltageWirePairings = other.LowVoltageWirePairings;
+            if (other.LaborHourEntries != null) LaborHourEntries = other.LaborHourEntries;
+            if (other.VoltageDropRules != null) VoltageDropRules = other.VoltageDropRules;
+            if (other.LowVoltageDevicePairings != null) LowVoltageDevicePairings = other.LowVoltageDevicePairings;
+            if (other.LowVoltageWirePairings != null) LowVoltageWirePairings = other.LowVoltageWirePairings;
 
             AssignDefaultPackages();
 
@@ -357,50 +372,50 @@ namespace JPMorrow.Revit.BOMPackage
 
         private void AssignDefaultPackages()
         {
-            if(!ConduitPackages.Any()) ConduitPackages.Add(new ConduitSubDataPackage("default"));
-            if(!P3Packages.Any()) P3Packages.Add(new P3SubDataPackage("default"));
-            if(!HangerPackages.Any()) HangerPackages.Add(new HangerSubDataPackage("default"));
-            if(!HardwarePackages.Any()) HardwarePackages.Add(new HardwareSubDataPackage("default"));
-            if(!ElecRoomPackages.Any()) ElecRoomPackages.Add(new ElectricalRoomSubDataPackage("default"));
-            if(!ConduitPackages.Any()) ConduitPackages.Add(new ConduitSubDataPackage("default"));
-            if(!GlobalSettingsPackages.Any()) GlobalSettingsPackages.Add(new GlobalSettingsSubDataPackage("default"));
-        }   
+            if (!ConduitPackages.Any()) ConduitPackages.Add(new ConduitSubDataPackage("default"));
+            if (!P3Packages.Any()) P3Packages.Add(new P3SubDataPackage("default"));
+            if (!HangerPackages.Any()) HangerPackages.Add(new HangerSubDataPackage("default"));
+            if (!HardwarePackages.Any()) HardwarePackages.Add(new HardwareSubDataPackage("default"));
+            if (!ElecRoomPackages.Any()) ElecRoomPackages.Add(new ElectricalRoomSubDataPackage("default"));
+            if (!ConduitPackages.Any()) ConduitPackages.Add(new ConduitSubDataPackage("default"));
+            if (!GlobalSettingsPackages.Any()) GlobalSettingsPackages.Add(new GlobalSettingsSubDataPackage("default"));
+        }
 
-		public MasterDataPackage() 
+        public MasterDataPackage()
         {
             AssignDefaultPackages();
         }
 
-        public MasterDataPackage(MasterDataPackage other) 
+        public MasterDataPackage(MasterDataPackage other)
         {
-			AssimilatePackage(other);
+            AssimilatePackage(other);
         }
 
-		/// <summary>
-		/// Load a data package from a location on disk
-		/// </summary>
-		/// <param name="file_path">the file path to the data package</param>
-		public void LoadPackageFromLocation(string file_path)
-		{
-			MasterDataPackage p = JSON_Serialization.DeserializeFromFile<MasterDataPackage>(file_path);
-			AssimilatePackage(p); 
-		}
+        /// <summary>
+        /// Load a data package from a location on disk
+        /// </summary>
+        /// <param name="file_path">the file path to the data package</param>
+        public void LoadPackageFromLocation(string file_path)
+        {
+            MasterDataPackage p = JSON_Serialization.DeserializeFromFile<MasterDataPackage>(file_path);
+            AssimilatePackage(p);
+        }
 
-		/// <summary>
-		/// Save a data package to a location on disk
-		/// </summary>
-		/// <param name="pack">the data package</param>
-		/// <param name="file_path">the location to save</param>
-		public void SavePackageToLocation(string file_path)
-		{
-			try
-			{
-				JSON_Serialization.SerializeToFile<MasterDataPackage>(this, file_path);
-			}
-			catch(Exception ex)
-			{
-				debugger.show(err:ex.ToString());
-			}
-		}
-	}
+        /// <summary>
+        /// Save a data package to a location on disk
+        /// </summary>
+        /// <param name="pack">the data package</param>
+        /// <param name="file_path">the location to save</param>
+        public void SavePackageToLocation(string file_path)
+        {
+            try
+            {
+                JSON_Serialization.SerializeToFile<MasterDataPackage>(this, file_path);
+            }
+            catch (Exception ex)
+            {
+                debugger.show(err: ex.ToString());
+            }
+        }
+    }
 }

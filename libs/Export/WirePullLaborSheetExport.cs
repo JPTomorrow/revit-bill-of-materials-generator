@@ -34,21 +34,10 @@ namespace JPMorrow.Excel
             var project_title = info.DOC.ProjectInformation.Name;
             string title = "M.P.A.C.T. - " + project_title;
 
-            if (pull_type == WireType.Branch)
-            {
-                InsertHeader(title, "Labor Breakdown", data_package.GetSelectedGlobalSettingsPackage().BranchExportSheetName);
-            }
-            else if (pull_type == WireType.Distribution)
-            {
-                InsertHeader(title, "Labor Breakdown", data_package.GetSelectedGlobalSettingsPackage().DistributionExportSheetName);
-            }
-            else if (pull_type == WireType.LowVoltage)
-            {
-                InsertHeader(title, "Labor Breakdown", data_package.GetSelectedGlobalSettingsPackage().LowVoltageExportSheetName);
-            }
+            InsertHeader(title, "Labor Breakdown", data_package.GetSelectedGlobalSettingsPackage().ExportTitle);
 
             // voltage drop
-            package = VoltageDrop.AllWireDropVoltage(package);
+            package = VoltageDrop.AllWireDropVoltage(package, out string changed_wires);
 
             double gt = 0.0; // Grand Total
             double code_one_gt = 0; // 01 EMPTY RACEWAY Grand Total

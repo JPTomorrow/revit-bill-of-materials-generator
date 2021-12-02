@@ -19,9 +19,10 @@ img {
 <br/><br/>
 
 # Todo
-- Allow user to set default location for saving Excel and PDF BOM's
+- User needs to be able to set a location for the BOM Exports.
 
 # Completed
+- Making a sub package now creates it in all categories
 - Remove 10' from all runs to account for elec rooms
 - HR boxes should use 1/4" thread by default
 - On Strut, default to 1/2" all thread

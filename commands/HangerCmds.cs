@@ -39,7 +39,7 @@ namespace JPMorrow.UI.ViewModels
         }
 
         // add single hangers
-        public async void AddSingleHangers(Window window)
+        public void AddSingleHangers(Window window)
         {
             try
             {
@@ -67,17 +67,13 @@ namespace JPMorrow.UI.ViewModels
                 opts.DrawSingleHangerModelGeometry = Draw_Single_Debug;
                 opts.DrawStrutHangerModelGeometry = Draw_Strut_Debug;
 
-                int single_cnt = 0;
-                var hangers = await SingleHanger.CreateSingleHangers(
+                var hangers = SingleHanger.CreateSingleHangers(
                     ALS.Info, ThisApplication.Hanger_View, ids, opts);
 
-                singles.AddRange(hangers);
-
-                ALS.AppData.GetSelectedHangerPackage().SingleHangers.AddRange(singles);
-                single_cnt += singles.Count();
+                ALS.AppData.GetSelectedHangerPackage().SingleHangers.AddRange(hangers);
 
                 RefreshDataGrids(BOMDataGrid.Hangers);
-                WriteToLog("Added " + single_cnt + " single hangers.");
+                WriteToLog("Added " + hangers.Count() + " single hangers.");
             }
             catch (Exception ex)
             {

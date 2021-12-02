@@ -471,6 +471,7 @@ namespace JPMorrow.P3
                 if (p_idx == -1)
                 {
                     hardware_parts.Add(final_box_part);
+                    hardware_parts.Add(final_connector_part);
                     hardware_parts.Add(plaster_ring_part);
                     var coll = new P3PartCollection(
                         code.RawDeviceCode, hardware_parts);
@@ -479,6 +480,7 @@ namespace JPMorrow.P3
                 else
                 {
                     part_colls[p_idx].AddPart(final_box_part);
+                    hardware_parts.Add(final_connector_part);
                     part_colls[p_idx].AddPart(plaster_ring_part);
 
                     foreach (var part in hardware_parts)
