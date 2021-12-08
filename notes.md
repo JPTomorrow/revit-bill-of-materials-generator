@@ -19,9 +19,20 @@ img {
 <br/><br/>
 
 # Todo
-- User needs to be able to set a location for the BOM Exports.
+- Fix accumulating strut straps between runs
+- Fix 1/2" washers and hex nuts [0.016	C] and [0.02	C] respectively  not showing up
+- Add [Caddy 4Z34812M Multi Function Clip	63	0.08	C] x1 for every helicopter bracket
+- (12/2/21) Update labor tab GUI
+- (12/2/21) Update Hardware tab GUI
+- (12/2/21) Update Voltage Drop GUI
+- (12/2/21) Update Wire Migration GUI
+- (12/2/21) Update Wire Automation GUI
+- (12/2/21) Update Wire GUI
+- (12/2/21) Update Settings GUI
+- (12/2/21) Fix Help Menu GUI
 
 # Completed
+- User needs to be able to set a location for the BOM Exports.
 - Making a sub package now creates it in all categories
 - Remove 10' from all runs to account for elec rooms
 - HR boxes should use 1/4" thread by default
