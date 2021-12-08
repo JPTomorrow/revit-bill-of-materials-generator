@@ -143,7 +143,7 @@ namespace JPMorrow.UI.ViewModels
         }
 
         // Add strut hangers
-        public async void AddStrutHangers(Window window)
+        public void AddStrutHangers(Window window)
         {
             try
             {
@@ -189,14 +189,14 @@ namespace JPMorrow.UI.ViewModels
                 List<StrutHanger> hangers = new List<StrutHanger>();
                 if (conduit_ids.Any())
                 {
-                    var current_hangers = await StrutHanger.CreateStrutHangers(
+                    var current_hangers = StrutHanger.CreateStrutHangers(
                         ALS.Info, ThisApplication.Hanger_View, conduit_ids, opts, StrutHangerRackType.Conduit, false);
                     if (current_hangers != null) hangers.AddRange(current_hangers);
                 }
 
                 if (tray_ids.Any())
                 {
-                    var current_hangers = await StrutHanger.CreateStrutHangers(
+                    var current_hangers = StrutHanger.CreateStrutHangers(
                         ALS.Info, ThisApplication.Hanger_View, tray_ids, opts, StrutHangerRackType.CableTray, false);
                     if (current_hangers != null) hangers.AddRange(current_hangers);
                 }
@@ -215,10 +215,11 @@ namespace JPMorrow.UI.ViewModels
             }
         }
 
-        public async void AddQuickStrutHangers(Window window)
+        public void AddQuickStrutHangers(Window window)
         {
             try
             {
+                // get selected element ids
                 List<ElementId> ids = ALS.Info.SEL.GetElementIds().ToList();
 
                 if (!ids.Any())
@@ -229,6 +230,7 @@ namespace JPMorrow.UI.ViewModels
                     return;
                 }
 
+                // filter out anything selected that isnt conduit
                 List<ElementId> conduit_ids = new List<ElementId>();
 
                 foreach (var id in ids.ToArray())
@@ -237,6 +239,15 @@ namespace JPMorrow.UI.ViewModels
                         conduit_ids.Add(id);
                 }
 
+                if (!conduit_ids.Any())
+                {
+                    debugger.show(
+                        header: "Quick Strut Hangers",
+                        err: "No Conduit was selected. Please select a conduit rack.");
+                    return;
+                }
+
+                // set hanger option properties
                 var m_span = RMeasure.LengthDbl(ALS.Info.DOC, HO_Max_Span_Txt);
                 var irg = RMeasure.LengthDbl(ALS.Info.DOC, HO_IRGap_Txt);
                 var oesl = RMeasure.LengthDbl(ALS.Info.DOC, HO_OESLength_Txt);
@@ -256,16 +267,14 @@ namespace JPMorrow.UI.ViewModels
                 opts.DrawSingleHangerModelGeometry = Draw_Single_Debug;
                 opts.DrawStrutHangerModelGeometry = Draw_Strut_Debug;
 
+                // create hangers
                 List<StrutHanger> hangers = new List<StrutHanger>();
-                if (conduit_ids.Any())
-                {
-                    var current_hangers = await StrutHanger.CreateStrutHangers(
+                var current_hangers = StrutHanger.CreateStrutHangers(
                         ALS.Info, ThisApplication.Hanger_View, conduit_ids, opts, StrutHangerRackType.Conduit, true);
-                    if (current_hangers != null) hangers.AddRange(current_hangers);
-                }
+                if (current_hangers != null) hangers.AddRange(current_hangers);
 
+                // add hangers to UI
                 ALS.Info.SEL.SetElementIds(hangers.Select(x => new ElementId(x.HangerFamilyInstanceId)).ToArray());
-
                 ALS.AppData.GetSelectedHangerPackage().StrutHangers.AddRange(hangers);
                 var strut_cnt = ALS.AppData.GetSelectedHangerPackage().StrutHangers.Count;
                 RefreshDataGrids(BOMDataGrid.Hangers);

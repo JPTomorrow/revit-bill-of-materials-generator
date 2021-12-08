@@ -111,7 +111,6 @@ namespace JPMorrow.UI.ViewModels
                 var new_package_name = PromptNewPackageName();
                 AddNewConduitSubPackage(new_package_name);
                 AddNewHangerSubPackage(new_package_name);
-                AddNewHangerSubPackage(new_package_name);
                 AddNewHardwareSubPackage(new_package_name);
                 AddNewGlobalSettingsSubPackage(new_package_name);
             }
@@ -319,8 +318,10 @@ namespace JPMorrow.UI.ViewModels
 
                 bool ss = ALS.AppData.SelectGlobalSettingsPackage(package_name, out var package);
                 Export_Title_Txt = package.ExportTitle;
+                Area_Title_Txt = package.AreaTitle;
 
                 Update("Export_Title_Txt");
+                Update("Area_Title_Txt");
             }
             catch (Exception ex)
             {

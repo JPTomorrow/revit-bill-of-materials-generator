@@ -23,7 +23,6 @@ namespace JPMorrow.Revit.Hangers
     {
         public static string[] SingleAndFixtureHardware = new string[] { "Washer", "Washer", "Hex Nut", "Spring Nut" };
         public static string[] StrutHardware = new string[] { "Washer", "Washer", "Washer", "Washer", "Hex Nut", "Hex Nut", "Spring Nut", "Spring Nut" };
-
         public static string[] RodDiameterMeasurments { get; } = new string[] { "1/4\"", "3/8\"", "1/2\"" };
         public static string[] SingleHangerAttachmentTypes { get; } = new string[] { "Batwing", "Mineralac" };
     }
@@ -37,7 +36,6 @@ namespace JPMorrow.Revit.Hangers
         string att_type, string att_size, string anchor_type,
         string[] hardware, int fam_id)
         {
-
             RodLength = rod_length;
             RodDiameter = rod_dia;
             RodCouplingCount = cc;
@@ -236,7 +234,6 @@ namespace JPMorrow.Revit.Hangers
             public static IEnumerable<SingleHangerConduitPlacementData> GenerateConduitPlacementData(
                 ModelInfo info, IEnumerable<ElementId> ids, HangerOptions opts)
             {
-
                 var placement_data = new List<SingleHangerConduitPlacementData>();
 
                 ids.ForEach(x =>
@@ -634,7 +631,7 @@ namespace JPMorrow.Revit.Hangers
         }
 
         // Main Strut Hanger Creation Method
-        public static async Task<IEnumerable<StrutHanger>> CreateStrutHangers(
+        public static IEnumerable<StrutHanger> CreateStrutHangers(
             ModelInfo info, View3D view, IEnumerable<ElementId> ids,
             HangerOptions opts, StrutHangerRackType rack_type,
             bool auto_resolve_placement_pts)
@@ -642,57 +639,47 @@ namespace JPMorrow.Revit.Hangers
             List<StrutHanger> hangers = new List<StrutHanger>();
 
             // create and get placement data for hangers
-            try
+            if (rack_type == StrutHangerRackType.Conduit)
             {
-                if (rack_type == StrutHangerRackType.Conduit)
+                var placement_data = SeparateConduitRacksByElevation(info, ids).Select(x => GetConduitPlacementData(info, x, auto_resolve_placement_pts));
+                placement_data.ForEach(x => hangers.AddRange(PlaceConduitHangers(info, view, ids, x, opts)));
+            }
+            else if (rack_type == StrutHangerRackType.CableTray)
+            {
+                var placement_data = new List<CableTrayHangerPlacementData>();
+                ids.ToList().ForEach(x => placement_data.Add(GetCableTrayPlacementData(info, x, view, opts)));
+
+                foreach (var d in placement_data)
                 {
-
-                    var placement_data = GetConduitPlacementData(info, ids, auto_resolve_placement_pts);
-                    var add_hangers = PlaceConduitHangers(info, view, ids, placement_data, opts);
-
-                    // draw hangers in model
-                    if (opts.DrawStrutHangerModelGeometry)
-                    {
-                        foreach (var hanger in add_hangers)
-                        {
-                            var fam = await GenerateConduitStrutHangerGeometry(info, view, hanger, opts, placement_data);
-                            hanger.SetFamilyInstanceId(fam.Id);
-                        }
-                    }
-
+                    var add_hangers = PlaceCableTrayHangers(info, view, d, opts);
                     hangers.AddRange(add_hangers);
                 }
-                else if (rack_type == StrutHangerRackType.CableTray)
-                {
-                    var placement_data = new List<CableTrayHangerPlacementData>();
-                    ids.ToList().ForEach(x => placement_data.Add(GetCableTrayPlacementData(info, x, view, opts)));
-
-                    foreach (var d in placement_data)
-                    {
-                        var add_hangers = PlaceCableTrayHangers(info, view, d, opts);
-
-                        if (opts.DrawStrutHangerModelGeometry)
-                        {
-                            foreach (var hanger in add_hangers)
-                            {
-                                var fam = await GenerateCableTrayStrutHangerGeometry(info, view, hanger, opts, d);
-                                hanger.SetFamilyInstanceId(fam.Id);
-                            }
-                        }
-
-                        // draw hangers in model
-                        hangers.AddRange(add_hangers);
-                    }
-                }
-                else
-                    throw new Exception("Invalid StrutHangerRacktype");
             }
-            catch
-            {
-                return new List<StrutHanger>();
-            }
+            else
+                throw new Exception("Invalid StrutHangerRacktype");
 
             return hangers;
+        }
+
+        // Separate conduit racks by elevation
+        private static IEnumerable<ElementId[]> SeparateConduitRacksByElevation(ModelInfo info, IEnumerable<ElementId> ids)
+        {
+            var conduit_racks = new List<ElementId[]>();
+
+            var conduit_racks_by_elevation = ids.GroupBy(x =>
+            {
+                var conduit = info.DOC.GetElement(x);
+                var offset = conduit.LookupParameter("Middle Elevation").AsValueString();
+                return offset;
+            }); ;
+
+            foreach (var grp in conduit_racks_by_elevation)
+            {
+                if (grp.Count() <= 1) continue;
+                conduit_racks.Add(grp.ToArray());
+            }
+
+            return conduit_racks;
         }
 
         private static IEnumerable<StrutHanger> PlaceConduitHangers(
@@ -846,31 +833,11 @@ namespace JPMorrow.Revit.Hangers
             if (tier_ids.Count() > 4)
                 tier_ids = tier_ids.Take(4);
 
+            // get conduit placement pts
             List<XYZ> placement_pts = new List<XYZ>();
-
             if (auto_resolve_placement_pts)
             {
-                var longest = ids.MaxBy(x =>
-                    info.DOC.GetElement(x)
-                    .LookupParameter("Length")
-                    .AsDouble()).First();
-
-                // (length of longest run / hanger_spacing) + 2
-                var el = info.DOC.GetElement(longest);
-                var length = (int)Math.Ceiling(el.LookupParameter("Length").AsDouble());
-                var line = (el.Location as LocationCurve).Curve as Line;
-                var segments = length <= 8 ? 3 : ((length - 6) / 8) + 2;
-                var dummy_pt = RGeo.DerivePointsOnLine(line, 1.0).ToList().First();
-
-                for (var i = 0; i < segments; i++)
-                    placement_pts.Add(dummy_pt);
-
-                debugger.show(
-                    header: "Quick Strut Hanger Creation",
-                    err: "The length of the longest pipe in rack: " +
-                        RMeasure.LengthFromDbl(info.DOC, length) + "\n" +
-                        "Number of hangers to be generated: " +
-                        placement_pts.Count().ToString());
+                placement_pts.AddRange(GenerateAutoResolvedConduitPlacementPts(info, ids));
             }
             else
             {
@@ -952,9 +919,39 @@ namespace JPMorrow.Revit.Hangers
                 info, placement_pts.ToArray(), left_id, right_id, tier_ids.ToArray());
         }
 
+        private static List<XYZ> GenerateAutoResolvedConduitPlacementPts(ModelInfo info, IEnumerable<ElementId> ids)
+        {
+            List<XYZ> placement_pts = new List<XYZ>();
+
+            // get longest conduit 
+            var longest = ids.MaxBy(x =>
+                info.DOC.GetElement(x)
+                .LookupParameter("Length")
+                .AsDouble()).First();
+
+            // (length of longest run / hanger_spacing) + 2
+            var el = info.DOC.GetElement(longest);
+            var length = (int)Math.Ceiling(el.LookupParameter("Length").AsDouble());
+            var line = (el.Location as LocationCurve).Curve as Line;
+            var segments = length <= 8 ? 3 : ((length) / 8) + 2;
+            var dummy_pt = RGeo.DerivePointsOnLine(line, 1.0).ToList().First();
+
+            for (var i = 0; i < segments; i++)
+                placement_pts.Add(dummy_pt);
+
+            debugger.show(
+                header: "Quick Strut Hanger Creation",
+                err: "The length of the longest pipe in rack: " +
+                    RMeasure.LengthFromDbl(info.DOC, length) + "\n" +
+                    "Number of hangers to be generated: " +
+                    placement_pts.Count().ToString());
+
+            return placement_pts;
+        }
+
         // Get Hanger Placement Data for Cable Tray
         private static CableTrayHangerPlacementData GetCableTrayPlacementData(
-            ModelInfo info, ElementId tray_id, View3D view, HangerOptions opts)
+                ModelInfo info, ElementId tray_id, View3D view, HangerOptions opts)
         {
 
             var tray = info.DOC.GetElement(tray_id);

@@ -60,8 +60,8 @@ namespace JPMorrow.UI.ViewModels
                 }
 
                 string export_title = string.IsNullOrWhiteSpace(ALS.AppData.GetSelectedGlobalSettingsPackage().ExportTitle) ? "bom-export" : ALS.AppData.GetSelectedGlobalSettingsPackage().ExportTitle;
-                string filename = ALS.AppData.GenerateExcelExportPath(export_title, PackageName());
-                var pdf_filename = ALS.AppData.GeneratePdfExportPath(filename, PackageName());
+                string filename = ALS.AppData.GenerateExcelExportPath(export_title, PackageName(), Area_Title_Txt);
+                var pdf_filename = ALS.AppData.GeneratePdfExportPath(filename, PackageName(), Area_Title_Txt);
 
                 string clean_file_name = ALS.AppData.GetSelectedGlobalSettingsPackage().ExportTitle;
                 clean_file_name = clean_file_name.Replace("_", " ");

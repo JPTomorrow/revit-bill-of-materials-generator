@@ -35,6 +35,7 @@ namespace JPMorrow.UI.ViewModels
             var makeup = RMeasure.LengthDbl(ALS.Info.DOC, Wire_Makeup_Length_Txt);
             ALS.AppData.GetSelectedGlobalSettingsPackage().WireMakeupLength = makeup;
             ALS.AppData.GetSelectedGlobalSettingsPackage().ExportTitle = Export_Title_Txt;
+            ALS.AppData.GetSelectedGlobalSettingsPackage().AreaTitle = Area_Title_Txt;
 
             WirePackageSettings.Save(ALS.WirePackSettings);
         }
@@ -144,9 +145,12 @@ namespace JPMorrow.UI.ViewModels
             if (ResetPackageSettings)
             {
                 Export_Title_Txt = "";
+                Area_Title_Txt = "";
                 Update("Export_Title_Txt");
+                Update("Area_Title_Txt");
 
                 ALS.AppData.GetSelectedGlobalSettingsPackage().ExportTitle = "";
+                ALS.AppData.GetSelectedGlobalSettingsPackage().AreaTitle = "";
             }
 
             var o = "Reset Project: { ";

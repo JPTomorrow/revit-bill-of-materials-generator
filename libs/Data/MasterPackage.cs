@@ -119,6 +119,8 @@ namespace JPMorrow.Revit.BOMPackage
         public double WireMakeupLength { get; set; } = 8.0;
         [DataMember]
         public string ExportTitle { get; set; } = "";
+        [DataMember]
+        public string AreaTitle { get; set; } = "";
 
         public GlobalSettingsSubDataPackage(string package_name)
         {
@@ -188,18 +190,18 @@ namespace JPMorrow.Revit.BOMPackage
                 SelectedElecRoomPackageIdx.ToString(), SelectedGlobalSettingsPackageIdx.ToString());
         }
 
-        public string GenerateExcelExportPath(string export_filename, string master_package_name)
+        public string GenerateExcelExportPath(string export_filename, string master_package_name, string area_title)
         {
-            var p = ExportRootDirectory + "\\excel\\" + master_package_name;
+            var p = ExportRootDirectory + "\\excel\\" + master_package_name + (string.IsNullOrWhiteSpace(area_title) ? "" : "\\" + area_title);
             if (!Directory.Exists(p)) Directory.CreateDirectory(p);
             p += "\\" + export_filename + ".xlsx";
             return p;
         }
 
-        public string GeneratePdfExportPath(string excel_export_filepath, string master_package_name)
+        public string GeneratePdfExportPath(string excel_export_filepath, string master_package_name, string area_title)
         {
 
-            var p = ExportRootDirectory + "\\pdf\\" + master_package_name;
+            var p = ExportRootDirectory + "\\pdf\\" + master_package_name + (string.IsNullOrWhiteSpace(area_title) ? "" : "\\" + area_title);
             if (!Directory.Exists(p)) Directory.CreateDirectory(p);
             var filename_no_ext = Path.GetFileNameWithoutExtension(excel_export_filepath);
             p += "\\" + filename_no_ext + ".pdf";

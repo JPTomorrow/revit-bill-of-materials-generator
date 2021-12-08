@@ -146,6 +146,7 @@ namespace JPMorrow.UI.ViewModels
         public string Voltage_Drop_Distance_Txt { get; set; }
         public string Wire_Makeup_Length_Txt { get; set; }
         public string Export_Title_Txt { get; set; }
+        public string Area_Title_Txt { get; set; }
         public string Load_Length_Txt { get; set; }
         public string Total_Unistrut_Hanger_Length_Txt { get; set; }
         public string Export_Root_Directory_Txt { get; set; }
@@ -358,6 +359,7 @@ namespace JPMorrow.UI.ViewModels
             SelGlobalSettingsPackage = ALS.AppData.SelectedGlobalSettingsPackageIdx;
 
             Export_Title_Txt = ALS.AppData.GetSelectedGlobalSettingsPackage().ExportTitle;
+            Area_Title_Txt = ALS.AppData.GetSelectedGlobalSettingsPackage().AreaTitle;
 
             // set makeup length from ALS.AppData
             Wire_Makeup_Length_Txt = RMeasure.LengthFromDbl(ALS.Info.DOC, ALS.AppData.GetSelectedGlobalSettingsPackage().WireMakeupLength);
@@ -380,6 +382,7 @@ namespace JPMorrow.UI.ViewModels
             Update("GlobalSettingsPackageNameItems");
 
             Update("Export_Title_Txt");
+            Update("Area_Title_Txt");
             Update("Wire_Makeup_Length_Txt");
         }
 
