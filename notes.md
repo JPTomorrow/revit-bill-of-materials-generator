@@ -19,7 +19,6 @@ img {
 <br/><br/>
 
 # Todo
-<<<<<<< HEAD
 - Fix accumulating strut straps between runs
 - Fix 1/2" washers and hex nuts [0.016	C] and [0.02	C] respectively  not showing up
 - Add [Caddy 4Z34812M Multi Function Clip	63	0.08	C] x1 for every helicopter bracket
@@ -31,9 +30,6 @@ img {
 - (12/2/21) Update Wire GUI
 - (12/2/21) Update Settings GUI
 - (12/2/21) Fix Help Menu GUI
-=======
-- add washers and hex nuts for 1/2" threaded rod hangers (probably single hangers x2 washer x1 hex nut?)
->>>>>>> 619b696331fb234795faa8df038ea560a44d7590
 
 # Completed
 - User needs to be able to set a location for the BOM Exports.
