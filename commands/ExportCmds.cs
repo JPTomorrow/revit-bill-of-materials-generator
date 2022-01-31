@@ -13,7 +13,6 @@ using JPMorrow.Revit.ElementCollection;
 using JPMorrow.Revit.Wires;
 using JPMorrow.Tools.Diagnostics;
 using JPMorrow.UI.Views;
-using JPMorrow.Windows.IO;
 
 namespace JPMorrow.UI.ViewModels
 {

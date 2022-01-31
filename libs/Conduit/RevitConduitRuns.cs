@@ -180,12 +180,24 @@ namespace JPMorrow.Revit.ConduitRuns
 
         }
 
-        public static void ProcessCRIFromConduitId(
-            ModelInfo info, IEnumerable<ElementId> conduit_ids, List<ConduitRunInfo> add_cri_list)
+        public class ConduitRunProcessResult
         {
+            public string Message { get; set; } = "";
+            public bool Success { get; set; } = false;
 
+            public void AddMessage(string message, bool separator = false)
+            {
+                Message += message + "\n";
+                if (separator)
+                    Message += "\n-------------------------------------------------------\n";
+            }
+        }
+
+        public static ConduitRunProcessResult ProcessCRIFromConduitId(ModelInfo info, IEnumerable<ElementId> conduit_ids, List<ConduitRunInfo> add_cri_list)
+        {
             var ids = new List<ElementId>(conduit_ids);
             ids = ids.OrderBy(x => x.IntegerValue).ToList();
+            ConduitRunProcessResult result = new ConduitRunProcessResult();
 
             List<RunNetwork> nets = new List<RunNetwork>();
 
@@ -200,6 +212,23 @@ namespace JPMorrow.Revit.ConduitRuns
                 nets.Add(rn);
             }
 
+            // @TODO: DELETE
+            var distinct_id_list = nets
+                .SelectMany(x => x.AllIds)
+                .GroupBy(x => x)
+                .Where(x => x.Count() > 1)
+                .Select(r => r.Key)
+                .ToList();
+
+            result.AddMessage("#NET");
+            distinct_id_list.ForEach(x =>
+            {
+                result.AddMessage(string.Format("Duplicate conduit id: {0}", x));
+            });
+
+            result.AddMessage("", true);
+
+            // stack stuff
             Stack<RunNetwork> fitting_nets = new Stack<RunNetwork>(nets);
             nets.Clear();
 
@@ -213,6 +242,7 @@ namespace JPMorrow.Revit.ConduitRuns
                     if (fitting_nets.Any(net => net.FittingIds.Any(rnid => rnid == id)))
                         rn.FittingIds.Remove(id);
                 });
+
                 nets.Add(rn);
             }
 
@@ -223,6 +253,7 @@ namespace JPMorrow.Revit.ConduitRuns
             }
 
             add_cri_list.AddRange(cris);
+            return result;
         }
 
         /// <summary>
@@ -403,10 +434,10 @@ namespace JPMorrow.Revit.ConduitRuns
 
     public class RunNetwork
     {
-        public List<int> RunIds { get; private set; }
-        public List<int> FittingIds { get; private set; }
-        public List<int> ConnectedJboxIds { get; private set; }
-        public int StartId { get; private set; }
+        public List<int> RunIds { get; set; }
+        public List<int> FittingIds { get; set; }
+        public List<int> ConnectedJboxIds { get; set; }
+        public int StartId { get; set; }
 
         public List<int> AllIds { get => RunIds.Concat(FittingIds).ToList(); }
 
@@ -603,7 +634,6 @@ namespace JPMorrow.Revit.ConduitRuns
 
             private bool IsConnectedTo(ModelInfo info, Connector c, Connector c2)
             {
-
                 if (c.ConnectorType == ConnectorType.Logical || c2.ConnectorType == ConnectorType.Logical) return false;
                 bool s = false;
 
@@ -614,9 +644,7 @@ namespace JPMorrow.Revit.ConduitRuns
                 catch
                 {
                     info.SEL.SetElementIds(new[] { c.Owner.Id, c2.Owner.Id });
-
                     var c1type = Enum.GetName(typeof(ConnectorType), c.ConnectorType);
-
                     var c2type = Enum.GetName(typeof(ConnectorType), c2.ConnectorType);
                     throw new Exception("Connector 1 Type: " + c1type + " | Connector 2 Type" + c2type);
                 }

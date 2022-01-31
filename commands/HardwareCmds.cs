@@ -76,8 +76,9 @@ namespace JPMorrow.UI.ViewModels
 
             var els = passed_els
                 .Where(x => x.Category.Name.Equals("Electrical Equipment"))
-                .Where(x => x.Name.ToLower().Contains("generic box"))
-                .Where(x => p(x, w) != null && p(x, h) != null && p(x, d) != null);
+                .Where(x => p(x, w) != null && p(x, h) != null && p(x, d) != null)
+                .Where(x => x as FamilyInstance != null)
+                .Where(x => (x as FamilyInstance).Symbol.FamilyName.ToLower().Contains("generic box"));
 
             debugger.show(header: "Hardware Pull Boxes", err: "Adding " + els.Count().ToString() + " pull boxes");
 
@@ -95,8 +96,10 @@ namespace JPMorrow.UI.ViewModels
 
                 var idx = pairs.FindIndex(x => x.entry_name.Equals(entry_name));
 
-                if (idx == -1) pairs.Add(new { entry_name = entry_name, qty = 1 });
-                else pairs[idx] = new { entry_name = entry_name, qty = pairs[idx].qty + 1 };
+                if (idx >= 0)
+                    pairs[idx] = new { entry_name = entry_name, qty = pairs[idx].qty + 1 };
+                else
+                    pairs.Add(new { entry_name = entry_name, qty = 1 });
             }
 
             foreach (var pair in pairs)

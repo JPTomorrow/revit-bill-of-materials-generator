@@ -51,6 +51,8 @@ namespace JPMorrow.UI.ViewModels
                 }
 
                 packagePath = save_result.Filename;
+                ResolveStartupExportDirectory(packagePath);
+                Update("Export_Root_Directory_Txt");
                 Header_Text = "Project: " + PackageName();
                 Update("Header_Text");
                 UpdateSubPackages();

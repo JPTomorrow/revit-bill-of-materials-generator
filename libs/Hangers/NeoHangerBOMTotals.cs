@@ -151,16 +151,16 @@ namespace JPMorrow.Revit.Hangers
     /// </summary>
     public class HangerTotal
     {
-        public List<HangerAnchorTotal> Anchors { get; private set; }
-        public List<HangerHexNutsTotal> HexNuts { get; private set; }
-        public List<HangerSpringNutsTotal> SpringNuts { get; private set; }
-        public List<HangerWashersTotal> Washers { get; private set; }
-        public List<HangerLockWashersTotal> LockWashers { get; private set; }
-        public List<HangerRodCouplingsTotal> RodCouplings { get; private set; }
-        public List<HangerThreadedRodTotal> ThreadedRod { get; private set; }
-        public List<HangerStrutTotal> Strut { get; private set; }
-        public List<HangerSingleAttachmentsTotal> SingleAttachments { get; private set; }
-        public List<HangerConduitStrapsTotal> ConduitStraps { get; private set; }
+        public List<HangerAnchorTotal> Anchors { get; set; }
+        public List<HangerHexNutsTotal> HexNuts { get; set; }
+        public List<HangerSpringNutsTotal> SpringNuts { get; set; }
+        public List<HangerWashersTotal> Washers { get; set; }
+        public List<HangerLockWashersTotal> LockWashers { get; set; }
+        public List<HangerRodCouplingsTotal> RodCouplings { get; set; }
+        public List<HangerThreadedRodTotal> ThreadedRod { get; set; }
+        public List<HangerStrutTotal> Strut { get; set; }
+        public List<HangerSingleAttachmentsTotal> SingleAttachments { get; set; }
+        public List<HangerConduitStrapsTotal> ConduitStraps { get; set; }
 
         // Constructor
         public HangerTotal()
@@ -182,15 +182,10 @@ namespace JPMorrow.Revit.Hangers
         /// </summary>
         public void PushAnchors(string type, string dia, int cnt)
         {
-            int index = Anchors
-                .FindIndex(ind => ind.Type.Equals(type) && ind.Diameter.Equals(dia));
+            int index = Anchors.FindIndex(ind => ind.Type.Equals(type) && ind.Diameter.Equals(dia));
 
-            if (index > -1)
-            {
-                var existing_cnt = Anchors[index].Count;
-                var new_entry = new HangerAnchorTotal(type, dia, existing_cnt + cnt);
-                Anchors[index] = new_entry;
-            }
+            if (index >= 0)
+                Anchors[index].Count += cnt;
             else
                 Anchors.Add(new HangerAnchorTotal(type, dia, cnt));
         }
@@ -200,15 +195,10 @@ namespace JPMorrow.Revit.Hangers
         /// </summary>
         public void PushHexNuts(string type, string dia, int cnt)
         {
-            int index = HexNuts
-                .FindIndex(ind => ind.Type.Equals(type) && ind.Diameter.Equals(dia));
+            int index = HexNuts.FindIndex(ind => ind.Type.Equals(type) && ind.Diameter.Equals(dia));
 
-            if (index > -1)
-            {
-                var existing_cnt = HexNuts[index].Count;
-                var new_entry = new HangerHexNutsTotal(type, dia, existing_cnt + cnt);
-                HexNuts[index] = new_entry;
-            }
+            if (index >= 0)
+                HexNuts[index].Count += cnt;
             else
                 HexNuts.Add(new HangerHexNutsTotal(type, dia, cnt));
         }
@@ -218,15 +208,10 @@ namespace JPMorrow.Revit.Hangers
         /// </summary>
         public void PushSpringNuts(string type, string dia, int cnt)
         {
-            int index = SpringNuts
-                .FindIndex(ind => ind.Type.Equals(type) && ind.Diameter.Equals(dia));
+            int index = SpringNuts.FindIndex(ind => ind.Type.Equals(type) && ind.Diameter.Equals(dia));
 
-            if (index > -1)
-            {
-                var existing_cnt = SpringNuts[index].Count;
-                var new_entry = new HangerSpringNutsTotal(type, dia, existing_cnt + cnt);
-                SpringNuts[index] = new_entry;
-            }
+            if (index >= 0)
+                SpringNuts[index].Count += cnt;
             else
                 SpringNuts.Add(new HangerSpringNutsTotal(type, dia, cnt));
         }
@@ -236,18 +221,13 @@ namespace JPMorrow.Revit.Hangers
         /// </summary>
         public void PushWashers(string type, string dia, int cnt)
         {
-            int index = Washers
-                .FindIndex(ind => ind.Type.Equals(type) && ind.Diameter.Equals(dia));
+            int idx = Washers.FindIndex(ind => ind.Type.Equals(type) && ind.Diameter.Equals(dia));
 
-
-            if (index > -1)
-            {
-                var existing_cnt = Washers[index].Count;
-                var new_entry = new HangerWashersTotal(type, dia, existing_cnt + cnt);
-                Washers[index] = new_entry;
-            }
+            if (idx >= 0)
+                Washers[idx].Count += cnt;
             else
                 Washers.Add(new HangerWashersTotal(type, dia, cnt));
+
         }
 
         /// <summary>
@@ -255,15 +235,10 @@ namespace JPMorrow.Revit.Hangers
         /// </summary>
         public void PushLockWashers(string type, string dia, int cnt)
         {
-            int index = LockWashers
-                .FindIndex(ind => ind.Type.Equals(type) && ind.Diameter.Equals(dia));
+            int index = LockWashers.FindIndex(ind => ind.Type.Equals(type) && ind.Diameter.Equals(dia));
 
-            if (index > -1)
-            {
-                var existing_cnt = LockWashers[index].Count;
-                var new_entry = new HangerLockWashersTotal(type, dia, existing_cnt + cnt);
-                LockWashers[index] = new_entry;
-            }
+            if (index >= 0)
+                LockWashers[index].Count += cnt;
             else
                 LockWashers.Add(new HangerLockWashersTotal(type, dia, cnt));
         }
@@ -273,15 +248,10 @@ namespace JPMorrow.Revit.Hangers
         /// </summary>
         public void PushRodCouplings(string type, string dia, int cnt)
         {
-            int index = RodCouplings
-                .FindIndex(ind => ind.Type.Equals(type) && ind.Diameter.Equals(dia));
+            int index = RodCouplings.FindIndex(ind => ind.Type.Equals(type) && ind.Diameter.Equals(dia));
 
-            if (index > -1)
-            {
-                var existing_cnt = RodCouplings[index].Count;
-                var new_entry = new HangerRodCouplingsTotal(type, dia, existing_cnt + cnt);
-                RodCouplings[index] = new_entry;
-            }
+            if (index >= 0)
+                RodCouplings[index].Count += cnt;
             else
                 RodCouplings.Add(new HangerRodCouplingsTotal(type, dia, cnt));
         }
@@ -291,15 +261,10 @@ namespace JPMorrow.Revit.Hangers
         /// </summary>
         public void PushThreadedRod(string type, string dia, double len)
         {
-            int index = ThreadedRod
-                .FindIndex(ind => ind.Type.Equals(type) && ind.Diameter.Equals(dia));
+            int index = ThreadedRod.FindIndex(ind => ind.Type.Equals(type) && ind.Diameter.Equals(dia));
 
-            if (index > -1)
-            {
-                var existing_len = ThreadedRod[index].Length;
-                var new_entry = new HangerThreadedRodTotal(type, dia, existing_len + len);
-                ThreadedRod[index] = new_entry;
-            }
+            if (index >= 0)
+                ThreadedRod[index].Length += len;
             else
                 ThreadedRod.Add(new HangerThreadedRodTotal(type, dia, len));
         }
@@ -311,15 +276,10 @@ namespace JPMorrow.Revit.Hangers
         {
             if (string.IsNullOrWhiteSpace(size)) return;
 
-            int index = Strut
-                .FindIndex(ind => ind.Type.Equals(type) && ind.Size.Equals(size));
+            int index = Strut.FindIndex(ind => ind.Type.Equals(type) && ind.Size.Equals(size));
 
-            if (index > -1)
-            {
-                var existing_len = Strut[index].Length;
-                var new_entry = new HangerStrutTotal(type, size, existing_len + len);
-                Strut[index] = new_entry;
-            }
+            if (index >= 0)
+                Strut[index].Length += len;
             else
                 Strut.Add(new HangerStrutTotal(type, size, len));
         }

@@ -1,44 +1,45 @@
-using System.Windows.Input;
+using System.IO;
+using System.Linq;
 using System.Windows;
 using System.Windows.Controls;
-using JPMorrow.Revit.Documents;
-using System.Linq;
-using System.IO;
-using JPMorrow.Revit.Wires;
+using System.Windows.Input;
+using JPMorrow.Data.Globals;
 using JPMorrow.Revit.BOMPackage;
-using JPMorrow.Revit.Hangers;
-using JPMorrow.Revit.WirePackage;
-using JPMorrow.Revit.Labor;
-using JPMorrow.Revit.Hardware;
-using JPMorrow.Revit.Custom.WallInspection;
+using JPMorrow.Revit.ConduitRuns;
 using JPMorrow.Revit.Custom.GroundBar;
+using JPMorrow.Revit.Custom.WallInspection;
+using JPMorrow.Revit.Documents;
+using JPMorrow.Revit.Hangers;
+using JPMorrow.Revit.Hardware;
+using JPMorrow.Revit.Labor;
+using JPMorrow.Revit.Measurements;
+using JPMorrow.Revit.WirePackage;
+using JPMorrow.Revit.Wires;
+using JPMorrow.Tools.Diagnostics;
 using JPMorrow.Views.RelayCmd;
 using om = System.Collections.ObjectModel;
-using JPMorrow.Revit.ConduitRuns;
-using JPMorrow.Revit.Measurements;
-using JPMorrow.Data.Globals;
 
 namespace JPMorrow.UI.ViewModels
 {
-    // observable collection aliases
-    using ObsStr = om.ObservableCollection<string>;
     using ObsConduitRun = om.ObservableCollection<ParentViewModel.RunPresenter>;
-    using ObsMigConduitRun = om.ObservableCollection<ParentViewModel.MigrantRunPresenter>;
-    using ObsWire = om.ObservableCollection<ParentViewModel.WirePresenter>;
-    using ObsSingleHanger = om.ObservableCollection<ParentViewModel.SingleHangerPresenter>;
-    using ObsStrutHanger = om.ObservableCollection<ParentViewModel.StrutHangerPresenter>;
+    using ObsDevicePairing = om.ObservableCollection<ParentViewModel.DevicePairingPresenter>;
+    using ObsElecRoom = om.ObservableCollection<ParentViewModel.ElecRoomPresenter>;
     using ObsFixtureHanger = om.ObservableCollection<ParentViewModel.FixtureHangerPresenter>;
+    using ObsGrdBar = om.ObservableCollection<ParentViewModel.GrdBarPresenter>;
     using ObsHardware = om.ObservableCollection<ParentViewModel.HardwarePresenter>;
     using ObsLabor = om.ObservableCollection<ParentViewModel.LaborPresenter>;
-    using ObsElecRoom = om.ObservableCollection<ParentViewModel.ElecRoomPresenter>;
-    using ObsUnistrut = om.ObservableCollection<ParentViewModel.UnistrutPresenter>;
-    using ObsGrdBar = om.ObservableCollection<ParentViewModel.GrdBarPresenter>;
-    using ObsPanelBacking = om.ObservableCollection<ParentViewModel.BackingPresenter>;
-    using ObsPanelboard = om.ObservableCollection<ParentViewModel.PanelboardPresenter>;
+    using ObsMigConduitRun = om.ObservableCollection<ParentViewModel.MigrantRunPresenter>;
     using ObsP3Box = om.ObservableCollection<ParentViewModel.P3BoxPresenter>;
     using ObsP3LightingFixture = om.ObservableCollection<ParentViewModel.P3LightingFixturePresenter>;
+    using ObsPanelBacking = om.ObservableCollection<ParentViewModel.BackingPresenter>;
+    using ObsPanelboard = om.ObservableCollection<ParentViewModel.PanelboardPresenter>;
+    using ObsSingleHanger = om.ObservableCollection<ParentViewModel.SingleHangerPresenter>;
+    // observable collection aliases
+    using ObsStr = om.ObservableCollection<string>;
+    using ObsStrutHanger = om.ObservableCollection<ParentViewModel.StrutHangerPresenter>;
+    using ObsUnistrut = om.ObservableCollection<ParentViewModel.UnistrutPresenter>;
     using ObsVDrop = om.ObservableCollection<ParentViewModel.VoltageDropPresenter>;
-    using ObsDevicePairing = om.ObservableCollection<ParentViewModel.DevicePairingPresenter>;
+    using ObsWire = om.ObservableCollection<ParentViewModel.WirePresenter>;
     using ObsWirePairing = om.ObservableCollection<ParentViewModel.WirePairingPresenter>;
 
     public partial class ParentViewModel : Presenter
@@ -364,9 +365,6 @@ namespace JPMorrow.UI.ViewModels
             // set makeup length from ALS.AppData
             Wire_Makeup_Length_Txt = RMeasure.LengthFromDbl(ALS.Info.DOC, ALS.AppData.GetSelectedGlobalSettingsPackage().WireMakeupLength);
 
-            // set the directory to which exports are saved
-            ResolveStartupExportDirectory(packagePath);
-
             Update("SelConduitPackage");
             Update("SelHangerPackage");
             Update("SelP3Package");
@@ -501,6 +499,9 @@ namespace JPMorrow.UI.ViewModels
             Update("Wire_Generation_Items");
 
             RefreshDataGrids(BOMDataGrid.All);
+
+            // set the directory to which exports are saved
+            ResolveStartupExportDirectory(packagePath);
         }
 
         // an enumeration of all the datagrids 

@@ -163,7 +163,6 @@ namespace JPMorrow.Revit.Hangers
 
                 if (!ray.collisions.Any())
                 {
-
                     hanger.RodCouplingCount = 0;
                     hanger.RodLength = 0;
                     hanger.AttachmentType = attachment_type;
@@ -810,25 +809,24 @@ namespace JPMorrow.Revit.Hangers
                 header: "Hanger Conduit Rack Information",
                 err: "Pick leftmost conduit in the rack");
 
+            var id_filter = new ConduitPlacementDataSelectionFilter(ids);
+
             var left_id = RvtPicker.PickObjectsSafe(info,
-                ObjectType.Element, new ConduitPlacementDataSelectionFilter(ids),
-                "Pick leftmost conduit in the rack", itr: 1).First();
+                ObjectType.Element, id_filter, "Pick leftmost conduit in the rack", itr: 1).First();
 
             debugger.show(
                 header: "Hanger Conduit Rack Information",
                 err: "Pick rightmost conduit in the rack");
 
             var right_id = RvtPicker.PickObjectsSafe(info,
-                ObjectType.Element, new ConduitPlacementDataSelectionFilter(ids),
-                "Pick rightmost conduit in the rack", itr: 1).First();
+                ObjectType.Element, id_filter, "Pick rightmost conduit in the rack", itr: 1).First();
 
             debugger.show(
                 header: "Hanger Conduit Rack Information",
                 err: "Pick a conduit from each tier of the rack.");
 
             var tier_ids = RvtPicker.PickObjectsSafe(info,
-                ObjectType.Element, new ConduitPlacementDataSelectionFilter(ids),
-                "Pick a conduit from each tier of the rack");
+                ObjectType.Element, id_filter, "Pick a conduit from each tier of the rack");
 
             if (tier_ids.Count() > 4)
                 tier_ids = tier_ids.Take(4);

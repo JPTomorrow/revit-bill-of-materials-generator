@@ -10,6 +10,7 @@ using JPMorrow.Revit.WirePackage;
 using JPMorrow.Revit.Wires;
 using JPMorrow.Tools.Diagnostics;
 using JPMorrow.UI.Views;
+using JPMorrow.Windows.IO;
 
 namespace JPMorrow.UI.ViewModels
 {
@@ -19,7 +20,16 @@ namespace JPMorrow.UI.ViewModels
         {
             try
             {
-                throw new NotImplementedException();
+                var default_path = string.IsNullOrWhiteSpace(Export_Root_Directory_Txt) ? Export_Root_Directory_Txt : "C:\\";
+                var result = OpenFolderSelection.Prompt(default_path);
+                if (result.Result != System.Windows.Forms.DialogResult.OK) return;
+                var path = result.Filename;
+                if (string.IsNullOrEmpty(path)) return;
+
+                ALS.AppData.ExportRootDirectory = path;
+                SavePackage(null);
+                Export_Root_Directory_Txt = path;
+                Update("Export_Root_Directory_Txt");
             }
             catch (Exception ex)
             {
@@ -31,12 +41,10 @@ namespace JPMorrow.UI.ViewModels
         public void SaveGlobalSettings(Window window)
         {
             ALS.WirePackSettings.CouplingType = Coupling_Mat_Items[Sel_Coupling_Mat_Type];
-
             var makeup = RMeasure.LengthDbl(ALS.Info.DOC, Wire_Makeup_Length_Txt);
             ALS.AppData.GetSelectedGlobalSettingsPackage().WireMakeupLength = makeup;
             ALS.AppData.GetSelectedGlobalSettingsPackage().ExportTitle = Export_Title_Txt;
             ALS.AppData.GetSelectedGlobalSettingsPackage().AreaTitle = Area_Title_Txt;
-
             WirePackageSettings.Save(ALS.WirePackSettings);
         }
 
@@ -52,7 +60,6 @@ namespace JPMorrow.UI.ViewModels
             bool ResetHangers = false;
             bool ResetAutomaticWire = false;
             bool ResetPackageSettings = false;
-
 
             try
             {

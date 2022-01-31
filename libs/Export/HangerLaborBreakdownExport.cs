@@ -5,6 +5,7 @@ using JPMorrow.Revit.Documents;
 using JPMorrow.Revit.Hangers;
 using JPMorrow.Revit.Labor;
 using JPMorrow.Revit.Measurements;
+using JPMorrow.Tools.Diagnostics;
 using OfficeOpenXml.Style;
 using Draw = System.Drawing;
 
@@ -85,10 +86,17 @@ namespace JPMorrow.Excel
                 ht.RodCouplings.RemoveAll(x => x.Count == 0);
 
                 // Conduit Straps
-                strut_hangers.ForEach(x => x.Straps.ToList().ForEach(y =>
-                ht.PushConduitStraps("Strut Strap", y.Diameter, y.Count)));
-
+                strut_hangers.ForEach(x => x.Straps.ToList().ForEach(y => ht.PushConduitStraps("Strut Strap", y.Diameter, y.Count)));
                 ht.ConduitStraps.RemoveAll(x => x.Count == 0);
+
+                // delete later
+                /*
+                var total_cri_len = data_package.GetSelectedConduitPackage().Cris.Select(x => x.Length).Sum();
+                var total_strap_cnt = ht.ConduitStraps.Select(x => x.Count).Sum();
+                var errr = total_strap_cnt.ToString() + " straps:\n" + string.Join("\n", ht.ConduitStraps.Select(x => x.Type + " " + x.Diameter + " " + x.Count)) + "\n";
+                errr += total_cri_len + " / " + "8ft = " + ((int)(total_cri_len / 8.0)).ToString() + "\n\n";
+                debugger.debug_show(err: errr);
+                */
 
                 // Threaded Rod
                 fixture_hangers.ForEach(x => ht.PushThreadedRod("Threaded Rod", sflen(x), x.RodLength));

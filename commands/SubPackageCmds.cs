@@ -156,6 +156,17 @@ namespace JPMorrow.UI.ViewModels
             try
             {
                 Update("SelConduitPackage");
+                Update("ConduitPackageNameItems");
+
+                var has_valid_idx = ConduitPackageNameItems.Any() && SelConduitPackage >= 0 && SelConduitPackage < ConduitPackageNameItems.Count;
+                // prompt user if problem loading package
+                if (!has_valid_idx)
+                {
+                    debugger.show(header: "Conduit Sub Package Selection Changed", err: "Failed to load selected conduit sub package.\nConduit Sub Package Index: " + SelConduitPackage + "\nLoading default sub package.");
+                    SelConduitPackage = 0;
+                    Update("SelConduitPackage");
+                }
+
                 var package_name = ConduitPackageNameItems[SelConduitPackage];
                 if (string.IsNullOrWhiteSpace(package_name))
                     throw new Exception("The selectd package name does not exist.");
@@ -208,6 +219,17 @@ namespace JPMorrow.UI.ViewModels
             try
             {
                 Update("SelHangerPackage");
+                Update("HangerPackageNameItems");
+
+                var has_valid_idx = HangerPackageNameItems.Any() && SelHangerPackage >= 0 && SelHangerPackage < HangerPackageNameItems.Count;
+                // prompt user if problem loading package
+                if (!has_valid_idx)
+                {
+                    debugger.show(header: "Hanger Sub Package Selection Changed", err: "Failed to load selected Hanger sub package.\nHanger Sub Package Index: " + SelHangerPackage + "\nLoading default sub package.");
+                    SelHangerPackage = 0;
+                    Update("SelHangerPackage");
+                }
+
                 var package_name = HangerPackageNameItems[SelHangerPackage];
                 if (string.IsNullOrWhiteSpace(package_name))
                     throw new Exception("The selectd package name does not exist.");

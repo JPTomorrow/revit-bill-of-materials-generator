@@ -13,6 +13,8 @@ using System.Diagnostics;
 using JPMorrow.Revit.Hangers.Internal;
 using JPMorrow.Revit.Measurements;
 using JPMorrow.Data.Globals;
+using System.IO;
+using JPMorrow.Revit.Documents;
 
 namespace JPMorrow.UI.ViewModels
 {
@@ -36,8 +38,7 @@ namespace JPMorrow.UI.ViewModels
                     return;
                 }
 
-                ConduitRunInfo.ProcessCRIFromConduitId(
-                    ALS.Info, collected_els, ALS.AppData.GetSelectedConduitPackage().Cris);
+                var result = ConduitRunInfo.ProcessCRIFromConduitId(ALS.Info, collected_els, ALS.AppData.GetSelectedConduitPackage().Cris);
 
                 // add low voltage wire automatically if devices are recognized in to parameter
                 if (Automate_Wire)
@@ -49,6 +50,9 @@ namespace JPMorrow.UI.ViewModels
                         ALS.AppData.LowVoltageWirePairings);
                 }
 
+                // write log result to file
+                string path = ModelInfo.GetDataDirectory("test_files", true) + "AddAllRunsCmd.txt";
+                File.WriteAllText(path, result.Message);
 
                 WriteToLog("Runs Processed: " + ALS.AppData.GetSelectedConduitPackage().Cris.Count().ToString());
                 RefreshDataGrids(BOMDataGrid.All);
@@ -85,7 +89,7 @@ namespace JPMorrow.UI.ViewModels
 
                 var old_cris = new List<ConduitRunInfo>(ALS.AppData.GetSelectedConduitPackage().Cris);
 
-                ConduitRunInfo.ProcessCRIFromConduitId(
+                var result = ConduitRunInfo.ProcessCRIFromConduitId(
                     ALS.Info, collected_els, ALS.AppData.GetSelectedConduitPackage().Cris);
 
                 // add low voltage wire automatically if devices are recognized in to parameter
@@ -118,7 +122,7 @@ namespace JPMorrow.UI.ViewModels
                     WriteToLog("No conduit is selected");
                 }
 
-                ConduitRunInfo.ProcessCRIFromConduitId(
+                var result = ConduitRunInfo.ProcessCRIFromConduitId(
                     ALS.Info, ids, ALS.AppData.GetSelectedConduitPackage().Cris);
 
                 // add low voltage wire automatically if devices are recognized in to parameter

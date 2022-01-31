@@ -1,5 +1,7 @@
 using System;
+using System.Collections.Generic;
 using System.Linq;
+using Autodesk.Revit.DB;
 using JPMorrow.Revit.BOMPackage;
 using JPMorrow.Revit.ConduitRuns;
 using JPMorrow.Revit.Connectors;
@@ -13,6 +15,7 @@ using JPMorrow.Revit.Tools.ConduitFittings;
 using JPMorrow.Revit.VoltageDrop;
 using JPMorrow.Revit.WirePackage;
 using JPMorrow.Revit.Wires;
+using JPMorrow.Tools.Diagnostics;
 using OfficeOpenXml.Style;
 using Draw = System.Drawing;
 
@@ -45,17 +48,11 @@ namespace JPMorrow.Excel
             static double shave_labor(double labor) => labor * 0.82;
 
             WirePackageSettings wire_pack_settings = WirePackageSettings.Load();
-            var h = package.GetSelectedHardwarePackage().MiscHardwareEntries;
-            var fixture_hangers = package.GetSelectedHangerPackage().FixtureHangers;
-            var single_hangers = package.GetSelectedHangerPackage().SingleHangers;
-            var strut_hangers = package.GetSelectedHangerPackage().StrutHangers;
             var totaled_cris = ConduitTotal.GetTotaledConduit(info, package, pull_type).Conduit;
             var couplings = CouplingTotal.GetTotaledCouplings(info, package, pull_type).Couplings;
             var connectors = ConnectorTotal.GetTotaledConnectors(info, package, pull_type).Connectors;
             var wires = WireTotal.GetTotaledWire(package, pull_type).Wires;
-
-            // @DELETE @TODO discontinued services. delete later.
-            // var elbows = FittingTotal.GetTotaledFittings(info, package, pull_type).Fittings;
+            var elbows = FittingTotal.GetTotaledFittings(info, package, pull_type).Fittings;
 
             InsertSingleDivider(Draw.Color.SlateGray, Draw.Color.White, "Conduit");
 
@@ -87,6 +84,30 @@ namespace JPMorrow.Excel
                 code_one_gt += li.TotalLaborValue;
                 NextRow(1);
             }
+
+            /* TODO: fix elbows code for Rigid pupe and 90's count
+            foreach (var elbow in elbows)
+            {
+                double prune_angle = RMeasure.AngleDbl(info.DOC, "90\u00B0");
+                if (elbow.Fitting.Angle < prune_angle) continue;
+                var diameter = RMeasure.LengthFromDbl(info.DOC, elbow.Fitting.Diameter);
+
+                // prune diameter into pipe lengths
+                var length = elbow.Fitting.Diameter > RMeasure.LengthDbl(info.DOC, "2\"") ? RMeasure.LengthDbl(info.DOC, "18\"") : RMeasure.LengthDbl(info.DOC, "6\"");
+                length *= elbow.Count;
+
+                var has_item = l.GetItem(out var li, length, "Conduit", "RMC", diameter);
+                if (!has_item) throw new Exception("No Labor item for Conduit");
+
+                string coupling_name = "Conduit - Female Adapter - RNC - " + diameter + " Dia.";
+                InsertIntoRow(li.MakeEntryName(postfix: "Dia."), li.DisplayQuantity,
+                    li.PerUnitWithSuffix(" per ft."), li.LaborCodeLetter, li.TotalLaborValue);
+
+                gt += li.TotalLaborValue;
+                code_one_gt += li.TotalLaborValue;
+                NextRow(1);
+            }
+            */
 
             InsertGrandTotal("Sub Total", ref gt, true, false, true);
             #endregion
@@ -124,31 +145,74 @@ namespace JPMorrow.Excel
             }
             #endregion
 
-            /* @DELETE @TODO discontinued service. delete later.
+            // /* TODO: fix elbows code for Rigid pupe and 90's count
+            // WARNING THIS BYPASSES THE ELBOW CODE ABOVE COMING OUT OF THE SYSTEM
+            // INTEGRATE THIS INTO THE ELBOW SYSTEM
+
             #region Elbow Fittings Labor
-            if (elbows.Any())
+
+            var fitting_ids = new FilteredElementCollector(info.DOC, info.UIDOC.ActiveView.Id)
+                .OfCategory(BuiltInCategory.OST_ConduitFitting).ToElementIds();
+
+            // @TODO: will crash on branch
+            if (fitting_ids.Any() && pull_type == WireType.Distribution)
             {
                 InsertSingleDivider(Draw.Color.SlateGray, Draw.Color.White, "Elbows");
 
-                foreach (var elbow in elbows)
+                var proc_elbows = new List<TotaledFitting>();
+                foreach (var id in fitting_ids)
                 {
+                    // get fitting element
+                    var el = info.DOC.GetElement(id);
+                    var fitting = el as FamilyInstance;
+                    if (fitting == null) continue;
+                    // get family name
+                    var name = fitting.Symbol.Family.Name;
+                    // get value diameter string of fitting
+                    var value_diameter = el.LookupParameter("Nominal Diameter").AsValueString();
+                    // get fitting diameter as double
+                    var diameter_dbl = el.LookupParameter("Nominal Diameter").AsDouble();
+                    // array of fitting marterial types 
+                    var material_types = new List<string> { "EMT", "RMC", "RNC", "IMC", "PVC" };
+                    // check if fitting name containes any of the material types
+                    bool is_valid_material = material_types.Any(x => name.ToUpper().Contains(x));
 
-                    string elbow_type = ConduitRunInfo.ConduitMaterialTypes[0];
+                    var angle = el.LookupParameter("Angle").AsDouble();
+                    double prune_angle = RMeasure.AngleDbl(info.DOC, "90\u00B0");
 
-                    if (ConduitRunInfo.ConduitMaterialTypes.Any(x => elbow.Fitting.Type.ToUpper().Contains(x)))
+                    var tolerance = 0.000000000005;
+                    bool is_tolerant(double angle) => (angle <= prune_angle + tolerance && angle >= prune_angle - tolerance);
+                    bool is_almost_eq(double angle1, double angle2) => (angle1 <= angle2 + tolerance && angle1 >= angle2 - tolerance);
+
+                    if (is_valid_material && is_tolerant(angle))
                     {
-                        elbow_type = ConduitRunInfo.ConduitMaterialTypes
-                            .Where(x => elbow.Fitting.Type.ToUpper().Contains(x)).First();
-                    }
+                        // get fitting material type
+                        var material_type = material_types.First(x => name.ToUpper().Contains(x));
+                        // add to existing totaled fitting or add new entry to proc_elbows
+                        var idx = proc_elbows.FindIndex(x => is_almost_eq(x.Fitting.Angle, angle) && x.Fitting.Type.Equals(material_type) && x.Fitting.Diameter == diameter_dbl);
 
-                    var has_item = l.GetItem(out var li, (double)elbow.Count, "Fitting", elbow_type, elbow.Fitting.GetDiameterString(info));
+                        if (idx >= 0)
+                        {
+                            proc_elbows[idx].Count++;
+                        }
+                        else
+                        {
+                            var fitting_diameter = RMeasure.LengthDbl(info.DOC, value_diameter);
+                            Fitting entry = new Fitting(angle, diameter_dbl, material_type);
+                            proc_elbows.Add(new TotaledFitting(entry, 1));
+                        }
+                    }
+                }
+
+                foreach (var elbow in proc_elbows)
+                {
+                    var has_item = l.GetItem(out var li, (double)elbow.Count, "Fitting", elbow.Fitting.Type, elbow.Fitting.GetDiameterString(info));
                     if (!has_item) throw new Exception("No Labor item for elbows");
 
-                    var elbow_name = elbow.Fitting.Type + " - " + elbow.Fitting.GetDiameterString(info) + " Dia. - " + elbow.Fitting.GetAngleString(info) + " degrees";
-                    InsertIntoRow(elbow_name, li.Quantity, li.PerUnitLabor, li.LaborCodeLetter, li.TotalLaborValue);
 
-                    //@FIX: had needs extra couplings flag, dont know if still need
-                    //CouplingTotal.AssimilateCouplings(coupling_totals, new CouplingTotal(elbow_type, elbow.Fitting.GetDiameterString(info), 1));
+                    var degrees = elbow.Fitting.GetAngleString(info);
+                    var elbow_name = elbow.Fitting.Type + " - " + elbow.Fitting.GetDiameterString(info) + " Dia. - " + degrees + " degrees";
+                    InsertIntoRow(elbow_name, li.Quantity, li.PerUnitLabor, li.LaborCodeLetter, li.TotalLaborValue);
 
                     gt += li.TotalLaborValue;
                     code_one_gt += li.TotalLaborValue;
@@ -159,72 +223,34 @@ namespace JPMorrow.Excel
                 InsertGrandTotal("Sub Total", ref gt, true, false, true);
             }
             #endregion
-            */
 
-            #region Couplings Labor
+
+            #region Coupling and Connector Labor
             if (couplings.Any())
             {
                 InsertSingleDivider(Draw.Color.SlateGray, Draw.Color.White, "Couplings & Connectors");
-
-                foreach (var total in couplings)
-                {
-                    string coupling_type = ConduitRunInfo.ConduitMaterialTypes[0];
-                    if (total.Type.ToUpper().Contains("IMC")) continue;
-
-                    if (ConduitRunInfo.ConduitMaterialTypes.Any(x => total.Type.ToUpper().Contains(x)))
-                    {
-                        coupling_type = ConduitRunInfo.ConduitMaterialTypes.Where(x => total.Type.ToUpper().Contains(x)).First();
-                    }
-
-                    var c_type = coupling_type.ToUpper().Contains("RNC") || coupling_type.Equals("PVC") ? "Standard" : wire_pack_settings.CouplingType;
-
-                    var has_item = l.GetItem(out var li, (double)total.Count, "Coupling", c_type, coupling_type, total.Diameter);
-                    if (!has_item) throw new Exception("No Labor item for couplings");
-
-                    string coupling_name = "Coupling - " + coupling_type + " - " + total.Diameter + " Dia.";
-                    InsertIntoRow(coupling_name, li.Quantity, li.PerUnitLabor, li.LaborCodeLetter, li.TotalLaborValue);
-
-                    gt += li.TotalLaborValue;
-                    code_one_gt += li.TotalLaborValue;
-                    NextRow(1);
-                }
+                foreach (var total in couplings) GetCouplingLabor(l, total, wire_pack_settings.CouplingType, ref code_one_gt, ref gt);
             }
-            #endregion
 
-            #region Connectors Labor
             if (connectors.Any())
             {
-                foreach (var total in connectors)
-                {
-                    string connector_type = ConduitRunInfo.ConduitMaterialTypes[0];
-                    if (ConduitRunInfo.ConduitMaterialTypes.Any(x => total.Type.ToUpper().Contains(x)))
-                    {
-                        connector_type = ConduitRunInfo.ConduitMaterialTypes.Where(x => total.Type.ToUpper().Contains(x)).First();
-                    }
-
-                    var c_type = connector_type.ToUpper().Contains("RNC") || connector_type.Equals("PVC") || connector_type.Equals("IMC") ? "Female Adapter" : wire_pack_settings.CouplingType;
-
-                    var has_item = l.GetItem(out var li, (double)total.Count, "Connector", c_type, connector_type, total.Diameter);
-                    if (!has_item) throw new Exception("No Labor item for connectors");
-
-                    string connector_name = "Connector - " + connector_type + " - " + total.Diameter + " Dia.";
-                    InsertIntoRow(connector_name, li.Quantity, li.PerUnitLabor, li.LaborCodeLetter, li.TotalLaborValue);
-
-                    gt += li.TotalLaborValue;
-                    code_one_gt += li.TotalLaborValue;
-                    NextRow(1);
-                }
+                foreach (var total in connectors) GetConnectorLabor(l, total, wire_pack_settings.CouplingType, ref code_one_gt, ref gt);
             }
 
             if (couplings.Any() || connectors.Any()) InsertGrandTotal("Sub Total", ref gt, true, false, true);
             #endregion
 
             #region Misc Hardware Labor
+            var h = package.GetSelectedHardwarePackage().MiscHardwareEntries;
+            var fixture_hangers = package.GetSelectedHangerPackage().FixtureHangers;
+            var single_hangers = package.GetSelectedHangerPackage().SingleHangers;
+            var strut_hangers = package.GetSelectedHangerPackage().StrutHangers;
 
             // local functions for hanger hardware
             string sslen(SingleHanger x) => RMeasure.LengthFromDbl(info.DOC, x.RodDiameter);
             string stlen(StrutHanger x) => RMeasure.LengthFromDbl(info.DOC, x.RodDiameter);
             string sflen(FixtureHanger x) => RMeasure.LengthFromDbl(info.DOC, x.RodDiameter);
+
 
             if (h.Any())
             {
@@ -241,6 +267,8 @@ namespace JPMorrow.Excel
                     if (li.EntryName.ToLower().Contains("washer"))
                     {
                         HangerTotal ht = new HangerTotal();
+
+                        // half inch washer counts from hanger anchor count
 
                         fixture_hangers.ForEach(x => ht.PushWashers(
                             "Washer", sflen(x), x.Hardware.Where(x => x == "Washer").Count()));
@@ -320,6 +348,73 @@ namespace JPMorrow.Excel
             ChangeColumnWidth('A', 50);
 
             HasData = true;
+        }
+
+        public void GetCouplingLabor(LaborExchange l, TotaledCoupling total, string coupling_type, ref double code_one_gt, ref double gt)
+        {
+            string coupling_mat_type = ConduitRunInfo.ConduitMaterialTypes[0];
+            if (total.Type.ToUpper().Contains("IMC")) return;
+
+            if (ConduitRunInfo.ConduitMaterialTypes.Any(x => total.Type.ToUpper().Contains(x)))
+            {
+                coupling_mat_type = ConduitRunInfo.ConduitMaterialTypes.Where(x => total.Type.ToUpper().Contains(x)).First();
+            }
+
+            var c_type = coupling_type;
+            if (coupling_mat_type.ToUpper().Contains("RNC") || coupling_mat_type.Equals("PVC")) c_type = "Standard";
+
+            var has_item = l.GetItem(out var li, (double)total.Count, "Coupling", c_type, coupling_mat_type, total.Diameter);
+            if (!has_item) throw new Exception("No Labor item for couplings " + ("-> Coupling " + c_type + " " + coupling_mat_type + " " + total.Diameter));
+
+            string coupling_name = "Coupling - " + coupling_type + " - " + total.Diameter + " Dia.";
+            InsertIntoRow(coupling_name, li.Quantity, li.PerUnitLabor, li.LaborCodeLetter, li.TotalLaborValue);
+
+            gt += li.TotalLaborValue;
+            code_one_gt += li.TotalLaborValue;
+            NextRow(1);
+        }
+
+        /// <summary>
+        /// get labor for connectors
+        /// </summary>
+        private void GetConnectorLabor(LaborExchange l, TotaledConnector total, string coupling_type, ref double code_one_gt, ref double gt)
+        {
+            string connector_type = ConduitRunInfo.ConduitMaterialTypes[0];
+            if (ConduitRunInfo.ConduitMaterialTypes.Any(x => total.Type.ToUpper().Contains(x)))
+            {
+                connector_type = ConduitRunInfo.ConduitMaterialTypes.Where(x => total.Type.ToUpper().Contains(x)).First();
+            }
+
+            var c_type = connector_type.ToUpper().Contains("RNC") || connector_type.Equals("PVC") || connector_type.Equals("IMC") ? "Female Adapter" : coupling_type;
+
+            var has_item = l.GetItem(out var li, (double)total.Count, "Connector", c_type, connector_type, total.Diameter);
+            if (!has_item) throw new Exception("No Labor item for connectors");
+
+            string connector_name = "Connector - " + connector_type + " - " + total.Diameter + " Dia.";
+            InsertIntoRow(connector_name, li.Quantity, li.PerUnitLabor, li.LaborCodeLetter, li.TotalLaborValue);
+
+            gt += li.TotalLaborValue;
+            code_one_gt += li.TotalLaborValue;
+            NextRow(1);
+
+            /* TODO: fix elbows code for Rigid pupe and 90's count
+            foreach (var elbow in elbows)
+            {
+                double prune_angle = RMeasure.AngleDbl(info.DOC, "90\u00B0");
+                if (elbow.Fitting.Angle < prune_angle) continue;
+                var diameter = RMeasure.LengthFromDbl(info.DOC, elbow.Fitting.Diameter);
+
+                var has_item = l.GetItem(out var li, elbow.Count, "Connector", "Female Adapter", "RNC", diameter);
+                if (!has_item) throw new Exception("No Labor item for Connector");
+
+                string coupling_name = "Connector - Female Adapter - RNC - " + diameter + " Dia.";
+                InsertIntoRow(coupling_name, li.Quantity, li.PerUnitLabor, li.LaborCodeLetter, li.TotalLaborValue);
+
+                gt += li.TotalLaborValue;
+                code_one_gt += li.TotalLaborValue;
+                NextRow(1);
+            }
+            */
         }
     }
 }

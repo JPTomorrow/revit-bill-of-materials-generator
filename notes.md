@@ -1,16 +1,3 @@
-<style>
-th {
-    display:none;
-}
-
-td {
-    outline: thin solid #fff;
-}
-img {
-    width: 100%;
-}
-</style>
-
 # Searchable Work Tags
 - @TODO
 - @DELETE
@@ -19,9 +6,12 @@ img {
 <br/><br/>
 
 # Todo
-- Fix accumulating strut straps between runs
 - Fix 1/2" washers and hex nuts [0.016	C] and [0.02	C] respectively  not showing up
-- Add [Caddy 4Z34812M Multi Function Clip	63	0.08	C] x1 for every helicopter bracket
+- Fix accumulating strut straps between runs
+- Add [Caddy 4Z34812M Multi Function ] x1 for every helicopter bracket
+- 2x square washers and 1x hex nut per threaded rod
+- Show Elbows above 1 1/4" on distribution
+- Don't show elbows on branch
 - (12/2/21) Update labor tab GUI
 - (12/2/21) Update Hardware tab GUI
 - (12/2/21) Update Voltage Drop GUI
@@ -32,7 +22,10 @@ img {
 - (12/2/21) Fix Help Menu GUI
 
 # Completed
-- User needs to be able to set a location for the BOM Exports.
+- fix duplicate area folder craeted when exporting (i.e. excel/2B/2B and pdf/2B/2B 2B would be the area folder)
+- fix new package not displaying the correct root export path
+- Fixed Sub-Package Selection errors when loading package
+- User needs to be able to set a location for the BOM Exports
 - Making a sub package now creates it in all categories
 - Remove 10' from all runs to account for elec rooms
 - HR boxes should use 1/4" thread by default
@@ -60,3 +53,16 @@ img {
 |||
 |-----|------|
 | asd | 1    |
+
+<style>
+th {
+    display:none;
+}
+
+td {
+    outline: thin solid #fff;
+}
+img {
+    width: 100%;
+}
+</style>
