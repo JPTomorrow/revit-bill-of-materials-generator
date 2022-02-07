@@ -330,8 +330,7 @@ namespace JPMorrow.Revit.Hangers
         /// </summary>
         public void PushConduitStraps(string type, string dia, int cnt)
         {
-            int index = ConduitStraps
-                .FindIndex(ind => ind.Type.Equals(type) && ind.Diameter.Equals(dia));
+            int index = ConduitStraps.FindIndex(ind => ind.Type.Equals(type) && ind.Diameter.Equals(dia));
 
             if (index > -1)
             {

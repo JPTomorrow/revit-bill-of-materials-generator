@@ -1,3 +1,4 @@
+using System;
 using System.IO;
 using System.Linq;
 using System.Windows;
@@ -283,10 +284,11 @@ namespace JPMorrow.UI.ViewModels
         /// </summary>
         public void WriteToLog(string str)
         {
-
-            var append_line = str + "\n";
+            // get current date and time as string
+            string date_time = DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss");
+            var append_line = date_time + " -> " + str + "\n";
             Action_Log += append_line;
-            Current_Action_String = str;
+            Current_Action_String = append_line;
             File.AppendAllText(Action_Log_File_Path, append_line);
             Update("Action_Log");
             Update("Current_Action_String");

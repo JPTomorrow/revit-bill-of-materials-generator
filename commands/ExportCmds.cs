@@ -159,7 +159,8 @@ namespace JPMorrow.UI.ViewModels
                 {
                     ExcelOutputSheet s1 = new ExcelOutputSheet(ExportStyle.Labor);
                     exporter.RegisterSheets("hanger labor", s1);
-                    s1.GenerateHangerLaborBreakdown(ALS.Info, ALS.AppData);
+                    var wire_type = export_branch ? WireType.Branch : WireType.Distribution;
+                    s1.GenerateHangerLaborBreakdown(ALS.Info, ALS.AppData, wire_type);
                 }
 
                 if (export_elecroom)

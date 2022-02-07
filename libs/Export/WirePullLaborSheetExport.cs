@@ -164,8 +164,12 @@ namespace JPMorrow.Excel
                 {
                     // get fitting element
                     var el = info.DOC.GetElement(id);
+                    if (el == null || el.Category.Name != "Conduit Fittings") continue;
                     var fitting = el as FamilyInstance;
                     if (fitting == null) continue;
+                    if (el.LookupParameter("Angle") == null || el.LookupParameter("Nominal Diameter") == null) continue;
+
+
                     // get family name
                     var name = fitting.Symbol.Family.Name;
                     // get value diameter string of fitting

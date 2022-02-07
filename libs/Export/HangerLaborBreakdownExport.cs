@@ -1,10 +1,12 @@
 using System;
 using System.Linq;
 using JPMorrow.Revit.BOMPackage;
+using JPMorrow.Revit.ConduitRuns;
 using JPMorrow.Revit.Documents;
 using JPMorrow.Revit.Hangers;
 using JPMorrow.Revit.Labor;
 using JPMorrow.Revit.Measurements;
+using JPMorrow.Revit.Wires;
 using JPMorrow.Tools.Diagnostics;
 using OfficeOpenXml.Style;
 using Draw = System.Drawing;
@@ -16,7 +18,7 @@ namespace JPMorrow.Excel
         /// <summary>
         /// Export a hanger labor hours breakdown sheet
         /// </summary>
-        public void GenerateHangerLaborBreakdown(ModelInfo info, MasterDataPackage data_package)
+        public void GenerateHangerLaborBreakdown(ModelInfo info, MasterDataPackage data_package, WireType pull_type)
         {
 
             if (HasData) throw new Exception("The sheet already has data");
@@ -195,9 +197,11 @@ namespace JPMorrow.Excel
                     gt += li.TotalLaborValue; code_one_gt += li.TotalLaborValue; NextRow(1);
                 } */
 
-                foreach (var c in ht.ConduitStraps)
+                var totaled_cris = ConduitTotal.GetTotaledConduit(info, package, pull_type).Conduit;
+
+                foreach (var c in totaled_cris)
                 {
-                    var has_item = l.GetItem(out var li, (double)c.Count, "Strut Strap", c.Diameter);
+                    var has_item = l.GetItem(out var li, (int)(Math.Round(c.Length) / 8), "Strut Strap", c.Diameter);
                     if (!has_item) throw new Exception("No Labor item for conduit straps");
                     string strap_name = "Strut Strap - " + c.Diameter + " Dia.";
                     InsertIntoRow(strap_name, li.Quantity, li.PerUnitLabor, li.LaborCodeLetter, li.TotalLaborValue);

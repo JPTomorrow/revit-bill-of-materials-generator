@@ -7,11 +7,8 @@
 
 # Todo
 - Fix 1/2" washers and hex nuts [0.016	C] and [0.02	C] respectively  not showing up
-- Fix accumulating strut straps between runs
 - Add [Caddy 4Z34812M Multi Function ] x1 for every helicopter bracket
 - 2x square washers and 1x hex nut per threaded rod
-- Show Elbows above 1 1/4" on distribution
-- Don't show elbows on branch
 - (12/2/21) Update labor tab GUI
 - (12/2/21) Update Hardware tab GUI
 - (12/2/21) Update Voltage Drop GUI
@@ -22,6 +19,9 @@
 - (12/2/21) Fix Help Menu GUI
 
 # Completed
+- Show Elbows above 1 1/4" on distribution
+- Don't show elbows on branch
+- Fix accumulating strut straps between runs
 - fix duplicate area folder craeted when exporting (i.e. excel/2B/2B and pdf/2B/2B 2B would be the area folder)
 - fix new package not displaying the correct root export path
 - Fixed Sub-Package Selection errors when loading package
