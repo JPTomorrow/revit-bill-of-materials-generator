@@ -160,7 +160,6 @@ namespace JPMorrow.Revit.VoltageDrop
 
         public static IEnumerable<VoltageDropRule> OrderByPrecedence(this List<VoltageDropRule> source)
         {
-
             return source.OrderBy(x => x.LongerThanDistance).ToList();
         }
 

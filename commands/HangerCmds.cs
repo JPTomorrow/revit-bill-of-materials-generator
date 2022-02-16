@@ -20,22 +20,36 @@ namespace JPMorrow.UI.ViewModels
     {
         public void SingleHangerSelChanged(Window window)
         {
-            var single_ids = Single_Hanger_Items
-            .Where(x => x.IsSelected)
-            .Select(x => new ElementId(x.Value.HangerFamilyInstanceId))
-            .ToList();
+            try
+            {
+                var single_ids = Single_Hanger_Items
+                    .Where(x => x.IsSelected)
+                    .Select(x => new ElementId(x.Value.HangerFamilyInstanceId))
+                    .ToList();
 
-            ALS.Info.SEL.SetElementIds(single_ids);
+                ALS.Info.SEL.SetElementIds(single_ids);
+            }
+            catch (Exception ex)
+            {
+                debugger.show(header: "Single Hanger Selection Changed", err: ex.Message);
+            }
         }
 
         public void StrutHangerSelChanged(Window window)
         {
-            var strut_ids = Strut_Hanger_Items
+            try
+            {
+                var strut_ids = Strut_Hanger_Items
                 .Where(x => x.IsSelected)
                 .Select(x => new ElementId(x.Value.HangerFamilyInstanceId))
                 .ToList();
 
-            ALS.Info.SEL.SetElementIds(strut_ids);
+                ALS.Info.SEL.SetElementIds(strut_ids);
+            }
+            catch (Exception ex)
+            {
+                debugger.show(header: "Strut Hanger Selection Changed", err: ex.Message);
+            }
         }
 
         // add single hangers
@@ -52,20 +66,16 @@ namespace JPMorrow.UI.ViewModels
 
                 List<SingleHanger> singles = new List<SingleHanger>();
 
-                var mrl = RMeasure.LengthDbl(ALS.Info.DOC, HO_Single_Min_Rod_Len_Txt);
-                var diameter = RMeasure.LengthDbl(ALS.Info.DOC, Rod_Diameter_Items[Sel_Single_Rod_Diameter]);
-                var nominal_spacing = RMeasure.LengthDbl(ALS.Info.DOC, Nominal_Hanger_Spacing_Txt);
-                var bend_spacing = RMeasure.LengthDbl(ALS.Info.DOC, Bend_Hanger_Spacing_Txt);
-                var att_type = Single_Att_Type_Items[Sel_Single_Att];
-
-                HangerOptions opts = new HangerOptions();
-                opts.SingleAttType = att_type;
-                opts.RodDiameter = diameter;
-                opts.MinRodLength = mrl;
-                opts.NominalSpacing = nominal_spacing;
-                opts.BendSpacing = bend_spacing;
-                opts.DrawSingleHangerModelGeometry = Draw_Single_Debug;
-                opts.DrawStrutHangerModelGeometry = Draw_Strut_Debug;
+                HangerOptions opts = new HangerOptions()
+                {
+                    SingleAttType = Single_Att_Type_Items[Sel_Single_Att],
+                    RodDiameter = RMeasure.LengthDbl(ALS.Info.DOC, Rod_Diameter_Items[Sel_Single_Rod_Diameter]),
+                    MinRodLength = RMeasure.LengthDbl(ALS.Info.DOC, HO_Single_Min_Rod_Len_Txt),
+                    NominalSpacing = RMeasure.LengthDbl(ALS.Info.DOC, Nominal_Hanger_Spacing_Txt),
+                    BendSpacing = RMeasure.LengthDbl(ALS.Info.DOC, Bend_Hanger_Spacing_Txt),
+                    DrawSingleHangerModelGeometry = Draw_Single_Debug,
+                    DrawStrutHangerModelGeometry = Draw_Strut_Debug,
+                };
 
                 var hangers = SingleHanger.CreateSingleHangers(
                     ALS.Info, ThisApplication.Hanger_View, ids, opts);
@@ -77,7 +87,7 @@ namespace JPMorrow.UI.ViewModels
             }
             catch (Exception ex)
             {
-                debugger.show(err: ex.ToString());
+                debugger.show(header: "Add Single Hangers", err: ex.Message);
             }
         }
 
@@ -112,13 +122,11 @@ namespace JPMorrow.UI.ViewModels
                 WriteToLog("Added hardware entry for '4 in. sq. box'");
                 WriteToLog("Added labor entry for '4 in. sq. box'");
 
-                // generate fixture hangers
-                var mrl = RMeasure.LengthDbl(ALS.Info.DOC, HO_Single_Min_Rod_Len_Txt);
-                var diameter = RMeasure.LengthDbl(ALS.Info.DOC, Rod_Diameter_Items[Sel_Single_Rod_Diameter]);
-
-                HangerOptions opts = new HangerOptions();
-                opts.RodDiameter = diameter;
-                opts.MinRodLength = mrl;
+                HangerOptions opts = new HangerOptions()
+                {
+                    RodDiameter = RMeasure.LengthDbl(ALS.Info.DOC, Rod_Diameter_Items[Sel_Single_Rod_Diameter]),
+                    MinRodLength = RMeasure.LengthDbl(ALS.Info.DOC, HO_Single_Min_Rod_Len_Txt),
+                };
 
                 foreach (var id in box_ids)
                 {
@@ -138,7 +146,7 @@ namespace JPMorrow.UI.ViewModels
             }
             catch (Exception ex)
             {
-                debugger.show(err: ex.ToString());
+                debugger.show(header: "Add Fixture Hangers", err: ex.Message);
             }
         }
 
@@ -167,24 +175,18 @@ namespace JPMorrow.UI.ViewModels
                         tray_ids.Add(id);
                 }
 
-                var m_span = RMeasure.LengthDbl(ALS.Info.DOC, HO_Max_Span_Txt);
-                var irg = RMeasure.LengthDbl(ALS.Info.DOC, HO_IRGap_Txt);
-                var oesl = RMeasure.LengthDbl(ALS.Info.DOC, HO_OESLength_Txt);
-                var mrl = RMeasure.LengthDbl(ALS.Info.DOC, HO_Strut_Min_Rod_Len_Txt);
-                var nominal_spacing = RMeasure.LengthDbl(ALS.Info.DOC, Nominal_Hanger_Spacing_Txt);
-                var bend_spacing = RMeasure.LengthDbl(ALS.Info.DOC, Bend_Hanger_Spacing_Txt);
-                var rod_diameter = RMeasure.LengthDbl(ALS.Info.DOC, Rod_Diameter_Items[Sel_Strut_Rod_Diameter]);
-
-                HangerOptions opts = new HangerOptions();
-                opts.MaxStrutGapSpan = m_span;
-                opts.RodDiameter = rod_diameter;
-                opts.InsideRodGap = irg;
-                opts.OutsideRodExtraLength = oesl;
-                opts.MinRodLength = mrl;
-                opts.NominalSpacing = nominal_spacing;
-                opts.BendSpacing = bend_spacing;
-                opts.DrawSingleHangerModelGeometry = Draw_Single_Debug;
-                opts.DrawStrutHangerModelGeometry = Draw_Strut_Debug;
+                HangerOptions opts = new HangerOptions()
+                {
+                    MaxStrutGapSpan = RMeasure.LengthDbl(ALS.Info.DOC, HO_Max_Span_Txt),
+                    RodDiameter = RMeasure.LengthDbl(ALS.Info.DOC, Rod_Diameter_Items[Sel_Strut_Rod_Diameter]),
+                    InsideRodGap = RMeasure.LengthDbl(ALS.Info.DOC, HO_IRGap_Txt),
+                    OutsideRodExtraLength = RMeasure.LengthDbl(ALS.Info.DOC, HO_OESLength_Txt),
+                    MinRodLength = RMeasure.LengthDbl(ALS.Info.DOC, HO_Strut_Min_Rod_Len_Txt),
+                    NominalSpacing = RMeasure.LengthDbl(ALS.Info.DOC, Nominal_Hanger_Spacing_Txt),
+                    BendSpacing = RMeasure.LengthDbl(ALS.Info.DOC, Bend_Hanger_Spacing_Txt),
+                    DrawSingleHangerModelGeometry = Draw_Single_Debug,
+                    DrawStrutHangerModelGeometry = Draw_Strut_Debug,
+                };
 
                 List<StrutHanger> hangers = new List<StrutHanger>();
                 if (conduit_ids.Any())
@@ -211,7 +213,7 @@ namespace JPMorrow.UI.ViewModels
             }
             catch (Exception ex)
             {
-                debugger.show(header: "HangerCmds", err: ex.Message);
+                debugger.show(header: "Add Strut Hangers", err: ex.Message);
             }
         }
 
@@ -247,25 +249,18 @@ namespace JPMorrow.UI.ViewModels
                     return;
                 }
 
-                // set hanger option properties
-                var m_span = RMeasure.LengthDbl(ALS.Info.DOC, HO_Max_Span_Txt);
-                var irg = RMeasure.LengthDbl(ALS.Info.DOC, HO_IRGap_Txt);
-                var oesl = RMeasure.LengthDbl(ALS.Info.DOC, HO_OESLength_Txt);
-                var mrl = RMeasure.LengthDbl(ALS.Info.DOC, HO_Strut_Min_Rod_Len_Txt);
-                var nominal_spacing = RMeasure.LengthDbl(ALS.Info.DOC, Nominal_Hanger_Spacing_Txt);
-                var bend_spacing = RMeasure.LengthDbl(ALS.Info.DOC, Bend_Hanger_Spacing_Txt);
-                var rod_diameter = RMeasure.LengthDbl(ALS.Info.DOC, Rod_Diameter_Items[Sel_Strut_Rod_Diameter]);
-
-                HangerOptions opts = new HangerOptions();
-                opts.MaxStrutGapSpan = m_span;
-                opts.RodDiameter = rod_diameter;
-                opts.InsideRodGap = irg;
-                opts.OutsideRodExtraLength = oesl;
-                opts.MinRodLength = mrl;
-                opts.NominalSpacing = nominal_spacing;
-                opts.BendSpacing = bend_spacing;
-                opts.DrawSingleHangerModelGeometry = Draw_Single_Debug;
-                opts.DrawStrutHangerModelGeometry = Draw_Strut_Debug;
+                HangerOptions opts = new HangerOptions()
+                {
+                    MaxStrutGapSpan = RMeasure.LengthDbl(ALS.Info.DOC, HO_Max_Span_Txt),
+                    RodDiameter = RMeasure.LengthDbl(ALS.Info.DOC, Rod_Diameter_Items[Sel_Strut_Rod_Diameter]),
+                    InsideRodGap = RMeasure.LengthDbl(ALS.Info.DOC, HO_IRGap_Txt),
+                    OutsideRodExtraLength = RMeasure.LengthDbl(ALS.Info.DOC, HO_OESLength_Txt),
+                    MinRodLength = RMeasure.LengthDbl(ALS.Info.DOC, HO_Strut_Min_Rod_Len_Txt),
+                    NominalSpacing = RMeasure.LengthDbl(ALS.Info.DOC, Nominal_Hanger_Spacing_Txt),
+                    BendSpacing = RMeasure.LengthDbl(ALS.Info.DOC, Bend_Hanger_Spacing_Txt),
+                    DrawSingleHangerModelGeometry = Draw_Single_Debug,
+                    DrawStrutHangerModelGeometry = Draw_Strut_Debug,
+                };
 
                 // create hangers
                 List<StrutHanger> hangers = new List<StrutHanger>();
@@ -283,87 +278,67 @@ namespace JPMorrow.UI.ViewModels
             }
             catch (Exception ex)
             {
-                debugger.show(header: "HangerCmds", err: ex.Message);
+                debugger.show(header: "Add Quick Strut Hangers", err: ex.Message);
             }
         }
 
         // Remove single hangers from model
         public void RemoveSingleHangers(Window window)
         {
-            var single_presenters = Single_Hanger_Items.Where(x => x.IsSelected).ToList();
-            var fixture_presenters = Fixture_Hanger_Items.Where(x => x.IsSelected).ToList();
-
-            var cnt = single_presenters.Count + fixture_presenters.Count;
-            if (cnt <= 0) return;
-
-            var hanger_fam_ids = single_presenters.Select(x => x.Value.HangerFamilyInstanceId).ToList();
-            RvtElementDeletion.DeleteRevitElements(ALS.Info, hanger_fam_ids.Select(x => new ElementId(x)));
-
-            if (single_presenters.Any())
+            try
             {
-                single_presenters.ForEach(x => Single_Hanger_Items.Remove(x));
-                single_presenters.Select(x => x.Value).ToList().ForEach(x => ALS.AppData.GetSelectedHangerPackage().SingleHangers.Remove(x));
-                WriteToLog("Removed " + single_presenters.Count + " single hangers.");
-            }
+                var single_presenters = Single_Hanger_Items.Where(x => x.IsSelected).ToList();
+                var fixture_presenters = Fixture_Hanger_Items.Where(x => x.IsSelected).ToList();
 
-            if (fixture_presenters.Any())
+                var cnt = single_presenters.Count + fixture_presenters.Count;
+                if (cnt <= 0) return;
+
+                var hanger_fam_ids = single_presenters.Select(x => x.Value.HangerFamilyInstanceId).ToList();
+                RvtElementDeletion.DeleteRevitElements(ALS.Info, hanger_fam_ids.Select(x => new ElementId(x)));
+
+                if (single_presenters.Any())
+                {
+                    single_presenters.ForEach(x => Single_Hanger_Items.Remove(x));
+                    single_presenters.Select(x => x.Value).ToList().ForEach(x => ALS.AppData.GetSelectedHangerPackage().SingleHangers.Remove(x));
+                    WriteToLog("Removed " + single_presenters.Count + " single hangers.");
+                }
+
+                if (fixture_presenters.Any())
+                {
+                    fixture_presenters.ForEach(x => Fixture_Hanger_Items.Remove(x));
+                    fixture_presenters.Select(x => x.Value).ToList().ForEach(x => ALS.AppData.GetSelectedHangerPackage().FixtureHangers.Remove(x));
+                    WriteToLog("Removed " + fixture_presenters.Count + " fixture hangers.");
+                }
+
+                RefreshDataGrids(BOMDataGrid.Hangers);
+            }
+            catch (Exception ex)
             {
-                fixture_presenters.ForEach(x => Fixture_Hanger_Items.Remove(x));
-                fixture_presenters.Select(x => x.Value).ToList().ForEach(x => ALS.AppData.GetSelectedHangerPackage().FixtureHangers.Remove(x));
-                WriteToLog("Removed " + fixture_presenters.Count + " fixture hangers.");
+                debugger.show(header: "Remove Single Hangers", err: ex.Message);
             }
-
-            RefreshDataGrids(BOMDataGrid.Hangers);
         }
 
         // Remove strut hangers from the model
         public void RemoveStrutHangers(Window window)
         {
-            var presenters = Strut_Hanger_Items.Where(x => x.IsSelected).ToList();
-            if (!presenters.Any()) return;
-
-            var hanger_fam_ids = presenters.Select(x => x.Value.HangerFamilyInstanceId).ToList();
-            RvtElementDeletion.DeleteRevitElements(ALS.Info, hanger_fam_ids.Select(x => new ElementId(x)));
-            presenters.ForEach(x => Strut_Hanger_Items.Remove(x));
-            presenters.Select(x => x.Value).ToList().ForEach(x => ALS.AppData.GetSelectedHangerPackage().StrutHangers.Remove(x));
-
-            RefreshDataGrids(BOMDataGrid.Hangers);
-            WriteToLog("Removed " + presenters.Count + " Strut hangers.");
-            UpdateTotalStrutLengthLabel();
-        }
-
-        public void RestoreHangers(Window window)
-        {
-            /*
             try
             {
-                var ids = Run_Items.SelectMany(x => x.Value.ConduitIds).Select(x => new ElementId(x)).ToList();
+                var presenters = Strut_Hanger_Items.Where(x => x.IsSelected).ToList();
+                if (!presenters.Any()) return;
 
-                if (!ids.Any())
-                {
-                    debugger.show(err: "There were no conduits in view to process.");
-                    return;
-                }
+                var hanger_fam_ids = presenters.Select(x => x.Value.HangerFamilyInstanceId).ToList();
+                RvtElementDeletion.DeleteRevitElements(ALS.Info, hanger_fam_ids.Select(x => new ElementId(x)));
+                presenters.ForEach(x => Strut_Hanger_Items.Remove(x));
+                presenters.Select(x => x.Value).ToList().ForEach(x => ALS.AppData.GetSelectedHangerPackage().StrutHangers.Remove(x));
 
-                UnitFormatUtils.TryParse(Info.DOC.GetUnits(), UnitType.UT_Length,
-                             HO_Single_Min_Rod_Len_Txt, out double mrl, out string mrl_msg);
-
-                var hangers = HangerRestoreUtil.RestoreHangersInView(Info, ids, ThisApplication.Hanger_View, mrl);
-
-                ALS.AppData.SingleHangers.AddRange(hangers.SingleHangers);
-                var single_cnt = ALS.AppData.SingleHangers.Count();
-                WriteToLog("Added " + single_cnt + " single hangers.");
-
-                ALS.AppData.StrutHangers.AddRange(hangers.StrutHangers);
-                var strut_cnt = ALS.AppData.StrutHangers.Count;
                 RefreshDataGrids(BOMDataGrid.Hangers);
-                WriteToLog("Added " + strut_cnt + " strut hangers.");
+                WriteToLog("Removed " + presenters.Count + " Strut hangers.");
+                UpdateTotalStrutLengthLabel();
             }
             catch (Exception ex)
             {
-                debugger.show(err: ex.ToString());
+                debugger.show(header: "Remove Strut Hangers", err: ex.Message);
             }
-            */
         }
 
         public void UpdateTotalStrutLengthLabel()

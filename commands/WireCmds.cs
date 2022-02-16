@@ -78,7 +78,7 @@ namespace JPMorrow.UI.ViewModels
             }
             catch (Exception ex)
             {
-                debugger.show(err: ex.ToString());
+                debugger.show(header: "Add Brach Wire", err: ex.Message);
             }
         }
 
@@ -126,7 +126,7 @@ namespace JPMorrow.UI.ViewModels
             }
             catch (Exception ex)
             {
-                debugger.show(err: ex.ToString());
+                debugger.show(header: "Add Brach Wire", err: ex.Message);
             }
         }
 
@@ -162,97 +162,113 @@ namespace JPMorrow.UI.ViewModels
             }
             catch (Exception ex)
             {
-                debugger.show(err: ex.ToString());
+                debugger.show(header: "Add Brach Wire", err: ex.Message);
             }
         }
 
         public void MarkConduitNoWireExport(Window window)
         {
-
-            var runs = Run_Items.Where(x => x.IsSelected).Select(x => x.Value).ToList();
-
-            if (!runs.Any()) return;
-
-            WireType type = Wire.GetWireType(Export_Type_Items[Sel_Export_Type]);
-
-            bool unmark(int[] ids) =>
-                ALS.AppData.GetSelectedConduitPackage().WireManager.GetWires(ids)
-                .Any(x => x.IsNoWireExport(type));
-
-            foreach (var run in runs)
+            try
             {
-                var ids = run.WireIds;
+                var runs = Run_Items.Where(x => x.IsSelected).Select(x => x.Value).ToList();
+                if (!runs.Any()) return;
+                WireType type = Wire.GetWireType(Export_Type_Items[Sel_Export_Type]);
 
-                if (unmark(ids))
+                bool unmark(int[] ids) =>
+                    ALS.AppData.GetSelectedConduitPackage().WireManager.GetWires(ids)
+                    .Any(x => x.IsNoWireExport(type));
+
+                foreach (var run in runs)
                 {
-                    ALS.AppData.GetSelectedConduitPackage().WireManager.RemoveWires(ids);
+                    var ids = run.WireIds;
+
+                    if (unmark(ids))
+                    {
+                        ALS.AppData.GetSelectedConduitPackage().WireManager.RemoveWires(ids);
+                    }
+                    else
+                    {
+                        ALS.AppData.GetSelectedConduitPackage().WireManager.RemoveWires(ids);
+                        var wire = new Wire("NO WIRE EXPORT", "NO WIRE EXPORT", "NO WIRE EXPORT", type, WireMaterialType.Special);
+                        ALS.AppData.GetSelectedConduitPackage().WireManager.StoreDistWire(ids, wire);
+                    }
                 }
-                else
-                {
-                    ALS.AppData.GetSelectedConduitPackage().WireManager.RemoveWires(ids);
-                    var wire = new Wire("NO WIRE EXPORT", "NO WIRE EXPORT", "NO WIRE EXPORT", type, WireMaterialType.Special);
-                    ALS.AppData.GetSelectedConduitPackage().WireManager.StoreDistWire(ids, wire);
-                }
+
+                RefreshDataGrids(BOMDataGrid.Runs);
             }
-
-            RefreshDataGrids(BOMDataGrid.Runs);
+            catch (Exception ex)
+            {
+                debugger.show(header: "Mark Conduit No Wire Export", err: ex.Message);
+            }
         }
 
         // add the wire that is reported in the wire size parameter
         public void AddReportedWires(Window window)
         {
-            var selected_pres = Selected_Run_Items;
-
-            if (!selected_pres.Any())
+            try
             {
-                debugger.show(
-                    header: "Add Reported Wire",
-                    err: "You must select some conduit runs to add their reported wire");
-                return;
+                var selected_pres = Selected_Run_Items;
+
+                if (!selected_pres.Any())
+                {
+                    debugger.show(
+                        header: "Add Reported Wire",
+                        err: "You must select some conduit runs to add their reported wire");
+                    return;
+                }
+
+                ReportableWireSizes wire_sizes = new ReportableWireSizes(Wire.WireSizes);
+                string panel_voltage = Reported_Wire_Panel_Voltage_Items[Sel_Reported_Wire_Panel_Voltage];
+
+                foreach (var presenter in selected_pres)
+                {
+                    var rep_wire_str = presenter.Value.ReportedWireSizes;
+                    ReportedWireCollection wires = ReportedWireConverter
+                        .GetWireFromReportedWires(wire_sizes, rep_wire_str, panel_voltage);
+                }
             }
-
-            ReportableWireSizes wire_sizes = new ReportableWireSizes(Wire.WireSizes);
-            string panel_voltage = Reported_Wire_Panel_Voltage_Items[Sel_Reported_Wire_Panel_Voltage];
-
-            foreach (var presenter in selected_pres)
+            catch (Exception ex)
             {
-                var rep_wire_str = presenter.Value.ReportedWireSizes;
-                ReportedWireCollection wires = ReportedWireConverter
-                    .GetWireFromReportedWires(wire_sizes, rep_wire_str, panel_voltage);
-
-
+                debugger.show(header: "Add Reported Wires", err: ex.Message);
             }
         }
 
         // remove selected wire from the wiremanager
         public void RemoveWire(Window window)
         {
-            var sel_presenters = Selected_Run_Items.ToList();
-            if (!sel_presenters.Any()) return;
-
-            var sel_wires = Wire_Items.Where(x => x.IsSelected).Select(x => x.Value).ToList();
-            if (!sel_wires.Any()) return;
-
-            List<Wire> display_wire = new List<Wire>();
-
-            foreach (var run in sel_presenters.Select(x => x.Value))
+            try
             {
-                var ids = run.WireIds;
+                var sel_presenters = Selected_Run_Items.ToList();
+                if (!sel_presenters.Any()) return;
 
-                foreach (var wire in sel_wires)
+                var sel_wires = Wire_Items.Where(x => x.IsSelected).Select(x => x.Value).ToList();
+                if (!sel_wires.Any()) return;
+
+                List<Wire> display_wire = new List<Wire>();
+
+                foreach (var run in sel_presenters.Select(x => x.Value))
                 {
-                    if (ALS.AppData.GetSelectedConduitPackage().WireManager.ContainsWire(ids, wire))
-                        ALS.AppData.GetSelectedConduitPackage().WireManager.RemoveWire(ids, wire, out int rem);
+                    var ids = run.WireIds;
+
+                    foreach (var wire in sel_wires)
+                    {
+                        if (ALS.AppData.GetSelectedConduitPackage().WireManager.ContainsWire(ids, wire))
+                            ALS.AppData.GetSelectedConduitPackage().WireManager.RemoveWire(ids, wire, out int rem);
+                    }
+
+
+                    display_wire.AddRange(ALS.AppData.GetSelectedConduitPackage().WireManager.GetWires(ids));
                 }
 
-
-                display_wire.AddRange(ALS.AppData.GetSelectedConduitPackage().WireManager.GetWires(ids));
+                Wire_Items.Clear();
+                display_wire.ForEach(x => Wire_Items.Add(new WirePresenter(x, ALS.Info)));
+                RefreshDataGrids(BOMDataGrid.SelectedRuns, BOMDataGrid.Wire);
+                WriteToLog("Removed selected wire.");
             }
-
-            Wire_Items.Clear();
-            display_wire.ForEach(x => Wire_Items.Add(new WirePresenter(x, ALS.Info)));
-            RefreshDataGrids(BOMDataGrid.SelectedRuns, BOMDataGrid.Wire);
-            WriteToLog("Removed selected wire.");
+            catch (Exception ex)
+            {
+                debugger.show(header: "Remove Wire", err: ex.Message);
+            }
         }
 
         private MasterDataPackage OtherProject = null;
@@ -286,7 +302,7 @@ namespace JPMorrow.UI.ViewModels
             }
             catch (Exception ex)
             {
-                debugger.show(err: ex.Message);
+                debugger.show(header: "Migrate Project", err: ex.Message);
             }
         }
 
@@ -319,7 +335,7 @@ namespace JPMorrow.UI.ViewModels
             }
             catch (Exception ex)
             {
-                debugger.show(err: ex.Message);
+                debugger.show(header: "Migrate Wire", err: ex.Message);
             }
         }
 
@@ -355,7 +371,7 @@ namespace JPMorrow.UI.ViewModels
             }
             catch (Exception ex)
             {
-                debugger.show(err: ex.Message);
+                debugger.show(header: "Migrate Wire Selection Changed", err: ex.Message);
             }
         }
 

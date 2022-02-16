@@ -59,7 +59,7 @@ namespace JPMorrow.UI.ViewModels
             }
             catch (Exception ex)
             {
-                debugger.show(err: ex.ToString());
+                debugger.show(header: "Add All Runs", err: ex.Message);
             }
         }
 
@@ -105,7 +105,7 @@ namespace JPMorrow.UI.ViewModels
             }
             catch (Exception ex)
             {
-                debugger.show(err: ex.ToString());
+                debugger.show(header: "Add All Runs By Workset And Level", err: ex.Message);
             }
         }
 
@@ -138,7 +138,7 @@ namespace JPMorrow.UI.ViewModels
             }
             catch (Exception ex)
             {
-                debugger.show(err: ex.ToString());
+                debugger.show(header: "Add Single Run", err: ex.Message);
             }
         }
 
@@ -147,16 +147,22 @@ namespace JPMorrow.UI.ViewModels
         /// </summary>
         public void UpdateRuns(Window window)
         {
+            try
+            {
+                if (!ALS.AppData.GetSelectedConduitPackage().Cris.Any()) return;
 
-            if (!ALS.AppData.GetSelectedConduitPackage().Cris.Any()) return;
+                var gen_ids = ALS.AppData.GetSelectedConduitPackage().Cris
+                    .Select(x => new ElementId(x.ConduitIds.First())).ToList();
 
-            var gen_ids = ALS.AppData.GetSelectedConduitPackage().Cris
-                .Select(x => new ElementId(x.ConduitIds.First())).ToList();
-
-            ALS.AppData.GetSelectedConduitPackage().Cris.Clear();
-            ConduitRunInfo.ProcessCRIFromConduitId(ALS.Info, gen_ids, ALS.AppData.GetSelectedConduitPackage().Cris);
-            RefreshDataGrids(BOMDataGrid.Runs, BOMDataGrid.SelectedRuns, BOMDataGrid.Wire);
-            WriteToLog("All runs have been updated");
+                ALS.AppData.GetSelectedConduitPackage().Cris.Clear();
+                ConduitRunInfo.ProcessCRIFromConduitId(ALS.Info, gen_ids, ALS.AppData.GetSelectedConduitPackage().Cris);
+                RefreshDataGrids(BOMDataGrid.Runs, BOMDataGrid.SelectedRuns, BOMDataGrid.Wire);
+                WriteToLog("All runs have been updated");
+            }
+            catch (Exception ex)
+            {
+                debugger.show(header: "Update Runs", err: ex.Message);
+            }
         }
 
         /// <summary>
@@ -164,37 +170,51 @@ namespace JPMorrow.UI.ViewModels
         /// </summary>
         public void RemoveSelectedRuns(Window window)
         {
-            var presenters = Run_Items.Where(x => x.IsSelected).ToList();
+            try
+            {
+                var presenters = Run_Items.Where(x => x.IsSelected).ToList();
 
-            Selected_Run_Items.Clear();
-            Update("Selected_Run_Items");
+                Selected_Run_Items.Clear();
+                Update("Selected_Run_Items");
 
-            if (!presenters.Any()) return;
+                if (!presenters.Any()) return;
 
-            presenters.ForEach(x => Run_Items.Remove(x));
-            var runs = presenters.Select(x => x.Value).ToList();
-            runs.ForEach(x => ALS.AppData.GetSelectedConduitPackage().Cris.Remove(x));
+                presenters.ForEach(x => Run_Items.Remove(x));
+                var runs = presenters.Select(x => x.Value).ToList();
+                runs.ForEach(x => ALS.AppData.GetSelectedConduitPackage().Cris.Remove(x));
 
-            // clear wire
-            runs.ForEach(x => ALS.AppData.GetSelectedConduitPackage().WireManager.RemoveWires(x.WireIds));
+                // clear wire
+                runs.ForEach(x => ALS.AppData.GetSelectedConduitPackage().WireManager.RemoveWires(x.WireIds));
 
-            RefreshDataGrids(BOMDataGrid.Runs, BOMDataGrid.SelectedRuns, BOMDataGrid.Wire);
-            WriteToLog(presenters.Count().ToString() + " selected runs were removed");
+                RefreshDataGrids(BOMDataGrid.Runs, BOMDataGrid.SelectedRuns, BOMDataGrid.Wire);
+                WriteToLog(presenters.Count().ToString() + " selected runs were removed");
+            }
+            catch (Exception ex)
+            {
+                debugger.show(header: "Remove Selected Runs", err: ex.Message);
+            }
         }
 
         public void ClearRuns(Window window)
         {
 
-            var cri_cnt = ALS.AppData.GetSelectedConduitPackage().Cris.Count();
+            try
+            {
+                var cri_cnt = ALS.AppData.GetSelectedConduitPackage().Cris.Count();
 
-            ALS.AppData.GetSelectedConduitPackage().Cris
-                .ForEach(x => ALS.AppData.GetSelectedConduitPackage().WireManager.RemoveWires(x.WireIds));
+                ALS.AppData.GetSelectedConduitPackage().Cris
+                    .ForEach(x => ALS.AppData.GetSelectedConduitPackage().WireManager.RemoveWires(x.WireIds));
 
-            ALS.AppData.GetSelectedConduitPackage().Cris.Clear();
-            Run_Items.Clear();
+                ALS.AppData.GetSelectedConduitPackage().Cris.Clear();
+                Run_Items.Clear();
 
-            WriteToLog("Cleared " + cri_cnt + " conduit runs");
-            RefreshDataGrids(BOMDataGrid.Runs, BOMDataGrid.SelectedRuns, BOMDataGrid.Wire);
+                WriteToLog("Cleared " + cri_cnt + " conduit runs");
+                RefreshDataGrids(BOMDataGrid.Runs, BOMDataGrid.SelectedRuns, BOMDataGrid.Wire);
+            }
+            catch (Exception ex)
+            {
+                debugger.show(header: "Clear Runs", err: ex.Message);
+            }
         }
 
 
@@ -203,44 +223,57 @@ namespace JPMorrow.UI.ViewModels
         /// </summary>
         public void SelectRun(Window window)
         {
-            var presenters = Run_Items.Where(x => x.IsSelected);
+            try
+            {
+                var presenters = Run_Items.Where(x => x.IsSelected);
 
-            Selected_Run_Items.Clear();
-            presenters.ToList().ForEach(x => Selected_Run_Items.Add(x));
-            Update("Selected_Run_Items");
+                Selected_Run_Items.Clear();
+                presenters.ToList().ForEach(x => Selected_Run_Items.Add(x));
+                Update("Selected_Run_Items");
 
-            List<ElementId> selected_runs = new List<ElementId>();
+                List<ElementId> selected_runs = new List<ElementId>();
 
-            presenters
-                .Select(x => x.Value)
-                .ToList().ForEach(x => x.WireIds.Concat(x.FittingIds).ToArray()
-                .ToList().ForEach(z => selected_runs
-                .Add(new ElementId(z))));
+                presenters
+                    .Select(x => x.Value)
+                    .ToList().ForEach(x => x.WireIds.Concat(x.FittingIds).ToArray()
+                    .ToList().ForEach(z => selected_runs
+                    .Add(new ElementId(z))));
 
-            if (!selected_runs.Any()) return;
-            ALS.Info.SEL.SetElementIds(selected_runs);
+                if (!selected_runs.Any()) return;
+                ALS.Info.SEL.SetElementIds(selected_runs);
 
-            List<Wire> wires = new List<Wire>();
-            Run_Items.Where(x => x.IsSelected).ToList().ForEach(x =>
-                wires.AddRange(ALS.AppData.GetSelectedConduitPackage().WireManager.GetWires(x.Value.WireIds)));
+                List<Wire> wires = new List<Wire>();
+                Run_Items.Where(x => x.IsSelected).ToList().ForEach(x =>
+                    wires.AddRange(ALS.AppData.GetSelectedConduitPackage().WireManager.GetWires(x.Value.WireIds)));
 
-            Wire_Items.Clear();
-            wires.ForEach(x => Wire_Items.Add(new WirePresenter(x, ALS.Info)));
+                Wire_Items.Clear();
+                wires.ForEach(x => Wire_Items.Add(new WirePresenter(x, ALS.Info)));
 
-            RefreshDataGrids(BOMDataGrid.Wire);
+                RefreshDataGrids(BOMDataGrid.Wire);
+            }
+            catch (Exception ex)
+            {
+                debugger.show(header: "Select Run", err: ex.Message);
+            }
         }
 
         public void ChangeConduitMaterialType(Window window)
         {
+            try
+            {
+                var runs = Run_Items.Where(x => x.IsSelected).Select(x => x.Value).ToList();
 
-            var runs = Run_Items.Where(x => x.IsSelected).Select(x => x.Value).ToList();
+                if (!runs.Any()) return;
 
-            if (!runs.Any()) return;
+                var change_mat = Conduit_Material_Items[Sel_Conduit_Material];
+                runs.ForEach(x => x.OverrideMaterialType(change_mat));
 
-            var change_mat = Conduit_Material_Items[Sel_Conduit_Material];
-            runs.ForEach(x => x.OverrideMaterialType(change_mat));
-
-            RefreshDataGrids(BOMDataGrid.Runs, BOMDataGrid.SelectedRuns, BOMDataGrid.Wire);
+                RefreshDataGrids(BOMDataGrid.Runs, BOMDataGrid.SelectedRuns, BOMDataGrid.Wire);
+            }
+            catch (Exception ex)
+            {
+                debugger.show(header: "Change Conduit Material Type", err: ex.Message);
+            }
         }
 
         public void CombineLikeRuns(Window window)
@@ -290,18 +323,25 @@ namespace JPMorrow.UI.ViewModels
 
         public void SelectAllRuns(Window window)
         {
-            var presenters = Run_Items.ToList();
+            try
+            {
+                var presenters = Run_Items.ToList();
 
-            List<ElementId> selected_runs = new List<ElementId>();
+                List<ElementId> selected_runs = new List<ElementId>();
 
-            presenters
-                .Select(x => x.Value)
-                .ToList().ForEach(x => x.WireIds.Concat(x.FittingIds).ToArray()
-                .ToList().ForEach(z => selected_runs
-                .Add(new ElementId(z))));
+                presenters
+                    .Select(x => x.Value)
+                    .ToList().ForEach(x => x.WireIds.Concat(x.FittingIds).ToArray()
+                    .ToList().ForEach(z => selected_runs
+                    .Add(new ElementId(z))));
 
-            if (!selected_runs.Any()) return;
-            ALS.Info.SEL.SetElementIds(selected_runs);
+                if (!selected_runs.Any()) return;
+                ALS.Info.SEL.SetElementIds(selected_runs);
+            }
+            catch (Exception ex)
+            {
+                debugger.show(header: "Select All Runs", err: ex.Message);
+            }
         }
 
         public void GetConduitLoad(Window window)
@@ -327,7 +367,7 @@ namespace JPMorrow.UI.ViewModels
             }
             catch (Exception ex)
             {
-                debugger.show(err: ex.ToString());
+                debugger.show(header: "Get Conduit Load", err: ex.Message);
             }
         }
 
@@ -342,7 +382,7 @@ namespace JPMorrow.UI.ViewModels
             }
             catch (Exception ex)
             {
-                debugger.show(err: ex.ToString());
+                debugger.show(header: "Get Strut Length From Selected", err: ex.Message);
             }
         }
 
@@ -359,7 +399,7 @@ namespace JPMorrow.UI.ViewModels
             }
             catch (Exception ex)
             {
-                debugger.show(err: ex.ToString());
+                debugger.show(header: "Fix To/From", err: ex.Message);
             }
         }
     }

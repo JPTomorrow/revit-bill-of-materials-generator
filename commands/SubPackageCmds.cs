@@ -109,10 +109,30 @@ namespace JPMorrow.UI.ViewModels
             try
             {
                 var new_package_name = PromptNewPackageName();
-                AddNewConduitSubPackage(new_package_name);
-                AddNewHangerSubPackage(new_package_name);
-                AddNewHardwareSubPackage(new_package_name);
-                AddNewGlobalSettingsSubPackage(new_package_name);
+                if (string.IsNullOrWhiteSpace(new_package_name)) return;
+
+                var s = ALS.AppData.AddNewAllSubPackage(new_package_name);
+
+                if (!s)
+                {
+                    debugger.show(err: "Package name already exists. Cancelling creation of new package.");
+                    return;
+                }
+
+                bool ss = ALS.AppData.SelectAllPackage(new_package_name);
+
+                if (!ss)
+                {
+                    debugger.show(err: "Failed to select package..");
+                    return;
+                }
+
+                ConduitPackageNameItems.Add(new_package_name);
+                HangerPackageNameItems.Add(new_package_name);
+                HardwarePackageNameItems.Add(new_package_name);
+                GlobalSettingsPackageNameItems.Add(new_package_name);
+
+                UpdateComboboxPackageNames(new_package_name);
             }
             catch (Exception ex)
             {
@@ -120,225 +140,62 @@ namespace JPMorrow.UI.ViewModels
             }
         }
 
-        private void AddNewConduitSubPackage(string new_package_name)
-        {
-
-            if (string.IsNullOrWhiteSpace(new_package_name)) return;
-
-            bool s = ALS.AppData.AddNewConduitSubPackage(new_package_name);
-
-            if (!s)
-            {
-                debugger.show(err: "Package name already exists. Cancelling creation of new package.");
-                return;
-            }
-
-            bool ss = ALS.AppData.SelectConduitPackage(new_package_name, out var package);
-
-            if (!ss)
-            {
-                debugger.show(err: "Failed to select package..");
-                return;
-            }
-
-            ConduitPackageNameItems.Add(package.PackageName);
-            SelConduitPackage = ALS.AppData.SelectedConduitPackageIdx;
-            Update("SelConduitPackage");
-        }
-
-        public void RemoveConduitSubPackage(Window window)
-        {
-
-        }
-
         public void ConduitSubPackageSelectionChanged(Window window)
         {
             try
             {
-                Update("SelConduitPackage");
-                Update("ConduitPackageNameItems");
-
-                var has_valid_idx = ConduitPackageNameItems.Any() && SelConduitPackage >= 0 && SelConduitPackage < ConduitPackageNameItems.Count;
-                // prompt user if problem loading package
-                if (!has_valid_idx)
-                {
-                    debugger.show(header: "Conduit Sub Package Selection Changed", err: "Failed to load selected conduit sub package.\nConduit Sub Package Index: " + SelConduitPackage + "\nLoading default sub package.");
-                    SelConduitPackage = 0;
-                    Update("SelConduitPackage");
-                }
-
+                UpdateSubPackageText();
                 var package_name = ConduitPackageNameItems[SelConduitPackage];
-                if (string.IsNullOrWhiteSpace(package_name))
-                    throw new Exception("The selectd package name does not exist.");
-
-                bool ss = ALS.AppData.SelectConduitPackage(package_name, out var package);
-                RefreshDataGrids(BOMDataGrid.Runs, BOMDataGrid.SelectedRuns, BOMDataGrid.Wire);
+                UpdateComboboxPackageNames(package_name);
+                RefreshDataGrids(BOMDataGrid.All);
             }
             catch (Exception ex)
             {
-                debugger.show(err: ex.ToString());
+                debugger.show(header: "Conduit Sub Package Selection Changed", err: ex.Message);
             }
-        }
-
-        /// <summary>
-        /// Hangers
-        /// </summary>
-
-        private void AddNewHangerSubPackage(string new_package_name)
-        {
-            if (string.IsNullOrWhiteSpace(new_package_name)) return;
-
-            bool s = ALS.AppData.AddNewHangerSubPackage(new_package_name);
-
-            if (!s)
-            {
-                debugger.show(err: "Package name already exists. Cancelling creation of new package.");
-                return;
-            }
-
-            bool ss = ALS.AppData.SelectHangerPackage(new_package_name, out var package);
-
-            if (!ss)
-            {
-                debugger.show(err: "Failed to select package..");
-                return;
-            }
-
-            HangerPackageNameItems.Add(package.PackageName);
-            SelHangerPackage = ALS.AppData.SelectedHangerPackageIdx;
-            Update("SelHangerPackage");
-        }
-
-        public void RemoveHangerSubPackage(Window window)
-        {
-
         }
 
         public void HangerSubPackageSelectionChanged(Window window)
         {
             try
             {
-                Update("SelHangerPackage");
-                Update("HangerPackageNameItems");
-
-                var has_valid_idx = HangerPackageNameItems.Any() && SelHangerPackage >= 0 && SelHangerPackage < HangerPackageNameItems.Count;
-                // prompt user if problem loading package
-                if (!has_valid_idx)
-                {
-                    debugger.show(header: "Hanger Sub Package Selection Changed", err: "Failed to load selected Hanger sub package.\nHanger Sub Package Index: " + SelHangerPackage + "\nLoading default sub package.");
-                    SelHangerPackage = 0;
-                    Update("SelHangerPackage");
-                }
-
+                UpdateSubPackageText();
                 var package_name = HangerPackageNameItems[SelHangerPackage];
-                if (string.IsNullOrWhiteSpace(package_name))
-                    throw new Exception("The selectd package name does not exist.");
-
-                bool ss = ALS.AppData.SelectHangerPackage(package_name, out var package);
-                RefreshDataGrids(BOMDataGrid.Hangers);
+                UpdateComboboxPackageNames(package_name);
+                RefreshDataGrids(BOMDataGrid.All);
             }
             catch (Exception ex)
             {
-                debugger.show(err: ex.ToString());
+                debugger.show(header: "Hanger Sub Package Selection Changed", err: ex.Message);
             }
-        }
-
-        /// <summary>
-        /// Hardware
-        /// </summary>
-
-        private void AddNewHardwareSubPackage(string new_package_name)
-        {
-            if (string.IsNullOrWhiteSpace(new_package_name)) return;
-
-            bool s = ALS.AppData.AddNewHardwareSubPackage(new_package_name);
-
-            if (!s)
-            {
-                debugger.show(err: "Package name already exists. Cancelling creation of new package.");
-                return;
-            }
-
-            bool ss = ALS.AppData.SelectHardwarePackage(new_package_name, out var package);
-
-            if (!ss)
-            {
-                debugger.show(err: "Failed to select package..");
-                return;
-            }
-
-            HardwarePackageNameItems.Add(package.PackageName);
-            SelHardwarePackage = ALS.AppData.SelectedHardwarePackageIdx;
-            Update("SelHardwarePackage");
-        }
-
-        public void RemoveHardwareSubPackage(Window window)
-        {
-
         }
 
         public void HardwareSubPackageSelectionChanged(Window window)
         {
             try
             {
-                Update("SelHardwarePackage");
+                UpdateSubPackageText();
                 var package_name = HardwarePackageNameItems[SelHardwarePackage];
-                if (string.IsNullOrWhiteSpace(package_name))
-                    throw new Exception("The selectd package name does not exist.");
-
-                bool ss = ALS.AppData.SelectHardwarePackage(package_name, out var package);
-                RefreshDataGrids(BOMDataGrid.Hardware);
+                UpdateComboboxPackageNames(package_name);
+                RefreshDataGrids(BOMDataGrid.All);
             }
             catch (Exception ex)
             {
-                debugger.show(err: ex.ToString());
+                debugger.show(header: "Hardware Sub Package Selection Changed", err: ex.Message);
             }
         }
 
-        /// <summary>
-        /// GlobalSettings
-        /// </summary>
-
-        private void AddNewGlobalSettingsSubPackage(string new_package_name)
-        {
-            if (string.IsNullOrWhiteSpace(new_package_name)) return;
-
-            bool s = ALS.AppData.AddNewGlobalSettingsSubPackage(new_package_name);
-
-            if (!s)
-            {
-                debugger.show(err: "Package name already exists. Cancelling creation of new package.");
-                return;
-            }
-
-            bool ss = ALS.AppData.SelectGlobalSettingsPackage(new_package_name, out var package);
-
-            if (!ss)
-            {
-                debugger.show(err: "Failed to select package..");
-                return;
-            }
-
-            GlobalSettingsPackageNameItems.Add(package.PackageName);
-            SelGlobalSettingsPackage = ALS.AppData.SelectedGlobalSettingsPackageIdx;
-            Update("SelGlobalSettingsPackage");
-        }
-
-        public void RemoveGlobalSettingsSubPackage(Window window)
-        {
-
-        }
 
         public void GlobalSettingsSubPackageSelectionChanged(Window window)
         {
             try
             {
-                Update("SelGlobalSettingsPackage");
+                UpdateSubPackageText();
                 var package_name = GlobalSettingsPackageNameItems[SelGlobalSettingsPackage];
-                if (string.IsNullOrWhiteSpace(package_name))
-                    throw new Exception("The selectd package name does not exist.");
+                UpdateComboboxPackageNames(package_name);
+                RefreshDataGrids(BOMDataGrid.All);
 
-                bool ss = ALS.AppData.SelectGlobalSettingsPackage(package_name, out var package);
+                var package = ALS.AppData.GetSelectedGlobalSettingsPackage();
                 Export_Title_Txt = package.ExportTitle;
                 Area_Title_Txt = package.AreaTitle;
 
@@ -347,8 +204,56 @@ namespace JPMorrow.UI.ViewModels
             }
             catch (Exception ex)
             {
-                debugger.show(err: ex.ToString());
+                debugger.show(header: "Global Settings Sub Package Selection Changed", err: ex.Message);
             }
+        }
+
+        public void UpdateSubPackageText()
+        {
+            Update("SelConduitPackage");
+            Update("ConduitPackageNameItems");
+            Update("SelGlobalSettingsPackage");
+            Update("SelHangerPackage");
+            Update("HangerPackageNameItems");
+            Update("SelHardwarePackage");
+        }
+
+        public void UpdateComboboxPackageNames(string package_name)
+        {
+            ALS.AppData.SelectConduitPackage(package_name, out _);
+            ALS.AppData.SelectHangerPackage(package_name, out _);
+            ALS.AppData.SelectHardwarePackage(package_name, out _);
+            ALS.AppData.SelectGlobalSettingsPackage(package_name, out _);
+
+            SelConduitPackage = ALS.AppData.SelectedConduitPackageIdx;
+            SelHangerPackage = ALS.AppData.SelectedHangerPackageIdx;
+            SelHardwarePackage = ALS.AppData.SelectedHardwarePackageIdx;
+            SelGlobalSettingsPackage = ALS.AppData.SelectedGlobalSettingsPackageIdx;
+
+            Update("SelConduitPackage");
+            Update("SelHangerPackage");
+            Update("SelHardwarePackage");
+            Update("SelGlobalSettingsPackage");
+        }
+
+        public void RemoveGlobalSettingsSubPackage(Window window)
+        {
+            return;
+        }
+
+        public void RemoveHardwareSubPackage(Window window)
+        {
+            return;
+        }
+
+        public void RemoveConduitSubPackage(Window window)
+        {
+            return;
+        }
+
+        public void RemoveHangerSubPackage(Window window)
+        {
+            return;
         }
     }
 }

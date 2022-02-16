@@ -6,9 +6,14 @@
 <br/><br/>
 
 # Todo
+- check pull box sizes for accuracy
+- make the program auto save the package every 3 mins
+- make selecting a package from the drop down switch all the packages. Then add a bool in the settings to separate it, like it is now.
+- make strut hanger generation not suck
+- tokenize some string for newline in the BOM title like 'MEC2.1C - Level 1 Area C - Overhead Branch - '
 - Fix 1/2" washers and hex nuts [0.016	C] and [0.02	C] respectively  not showing up
 - Add [Caddy 4Z34812M Multi Function ] x1 for every helicopter bracket
-- 2x square washers and 1x hex nut per threaded rod
+- 2x square washers and 1x hex nut per threaded rod (really you should count anchors to get to this.)
 - (12/2/21) Update labor tab GUI
 - (12/2/21) Update Hardware tab GUI
 - (12/2/21) Update Voltage Drop GUI
@@ -19,6 +24,7 @@
 - (12/2/21) Fix Help Menu GUI
 
 # Completed
+- make program prompt to load or create new package on first load when no package path is set
 - Show Elbows above 1 1/4" on distribution
 - Don't show elbows on branch
 - Fix accumulating strut straps between runs

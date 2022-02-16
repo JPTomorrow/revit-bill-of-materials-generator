@@ -18,12 +18,11 @@ namespace JPMorrow.UI.ViewModels
         {
             try
             {
-
                 throw new NotImplementedException("This is not implemented");
             }
             catch (Exception ex)
             {
-                debugger.show(err: ex.ToString());
+                debugger.show(header: "Add P3 Fixtures In View", err: ex.Message);
             }
         }
 
@@ -36,7 +35,7 @@ namespace JPMorrow.UI.ViewModels
             }
             catch (Exception ex)
             {
-                debugger.show(err: ex.ToString());
+                debugger.show(header: "Select P3 Lighting Network", err: ex.Message);
             }
         }
 
@@ -49,7 +48,7 @@ namespace JPMorrow.UI.ViewModels
             }
             catch (Exception ex)
             {
-                debugger.show(err: ex.ToString());
+                debugger.show(header: "P3 Lighting Fixture Sel Changed", err: ex.Message);
             }
         }
 
@@ -57,12 +56,11 @@ namespace JPMorrow.UI.ViewModels
         {
             try
             {
-
                 debugger.show(err: "debug selected p3 fixture test");
             }
             catch (Exception ex)
             {
-                debugger.show(err: ex.ToString());
+                debugger.show(header: "Debug Selected P3 Lighting Fixture", err: ex.Message);
             }
         }
     }

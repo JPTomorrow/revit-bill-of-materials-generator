@@ -12,49 +12,50 @@ namespace JPMorrow.UI.Views
     /// Code Behind landing for templateForm.xaml
     /// </summary>
     public partial class ParentView : Window, IComponentConnector
-	{
-		/// <summary>
-		/// Default Constructor.static Bind DataContext
-		/// </summary>
-		public ParentView(ModelInfo info, IntPtr parent_wind_handle)
-		{
-			InitializeComponent();
+    {
+        /// <summary>
+        /// Default Constructor.static Bind DataContext
+        /// </summary>
+        public ParentView(ModelInfo info, IntPtr parent_wind_handle)
+        {
+            InitializeComponent();
 
-			// set parent window to passed handle
-			var interop = new WindowInteropHelper(this);
-			interop.EnsureHandle();
-			interop.Owner = parent_wind_handle;
+            // set parent window to passed handle
+            var interop = new WindowInteropHelper(this);
+            interop.EnsureHandle();
+            interop.Owner = parent_wind_handle;
 
-			this.DataContext = new ParentViewModel(info);
-		}
+            var vm = new ParentViewModel(info);
+            this.DataContext = vm;
+        }
 
-		/// <summary>
-		/// Custom Window Drag on DockPanel
-		/// </summary>
-		private void WindowDrag(object o, MouseEventArgs e)
-		{
-            if (this.WindowState == System.Windows.WindowState.Maximized) 
+        /// <summary>
+        /// Custom Window Drag on DockPanel
+        /// </summary>
+        private void WindowDrag(object o, MouseEventArgs e)
+        {
+            if (this.WindowState == System.Windows.WindowState.Maximized)
             {
-                this.WindowState = System.Windows.WindowState.Normal; 
+                this.WindowState = System.Windows.WindowState.Normal;
             }
-            
-			this.DragMove();
-		}
 
-		/// <summary>
-		/// Custom Window Drag on DockPanel
-		/// </summary>
-		private void HelpClick(object o, RoutedEventArgs e)
-		{
-            
-		}
+            this.DragMove();
+        }
 
-		/// <summary>
-		/// Custom Window Drag on DockPanel
-		/// </summary>
-		private void ExitClick(object o, RoutedEventArgs e)
-		{
-			this.Close();
-		}
-	}
+        /// <summary>
+        /// Custom Window Drag on DockPanel
+        /// </summary>
+        private void HelpClick(object o, RoutedEventArgs e)
+        {
+
+        }
+
+        /// <summary>
+        /// Custom Window Drag on DockPanel
+        /// </summary>
+        private void ExitClick(object o, RoutedEventArgs e)
+        {
+            this.Close();
+        }
+    }
 }

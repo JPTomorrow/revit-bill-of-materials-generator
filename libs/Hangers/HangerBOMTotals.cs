@@ -193,14 +193,21 @@ namespace JPMorrow.Revit.Hangers
         /// <summary>
         /// Add Hex Nuts to the total
         /// </summary>
-        public void PushHexNuts(string type, string dia, int cnt)
+        public void PushHexNuts(string type, int cnt)
         {
-            int index = HexNuts.FindIndex(ind => ind.Type.Equals(type) && ind.Diameter.Equals(dia));
+            var diameters = new string[] { "1/2\"", "1/4\"" };
+            int idx_one_half = HexNuts.FindIndex(ind => ind.Type.Equals(type) && ind.Diameter.Equals(diameters[0]));
+            int idx_one_quarter = HexNuts.FindIndex(ind => ind.Type.Equals(type) && ind.Diameter.Equals(diameters[1]));
 
-            if (index >= 0)
-                HexNuts[index].Count += cnt;
+            if (idx_one_half >= 0)
+                HexNuts[idx_one_half].Count += cnt;
             else
-                HexNuts.Add(new HangerHexNutsTotal(type, dia, cnt));
+                HexNuts.Add(new HangerHexNutsTotal(type, diameters[0], cnt));
+
+            if (idx_one_quarter >= 0)
+                HexNuts[idx_one_quarter].Count += cnt;
+            else
+                HexNuts.Add(new HangerHexNutsTotal(type, diameters[1], cnt));
         }
 
         /// <summary>
@@ -219,15 +226,21 @@ namespace JPMorrow.Revit.Hangers
         /// <summary>
         /// Add Washers to the total
         /// </summary>
-        public void PushWashers(string type, string dia, int cnt)
+        public void PushWashers(string type, int cnt)
         {
-            int idx = Washers.FindIndex(ind => ind.Type.Equals(type) && ind.Diameter.Equals(dia));
+            var diameters = new string[] { "1/2\"", "1/4\"" };
+            int idx_one_half = Washers.FindIndex(ind => ind.Type.Equals(type) && ind.Diameter.Equals(diameters[0]));
+            int idx_one_quarter = Washers.FindIndex(ind => ind.Type.Equals(type) && ind.Diameter.Equals(diameters[1]));
 
-            if (idx >= 0)
-                Washers[idx].Count += cnt;
+            if (idx_one_half >= 0)
+                Washers[idx_one_half].Count += cnt;
             else
-                Washers.Add(new HangerWashersTotal(type, dia, cnt));
+                Washers.Add(new HangerWashersTotal(type, diameters[0], cnt));
 
+            if (idx_one_quarter >= 0)
+                Washers[idx_one_quarter].Count += cnt;
+            else
+                Washers.Add(new HangerWashersTotal(type, diameters[1], cnt));
         }
 
         /// <summary>

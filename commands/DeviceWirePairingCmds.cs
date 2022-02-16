@@ -22,12 +22,12 @@ namespace JPMorrow.UI.ViewModels
                 OpenFileDialog ofd = new OpenFileDialog();
                 ofd.Filter = "Excel Files|*.xlsx;";
                 var result = ofd.ShowDialog();
-                if(result != DialogResult.OK && result != DialogResult.Yes) return;
+                if (result != DialogResult.OK && result != DialogResult.Yes) return;
                 var filename = ofd.FileName;
 
                 var device_pairings = LowVoltageDeviceAutomation.MakeDevicePairings(filename);
                 var wire_pairings = LowVoltageDeviceAutomation.MakeWirePairings(filename).ToList();
-                
+
                 ALS.AppData.LowVoltageDevicePairings.AddRange(device_pairings);
 
                 wire_pairings.AddRange(ALS.AppData.LowVoltageWirePairings);
@@ -39,9 +39,9 @@ namespace JPMorrow.UI.ViewModels
                 WriteToLog("Added " + device_pairings.Count().ToString() + " device pairings");
                 WriteToLog("Added " + wire_pairings.Count().ToString() + " wire pairings");
             }
-            catch(Exception ex)
+            catch (Exception ex)
             {
-                debugger.show(err:ex.ToString());
+                debugger.show(header: "Import Device Wire Pairings", err: ex.Message);
             }
         }
 
@@ -51,14 +51,14 @@ namespace JPMorrow.UI.ViewModels
             try
             {
                 var pairings = Device_Pairing_Items.Where(x => x.IsSelected).ToList();
-                if(!pairings.Any()) return;
+                if (!pairings.Any()) return;
                 pairings.ForEach(x => ALS.AppData.LowVoltageDevicePairings.Remove(x.Value));
                 RefreshDataGrids(BOMDataGrid.DeviceWirePairings);
                 WriteToLog("Removed " + pairings.Count().ToString() + " device pairings");
             }
-            catch(Exception ex)
+            catch (Exception ex)
             {
-                debugger.show(err:ex.ToString());
+                debugger.show(header: "Remove Device Pairings", err: ex.Message);
             }
         }
 
@@ -68,34 +68,41 @@ namespace JPMorrow.UI.ViewModels
             try
             {
                 var pairings = Wire_Pairing_Items.Where(x => x.IsSelected).ToList();
-                if(!pairings.Any()) return;
+                if (!pairings.Any()) return;
                 pairings.ForEach(x => ALS.AppData.LowVoltageWirePairings.Remove(x.Value));
                 RefreshDataGrids(BOMDataGrid.DeviceWirePairings);
                 WriteToLog("Removed " + pairings.Count().ToString() + " wire pairings");
             }
-            catch(Exception ex)
+            catch (Exception ex)
             {
-                debugger.show(err:ex.ToString());
+                debugger.show(header: "Remove Wire Pairings", err: ex.Message);
             }
         }
 
         // low voltage device tagging designed for NHA but will be refactored to be generic later
-        public void AutomateDeviceTagging(Window window) {
-            
-            debugger.show(
-                header:"Device Tagging", 
-                err:"This will fill in the Device ID parameter on all the electrical fixtures, that have the appropriate" + 
+        public void AutomateDeviceTagging(Window window)
+        {
+            try
+            {
+                debugger.show(
+                header: "Device Tagging",
+                err: "This will fill in the Device ID parameter on all the electrical fixtures, that have the appropriate" +
                 " parameters loaded, in the current view. The format will be [PANEL_NAME]-[DEVICE_NUMBER]-[WIRE_NUMBER]\n\n" +
                 "The following parameters are required on electrical fixtures for this to work:\n\n" +
                 "Panel Fed From\n" + "Device #\n" + "Wire #\n");
 
-            List<ElementId> collected_fixtures = ElementCollector
-                .CollectElements(ALS.Info, BuiltInCategory.OST_ElectricalFixtures, false, "BYPASS")
-                .Element_Ids.ToList();
+                List<ElementId> collected_fixtures = ElementCollector
+                    .CollectElements(ALS.Info, BuiltInCategory.OST_ElectricalFixtures, false, "BYPASS")
+                    .Element_Ids.ToList();
 
-            if(!collected_fixtures.Any()) return;
+                if (!collected_fixtures.Any()) return;
 
-            LowVoltageDeviceAutomation.NHA_TagLowVoltageDevices(ALS.Info, collected_fixtures);
+                LowVoltageDeviceAutomation.NHA_TagLowVoltageDevices(ALS.Info, collected_fixtures);
+            }
+            catch (Exception ex)
+            {
+                debugger.show(header: "Automate Device Tagging", err: ex.Message);
+            }
         }
-	}
+    }
 }

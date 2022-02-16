@@ -31,7 +31,7 @@ namespace JPMorrow.UI.ViewModels
             }
             catch (Exception ex)
             {
-                debugger.show(err: ex.ToString());
+                debugger.show(header: "Master Close", err: ex.Message);
             }
         }
 
@@ -45,7 +45,7 @@ namespace JPMorrow.UI.ViewModels
             }
             catch (Exception ex)
             {
-                debugger.show(err: ex.ToString());
+                debugger.show(header: "Full Action Log", err: ex.Message);
             }
         }
     }
@@ -63,7 +63,7 @@ namespace JPMorrow.UI.ViewModels
             }
             catch (Exception ex)
             {
-                debugger.show(err: ex.ToString());
+                debugger.show(header: "Master Close", err: ex.Message);
             }
         }
     }
@@ -81,7 +81,7 @@ namespace JPMorrow.UI.ViewModels
             }
             catch (Exception ex)
             {
-                debugger.show(err: ex.ToString());
+                debugger.show(header: "Master Close", err: ex.Message);
             }
         }
     }
@@ -99,7 +99,7 @@ namespace JPMorrow.UI.ViewModels
             }
             catch (Exception ex)
             {
-                debugger.show(err: ex.ToString());
+                debugger.show(header: "Master Close", err: ex.Message);
             }
         }
     }
@@ -118,7 +118,7 @@ namespace JPMorrow.UI.ViewModels
             }
             catch (Exception ex)
             {
-                debugger.show(err: ex.ToString());
+                debugger.show(header: "Master Close", err: ex.Message);
             }
         }
 
@@ -130,7 +130,7 @@ namespace JPMorrow.UI.ViewModels
             }
             catch (Exception ex)
             {
-                debugger.show(err: ex.ToString());
+                debugger.show(header: "Close", err: ex.Message);
             }
         }
     }

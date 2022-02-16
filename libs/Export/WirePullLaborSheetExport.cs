@@ -250,15 +250,11 @@ namespace JPMorrow.Excel
             var single_hangers = package.GetSelectedHangerPackage().SingleHangers;
             var strut_hangers = package.GetSelectedHangerPackage().StrutHangers;
 
-            // local functions for hanger hardware
-            string sslen(SingleHanger x) => RMeasure.LengthFromDbl(info.DOC, x.RodDiameter);
-            string stlen(StrutHanger x) => RMeasure.LengthFromDbl(info.DOC, x.RodDiameter);
-            string sflen(FixtureHanger x) => RMeasure.LengthFromDbl(info.DOC, x.RodDiameter);
-
-
             if (h.Any())
             {
                 InsertSingleDivider(Draw.Color.SlateGray, Draw.Color.White, "Misc. Hardware");
+
+                HangerTotal ht = new HangerTotal();
 
                 foreach (HardwareEntry entry in h)
                 {
@@ -268,41 +264,61 @@ namespace JPMorrow.Excel
                     var final_qty = li.Quantity;
 
                     // Hanger Washers on this page per elmores request
-                    if (li.EntryName.ToLower().Contains("washer"))
+                    var has_washer = li.EntryName.ToLower().Contains("washer");
+                    var has_hex = li.EntryName.ToLower().Contains("hex nut");
+                    if (has_washer)
                     {
-                        HangerTotal ht = new HangerTotal();
-
                         // half inch washer counts from hanger anchor count
-
                         fixture_hangers.ForEach(x => ht.PushWashers(
-                            "Washer", sflen(x), x.Hardware.Where(x => x == "Washer").Count()));
+                            "Washer", x.Hardware.Where(x => x == "Washer").Count()));
                         single_hangers.ForEach(x => ht.PushWashers(
-                            "Washer", sslen(x), x.Hardware.Where(x => x == "Washer").Count()));
+                            "Washer", x.Hardware.Where(x => x == "Washer").Count()));
                         strut_hangers.ForEach(x => ht.PushWashers(
-                            "Washer", stlen(x), x.Hardware.Where(x => x == "Washer").Count()));
+                            "Washer", x.Hardware.Where(x => x == "Washer").Count()));
 
                         ht.Washers.RemoveAll(x => x.Count == 0);
-                        final_qty += ht.Washers.Select(x => x.Count).Sum();
                     }
 
                     // Hanger Hex Nuts
-                    if (li.EntryName.ToLower().Contains("hex nut"))
+                    if (has_hex)
                     {
-                        HangerTotal ht = new HangerTotal();
-
                         fixture_hangers.ForEach(x => ht.PushHexNuts(
-                            "Hex Nut", sflen(x), x.Hardware.Where(x => x == "Hex Nut").Count()));
+                            "Hex Nut", x.Hardware.Where(x => x == "Hex Nut").Count()));
                         single_hangers.ForEach(x => ht.PushHexNuts(
-                            "Hex Nut", sslen(x), x.Hardware.Where(x => x == "Hex Nut").Count()));
+                            "Hex Nut", x.Hardware.Where(x => x == "Hex Nut").Count()));
                         strut_hangers.ForEach(x => ht.PushHexNuts(
-                            "Hex Nut", stlen(x), x.Hardware.Where(x => x == "Hex Nut").Count()));
+                            "Hex Nut", x.Hardware.Where(x => x == "Hex Nut").Count()));
 
                         ht.HexNuts.RemoveAll(x => x.Count == 0);
-                        final_qty += ht.HexNuts.Select(x => x.Count).Sum();
                     }
+
+                    if (has_washer || has_hex) continue;
 
                     InsertIntoRow(li.EntryName, final_qty, li.PerUnitLabor, li.LaborCodeLetter, li.TotalLaborValue);
                     gt += li.TotalLaborValue; code_one_gt += li.TotalLaborValue; NextRow(1);
+                }
+
+                // washers and hex nuts from hanger Total
+                if (ht.Washers.Any())
+                {
+                    foreach (var washer in ht.Washers)
+                    {
+                        var has_item = l.GetItem(out var li, (double)washer.Count, "Washer", washer.Diameter);
+                        if (!has_item) throw new Exception("No Labor item for washers");
+                        InsertIntoRow(li.EntryName, washer.Count, li.PerUnitLabor, li.LaborCodeLetter, li.TotalLaborValue);
+                        gt += li.TotalLaborValue; code_one_gt += li.TotalLaborValue; NextRow(1);
+                    }
+                }
+
+                if (ht.HexNuts.Any())
+                {
+                    foreach (var nut in ht.HexNuts)
+                    {
+                        var has_item = l.GetItem(out var li, (double)nut.Count, "Hex Nut", nut.Diameter);
+                        if (!has_item) throw new Exception("No Labor item for hex nuts");
+                        InsertIntoRow(li.EntryName, nut.Count, li.PerUnitLabor, li.LaborCodeLetter, li.TotalLaborValue);
+                        gt += li.TotalLaborValue; code_one_gt += li.TotalLaborValue; NextRow(1);
+                    }
                 }
 
                 InsertGrandTotal("Sub Total", ref gt, true, false, true);

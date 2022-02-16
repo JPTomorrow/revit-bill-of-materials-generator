@@ -254,6 +254,15 @@ namespace JPMorrow.Revit.BOMPackage
             return true;
         }
 
+        public bool AddNewAllSubPackage(string package_name)
+        {
+            var c = AddNewConduitSubPackage(package_name);
+            var h = AddNewHangerSubPackage(package_name);
+            var hw = AddNewHardwareSubPackage(package_name);
+            var gs = AddNewGlobalSettingsSubPackage(package_name);
+            return c && h && hw && gs;
+        }
+
         /// <summary>
         /// Package Selection
         /// </summary>
@@ -316,6 +325,15 @@ namespace JPMorrow.Revit.BOMPackage
             package = GlobalSettingsPackages[idx];
             selectedGlobalSettingsPackageIdx = idx;
             return true;
+        }
+
+        public bool SelectAllPackage(string package_name)
+        {
+            var c = SelectConduitPackage(package_name, out var conduit_package);
+            var h = SelectHangerPackage(package_name, out var hanger_package);
+            var hw = SelectHardwarePackage(package_name, out var hardware_package);
+            var gs = SelectGlobalSettingsPackage(package_name, out var global_settings_package);
+            return (c && h && hw && gs);
         }
 
         public ConduitSubDataPackage GetSelectedConduitPackage()

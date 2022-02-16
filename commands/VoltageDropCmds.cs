@@ -58,7 +58,7 @@ namespace JPMorrow.UI.ViewModels
             }
             catch (Exception ex)
             {
-                debugger.show(err: ex.ToString());
+                debugger.show(header: "Add Voltage Drop Rule", err: ex.Message);
             }
         }
 
@@ -79,7 +79,7 @@ namespace JPMorrow.UI.ViewModels
             }
             catch (Exception ex)
             {
-                debugger.show(err: ex.ToString());
+                debugger.show(header: "Remove Voltage Drop Rule", err: ex.Message);
             }
         }
     }

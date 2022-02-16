@@ -238,7 +238,7 @@ namespace JPMorrow.UI.ViewModels
             }
             catch (Exception ex)
             {
-                debugger.show(err: ex.ToString());
+                debugger.show(header: "Export Selection", err: ex.ToString());
             }
         }
     }

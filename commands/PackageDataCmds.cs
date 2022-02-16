@@ -23,10 +23,13 @@ namespace JPMorrow.UI.ViewModels
         {
             try
             {
-                var result = System.Windows.MessageBox.Show(
+                if (!string.IsNullOrWhiteSpace(packagePath) && !packagePath.Equals("Untitled"))
+                {
+                    var result = System.Windows.MessageBox.Show(
                     "Any unsaved data on your current project will be lost. Do you want to continue??",
                     "New Project", MessageBoxButton.YesNo, MessageBoxImage.Exclamation);
-                if (result.Equals(MessageBoxResult.No)) return;
+                    if (result.Equals(MessageBoxResult.No)) return;
+                }
 
                 // open save file dialog
                 var save_result = SaveFileSelection.Prompt("New Project File Location", "bom");
@@ -60,7 +63,7 @@ namespace JPMorrow.UI.ViewModels
             }
             catch (Exception ex)
             {
-                debugger.show(err: ex.ToString());
+                debugger.show(header: "New Package", err: ex.Message);
             }
         }
 
@@ -95,7 +98,7 @@ namespace JPMorrow.UI.ViewModels
             }
             catch (Exception ex)
             {
-                debugger.show(err: ex.ToString());
+                debugger.show(header: "Load Package", err: ex.Message);
             }
         }
 
@@ -134,7 +137,7 @@ namespace JPMorrow.UI.ViewModels
             }
             catch (Exception ex)
             {
-                debugger.show(err: ex.ToString());
+                debugger.show(header: "Save Package", err: ex.Message);
             }
         }
     }

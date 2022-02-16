@@ -910,7 +910,7 @@
           <Grid.RowDefinitions>
             <RowDefinition Height="40*"/>
             <RowDefinition Height="{Binding Source={StaticResource Datagrid_Size}}"/>
-            <RowDefinition Height="200"/>
+            <RowDefinition Height="300"/>
             <RowDefinition Height="20"/>
           </Grid.RowDefinitions>
 
@@ -941,6 +941,7 @@
                   <ColumnDefinition Width="*"/>
                 </Grid.ColumnDefinitions>
                 <Grid.RowDefinitions>
+                  <RowDefinition Height="40"/>
                   <RowDefinition Height="40"/>
                   <RowDefinition Height="40"/>
                   <RowDefinition Height="40"/>
@@ -1402,8 +1403,6 @@
             <RowDefinition Height="40"/>
             <RowDefinition Height="40"/>
             <RowDefinition Height="40"/>
-            <RowDefinition Height="40"/>
-            <RowDefinition Height="40"/>
           </Grid.RowDefinitions>
 
           <ComboBox Name="GlobalSettingsSubPackageCB" SelectedIndex="{Binding Path=SelGlobalSettingsPackage, Mode=TwoWay}" VerticalContentAlignment="Center" ItemsSource="{Binding GlobalSettingsPackageNameItems}" Margin="3" Grid.Column="0" Grid.Row="0" Grid.ColumnSpan="1">
@@ -1432,12 +1431,12 @@
 
           <Button Name="SaveSettingsButton" Command="{Binding SaveGlobalSettingsCmd}" CommandParameter="{Binding ElementName = WindowBase}" Style="{StaticResource MarathonRed}" Content="Save Settings" Margin="2,2,0,2" BorderThickness="1" Width="auto" Height="auto" Grid.Column="3" Grid.Row="6"/>
 
-          <!-- <TextBlock Text="Hanger Settings" Margin="10,0,0,0" FontSize="18" Foreground="White" Grid.Column="0" Grid.Row="7" Grid.ColumnSpan="2" VerticalAlignment="center" TextDecorations="Underline"/>
-          <Button Name="RestoreHangersButton" Command="{Binding RestoreHangersCmd}" CommandParameter="{Binding ElementName = WindowBase}" Style="{StaticResource MarathonRed}" Content="Restore Hangers" Margin="10,2,0,2" BorderThickness="1" Width="auto" Height="auto" Grid.Column="0" Grid.Row="8"/> -->
-
           <TextBlock Text="BOM Export Root Directory:" Margin="10,0,0,0" FontSize="14" Foreground="White" Grid.Column="0" Grid.ColumnSpan="1" Grid.Row="7" VerticalAlignment="center"/>
           <TextBox Text="{Binding Path=Export_Root_Directory_Txt, Mode=TwoWay}" VerticalContentAlignment="Center" Margin="3" Grid.Column="0" Grid.Row="8" Grid.ColumnSpan="3"/>
           <Button Name="BrowseRootPathButton" Command="{Binding BrowseRootPathCmd}" CommandParameter="{Binding ElementName = WindowBase}" Style="{StaticResource MarathonRed}" Content="Browse" Margin="2,2,0,2" BorderThickness="1" Width="auto" Height="auto" Grid.Column="3" Grid.Row="8"/>
+          
+          <TextBlock Text="Misc. Settings (Does not save with package)" Margin="10,0,0,0" FontSize="18" Foreground="White" Grid.Column="0" Grid.Row="9" Grid.ColumnSpan="4" VerticalAlignment="center" TextDecorations="Underline"/>
+          <CheckBox Name="SeparateSubPackageSelection" Margin="10,0,0,0" Foreground="White" IsChecked="{Binding SeparateSubPackageSelection}" Content="Separate Sub-Package Selection By Tab" Grid.Column="0" Grid.Row="10" Grid.ColumnSpan="4" VerticalAlignment="center"/>
         </Grid>
       </TabItem>
       <!-- Help -->

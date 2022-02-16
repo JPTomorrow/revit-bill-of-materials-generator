@@ -40,12 +40,19 @@ namespace JPMorrow.UI.ViewModels
         // save global settings
         public void SaveGlobalSettings(Window window)
         {
-            ALS.WirePackSettings.CouplingType = Coupling_Mat_Items[Sel_Coupling_Mat_Type];
-            var makeup = RMeasure.LengthDbl(ALS.Info.DOC, Wire_Makeup_Length_Txt);
-            ALS.AppData.GetSelectedGlobalSettingsPackage().WireMakeupLength = makeup;
-            ALS.AppData.GetSelectedGlobalSettingsPackage().ExportTitle = Export_Title_Txt;
-            ALS.AppData.GetSelectedGlobalSettingsPackage().AreaTitle = Area_Title_Txt;
-            WirePackageSettings.Save(ALS.WirePackSettings);
+            try
+            {
+                ALS.WirePackSettings.CouplingType = Coupling_Mat_Items[Sel_Coupling_Mat_Type];
+                var makeup = RMeasure.LengthDbl(ALS.Info.DOC, Wire_Makeup_Length_Txt);
+                ALS.AppData.GetSelectedGlobalSettingsPackage().WireMakeupLength = makeup;
+                ALS.AppData.GetSelectedGlobalSettingsPackage().ExportTitle = Export_Title_Txt;
+                ALS.AppData.GetSelectedGlobalSettingsPackage().AreaTitle = Area_Title_Txt;
+                WirePackageSettings.Save(ALS.WirePackSettings);
+            }
+            catch (Exception ex)
+            {
+                debugger.show(header: "Save Global Settings", err: ex.Message);
+            }
         }
 
         // reset the project file

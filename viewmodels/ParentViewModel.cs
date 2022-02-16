@@ -3,6 +3,7 @@ using System.IO;
 using System.Linq;
 using System.Windows;
 using System.Windows.Controls;
+using forms = System.Windows.Forms;
 using System.Windows.Input;
 using JPMorrow.Data.Globals;
 using JPMorrow.Revit.BOMPackage;
@@ -35,6 +36,7 @@ namespace JPMorrow.UI.ViewModels
     using ObsPanelBacking = om.ObservableCollection<ParentViewModel.BackingPresenter>;
     using ObsPanelboard = om.ObservableCollection<ParentViewModel.PanelboardPresenter>;
     using ObsSingleHanger = om.ObservableCollection<ParentViewModel.SingleHangerPresenter>;
+
     // observable collection aliases
     using ObsStr = om.ObservableCollection<string>;
     using ObsStrutHanger = om.ObservableCollection<ParentViewModel.StrutHangerPresenter>;
@@ -123,6 +125,8 @@ namespace JPMorrow.UI.ViewModels
         public bool Automate_Wire { get; set; } = false;
         public bool NHA_Tag_Low_Voltage_Devices { get; set; } = false;
         public bool Treat_Dist_As_Branch { get; set; } = false;
+        public bool SeparateSubPackageSelection { get; set; } = false;
+
 
         public bool Draw_Single_Debug { get; set; } = false;
         public bool Draw_Strut_Debug { get; set; } = false;
@@ -154,7 +158,6 @@ namespace JPMorrow.UI.ViewModels
         public string Export_Root_Directory_Txt { get; set; }
 
         public ICommand MasterCloseCmd => new RelayCommand<Window>(MasterClose);
-        public ICommand TestCmd => new RelayCommand<Window>(Test);
         public ICommand NewPackageCmd => new RelayCommand<Window>(NewPackage);
         public ICommand LoadPackageCmd => new RelayCommand<Window>(LoadPackage);
         public ICommand SavePackageCmd => new RelayCommand<Window>(SavePackage);
@@ -202,7 +205,6 @@ namespace JPMorrow.UI.ViewModels
 
         public ICommand RemoveSingleHangersCmd => new RelayCommand<Window>(RemoveSingleHangers);
         public ICommand RemoveStrutHangersCmd => new RelayCommand<Window>(RemoveStrutHangers);
-        public ICommand RestoreHangersCmd => new RelayCommand<Window>(RestoreHangers);
         public ICommand SingleHangerSelChangedCmd => new RelayCommand<Window>(SingleHangerSelChanged);
         public ICommand StrutHangerSelChangedCmd => new RelayCommand<Window>(StrutHangerSelChanged);
 
@@ -230,7 +232,6 @@ namespace JPMorrow.UI.ViewModels
 
         public ICommand FullActionLogCmd => new RelayCommand<Window>(FullActionLog);
         public ICommand ExportCmd => new RelayCommand<Window>(ExportSelection);
-        public ICommand PrepViewCmd => new RelayCommand<Window>(PrepView);
 
         public ICommand GetConduitLoadCmd => new RelayCommand<Window>(GetConduitLoad);
         public ICommand GetStrutLengthFromSelectedCmd => new RelayCommand<Window>(GetStrutLengthFromSelected);
@@ -335,13 +336,32 @@ namespace JPMorrow.UI.ViewModels
 
             if (path == "Untitled")
             {
-                WriteToLog("No package to load. Loading default package.");
-                return;
+                var dr = debugger.show_yesno(
+                    header: "Load Master Package",
+                    err: "No project file (.bom) is loaded.",
+                    continue_txt: "Would you like to select a project file to load?");
+
+                if (dr == forms.DialogResult.Yes)
+                {
+                    LoadPackage(null);
+                    WriteToLog("Loaded package at: " + packagePath);
+                    return;
+                }
+                else
+                {
+                    debugger.show(
+                        header: "Load Master Package",
+                        err: "You should not continue without a loaded project file. Loss of data can occur. You will be prompted to pick a save location for a new project file.");
+
+                    NewPackage(null);
+                    WriteToLog("Created new package at: " + packagePath);
+                    return;
+                }
             }
 
             ALS.AppData.LoadPackageFromLocation(path);
             UpdateSubPackages();
-            WriteToLog("Loaded package at: " + packagePath);
+            WriteToLog("Loaded project file at: " + packagePath);
         }
 
         public void UpdateSubPackages()
@@ -503,7 +523,8 @@ namespace JPMorrow.UI.ViewModels
             RefreshDataGrids(BOMDataGrid.All);
 
             // set the directory to which exports are saved
-            ResolveStartupExportDirectory(packagePath);
+            if (packagePath != null && !packagePath.Equals("Untitled"))
+                ResolveStartupExportDirectory(packagePath);
         }
 
         // an enumeration of all the datagrids 
